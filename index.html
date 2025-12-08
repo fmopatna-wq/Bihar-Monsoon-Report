@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="hi" class="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>बिहार मानसून डैशबोर्ड 2025</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    // --- नया बैकग्राउंड कलर टोकन यहाँ है ---
+                    'app-bg': '#F0F9FF', // Light Mode के लिए हल्का नीला (Sky 50)
+                    
+                    // यदि आप Dark Mode के लिए भी अलग बेस बैकग्राउंड कलर रखना चाहते हैं:
+                    'dark-app-bg': '#030712', // Dark Mode के लिए गहरा काला (Gray 950)
+                    // ------------------------------------------
+
+                    primary: '#2E8B57',
+                    secondary: '#E6F4EA',
+                    darkbg: '#1a202c',
+                    carddark: '#2d3748',
+                }
+            }
+        }
+    }
+</script>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap');
+        
+        body { font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif; scroll-behavior: smooth; }
+        
+        .card { 
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .dark .card { border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-track { background: #2d3748; }
+
+        .nav-btn {
+            @apply px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-green-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all select-none cursor-pointer;
+        }
+
+        /* --- NEW: Transparent/Sticky Header Style --- */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: sticky; 
+            top: 0;
+            z-index: 50;
+        }
+        .dark .navbar {
+            background-color: rgba(30, 41, 59, 0.9);
+        }
+
+        /* --- NEW: Gradient Text Class (For Headers) --- */
+        .gradient-text {
+            background: linear-gradient(to right, #2563eb, #0d9488); /* Blue to Teal */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+        .dark .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #2dd4bf); /* Lighter Blue to Teal for Dark Mode */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* --- NEW: Nav Box Style --- */
+        .nav-box {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: #4b5563; /* gray-600 */
+        }
+        .dark .nav-box {
+            color: #d1d5db; /* gray-300 */
+        }
+        
+        /* Hover Effect */
+        .nav-box:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+            background-color: white;
+        }
+        .dark .nav-box:hover {
+            background-color: #374151;
+        }
+
+        /* Active State (Gradient Box) */
+        .nav-box.active-nav {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            border: none;
+        }
+
+        /* Responsive Navigation Handling */
+        .nav-links-container {
+            display: flex;
+            gap: 1rem; 
+            align-items: center;
+        }
+
+        @media (max-width: 1023px) {
+            .nav-links-container {
+                gap: 0.5rem; 
+                overflow-x: auto; 
+                white-space: nowrap; 
+                padding-bottom: 4px; 
+                flex-grow: 1; 
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<nav id="navbar" class="navbar">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+        
+        <div class="flex items-center gap-3 nav-logo shrink-0">
+            <img src="assets/logo.png" alt="IMD Logo" class="h-8 w-8 object-contain dark:invert"/> 
+            <div>
+                <h1 class="text-xl font-bold leading-tight gradient-text">बिहार मानसून डैशबोर्ड</h1>
+                <div class="text-xs text-gray-500 dark:text-gray-400">IMD MC Patna — व्यापक विश्लेषण</div>
+            </div>
+        </div>
+        
+        <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
+            <a href="index.html" class="nav-box active-nav" onclick="setActive(this)">होम</a>
+            <a href="index.html#analysis" class="nav-box" onclick="setActive(this)">डैशबोर्ड</a>    
+            <a href="district.html" class="nav-box" onclick="setActive(this)">जिलावार</a> 
+            <a href="maps.html" class="nav-box" onclick="setActive(this)">मानचित्र</a>
+            <a href="history.html" class="nav-box" onclick="setActive(this)">ऐतिहासिक</a>
+        </div>
+
+        <div class="flex items-center gap-4 shrink-0">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
+
+    <header id="overview" class="text-center py-6 space-y-4">
+        <h2 class="text-3xl md:text-4xl font-bold">
+            <span class="gradient-text">बिहार मानसून विश्लेषण <span id="yearDisplay">2025</span></span>
+        </h2>
+        
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm inline-flex flex-col md:flex-row items-center gap-6 mx-auto border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-semibold text-gray-500">वर्ष:</label>
+                <select id="yearSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+            <div class="h-8 w-px bg-gray-300 dark:bg-gray-600 hidden md:block"></div>
+            <div class="flex items-center gap-4">
+                <button onclick="changeMonth(-1)" class="nav-btn group">
+                    <i class="fa-solid fa-chevron-left text-gray-500 group-hover:text-blue-600"></i>
+                </button>
+                <div class="text-center w-32">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">चयनित अवधि</div>
+                    <div id="monthDisplay" class="text-xl font-bold text-blue-700 dark:text-blue-400">कुल (Overall)</div>
+                </div>
+                <button onclick="changeMonth(1)" class="nav-btn group">
+                    <i class="fa-solid fa-chevron-right text-gray-500 group-hover:text-blue-600"></i>
+                </button>
+            </div>
+        </div>
+        <div class="flex justify-center items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400 mt-2">
+            <span><i class="fa-solid fa-map-location-dot"></i> कुल जिले: 38</span>
+        </div>
+    </header>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl">
+            <div class="text-blue-600 dark:text-blue-400 text-3xl mb-2"><i class="fa-solid fa-droplet"></i></div>
+            <div class="text-3xl font-bold gradient-text" id="statAvgRain">--</div>
+            <div class="text-sm text-gray-500 mt-1">औसत वर्षा (मिमी)</div>
+        </div>
+        <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl">
+            <div id="statIconDev" class="text-3xl mb-2"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="text-3xl font-bold" id="statAvgDev">--</div>
+            <div class="text-sm text-gray-500 mt-1" id="statDevLabel">विचलन</div>
+        </div>
+        <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl">
+            <div class="text-orange-500 text-3xl mb-2"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="text-3xl font-bold gradient-text" id="statDeficitCount">--</div>
+            <div class="text-sm text-gray-500 mt-1">घाटा जिले</div>
+        </div>
+        <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl">
+            <div class="text-teal-600 dark:text-teal-400 text-3xl mb-2"><i class="fa-solid fa-trophy"></i></div>
+            <div class="text-xl font-bold truncate gradient-text" id="statMaxDist">--</div>
+            <div class="text-sm font-bold text-gray-600 dark:text-gray-300" id="statMaxVal">--</div>
+        </div>
+    </section>
+
+    <section id="analysis" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm lg:col-span-3">
+            <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-chart-column text-blue-600"></i> 
+                <span class="gradient-text">जिलेवार वर्षा विचलन (<span class="dynamic-month-label"></span>)</span>
+            </h3>
+            <div id="deviationChart" class="w-full h-[500px]"></div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-chart-area text-blue-600"></i> 
+                <span class="gradient-text">वर्षा प्रवृत्ति / तुलना</span>
+            </h3>
+            <div id="lineChart" class="w-full h-[400px]"></div>
+        </div>
+        <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-orange-600"></i> 
+                <span class="gradient-text">प्रदर्शन वर्गीकरण</span>
+            </h3>
+            <div id="pieChart" class="w-full h-[400px]"></div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-list-ol text-purple-600"></i> 
+                <span class="gradient-text">टॉप 5 और बॉटम 5 जिले</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="topDistChart" class="h-[400px]"></div>
+                <div id="botDistChart" class="h-[400px]"></div>
+            </div>
+        </div>
+        <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-table-cells text-teal-600"></i> 
+                <span class="gradient-text">वर्षा वितरण मैट्रिक्स (Heatmap)</span>
+            </h3>
+            <div id="heatmapChart" class="w-full h-[600px]"></div>
+        </div>
+    </section>
+    
+    <section id="maps-section" class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm text-center">
+        <div class="border-b border-gray-100 dark:border-gray-700 pb-4 mb-4">
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center justify-center gap-2">
+                <i class="fa-solid fa-map text-teal-600"></i> 
+                <span class="gradient-text">भौगोलिक मानचित्र विश्लेषण</span>
+            </h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">मासिक और समग्र वर्षा वितरण मानचित्र देखने के लिए अलग पृष्ठ पर जाएँ।</p>
+        </div>
+        <a href="maps.html" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+            <i class="fa-solid fa-arrow-up-right-from-square mr-2"></i> मानचित्र पृष्ठ खोलें
+        </a>
+    </section>
+    
+    <section id="data-table" class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">विस्तृत डेटा: <span class="dynamic-month-label text-blue-600"></span></h3>
+             <a href="district.html" class="text-sm text-blue-500 dark:text-blue-400 hover:underline mt-1 block">
+                 <i class="fa-solid fa-table-list mr-1"></i> जिलावार सर्च और सॉर्टिंग के लिए यहाँ क्लिक करें।
+            </a>
+        </div>
+        <div class="overflow-x-auto max-h-[500px]">
+            <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-6 py-3">जिला</th>
+                        <th class="px-6 py-3 text-right">वास्तविक (मिमी)</th>
+                        <th class="px-6 py-3 text-right">सामान्य (मिमी)</th>
+                        <th class="px-6 py-3 text-right">विचलन (%)</th>
+                        <th class="px-6 py-3 text-center">स्थिति</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
+                    </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer class="bg-slate-800 text-white p-8 rounded-xl mt-8 text-center space-y-4">
+        <h4 class="text-xl font-bold gradient-text">डेटा स्रोत और क्रेडिट</h4>
+        <p class="text-gray-300">India Meteorological Department: Meteorological Centre Patna</p>
+        <div class="pt-4 border-t border-slate-700">
+            <p class="text-sm text-gray-400">विश्लेषण तैयार किया गया:</p>
+            <p class="text-lg font-semibold">© Lal Kamal</p>
+        </div>
+    </footer>
+
+</main>
+
+<script>
+    // --- UI Logic: Active Tab Switching ---
+    function setActive(element) {
+        // Remove active class from all links
+        document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('active-nav'));
+        // Add active class to clicked link
+        element.classList.add('active-nav');
+    }
+
+    // --- 1. Config ---
+    const months = ['जून', 'जुलाई', 'अगस्त', 'सितंबर', 'कुल (Overall)'];
+    const monthKeys = ['June', 'July', 'August', 'September'];
+    let currentMonthIndex = 4;
+    let rawData = [];
+
+    const districtNames = [
+        "ARARIA", "ARWAL", "AURANGABAD", "BANKA", "BEGUSARAI", "BHABUA", "BHAGALPUR", 
+        "BHOJPUR", "BUXAR", "DARBHANGA", "EAST CHAMPARAN", "GAYA", "GOPALGANJ", 
+        "JAHANABAD", "JAMUI", "KATIHAR", "KHAGARIA", "KISHANGANJ", "LAKHISARAI", 
+        "MADHEPURA", "MADHUBANI", "MONGHYR", "MUZAFFARPUR", "NALANDA", "NAWADA", 
+        "PATNA", "PURNEA", "ROHTAS", "SAHARSA", "SAMASTIPUR", "SARAN", "SHEIKHPURA", 
+        "SHEOHAR", "SITAMARHI", "SIWAN", "SUPAUL", "VAISHALI", "WEST CHAMPARAN"
+    ];
+
+    // --- 2. Data Logic ---
+    function generateDetailedData() {
+        // Dummy data generation logic (as provided)
+        return districtNames.map(d => {
+            const monthlyStats = {};
+            let totalActual = 0, totalNormal = 0;
+            monthKeys.forEach(m => {
+                const norm = Math.floor(Math.random() * (350 - 150) + 150);
+                let variance = Math.floor(Math.random() * (20 - (-60)) + (-60));
+                
+                if(d === 'KISHANGANJ') variance = 20; 
+                if(d === 'GAYA' && m === 'August') variance = 10;
+                if(d === 'SITAMARHI') variance = -50;
+
+                const act = parseFloat((norm * (1 + variance/100)).toFixed(1));
+                monthlyStats[m] = { actual: act, normal: norm };
+                totalActual += act; totalNormal += norm;
+            });
+            return {
+                district: d,
+                monthly: monthlyStats,
+                overall: { actual: parseFloat(totalActual.toFixed(1)), normal: totalNormal }
+            };
+        });
+    }
+
+    function getProcessedData() {
+        const isOverall = currentMonthIndex === 4;
+        const selectedMonthKey = isOverall ? null : monthKeys[currentMonthIndex];
+        return rawData.map(d => {
+            let act, norm;
+            if (isOverall) { act = d.overall.actual; norm = d.overall.normal; }
+            else { act = d.monthly[selectedMonthKey].actual; norm = d.monthly[selectedMonthKey].normal; }
+            const dev = norm === 0 ? 0 : Math.round(((act - norm) / norm) * 100);
+            return {
+                district: d.district, actual: act, normal: norm, deviation: dev,
+                fullMonthly: d.monthly 
+            };
+        });
+    }
+
+    // --- 3. Render Logic ---
+    function changeMonth(direction) {
+        currentMonthIndex += direction;
+        if (currentMonthIndex < 0) currentMonthIndex = months.length - 1;
+        if (currentMonthIndex >= months.length) currentMonthIndex = 0;
+        updateDashboardUI();
+    }
+
+    function updateDashboardUI() {
+        const monthLabel = months[currentMonthIndex];
+        document.getElementById('monthDisplay').innerText = monthLabel;
+        document.querySelectorAll('.dynamic-month-label').forEach(el => el.innerText = monthLabel);
+        const data = getProcessedData();
+        renderStats(data);
+        renderCharts(data);
+        renderTable(data);
+    }
+
+    function renderStats(data) {
+        const totalActual = data.reduce((sum, d) => sum + d.actual, 0);
+        const totalNormal = data.reduce((sum, d) => sum + d.normal, 0);
+        const avgActual = (totalActual / 38).toFixed(1);
+        const avgDev = Math.round(((totalActual - totalNormal) / totalNormal) * 100);
+        const deficitCount = data.filter(d => d.deviation < 0).length;
+        const maxDist = data.reduce((prev, current) => (prev.actual > current.actual) ? prev : current);
+
+        document.getElementById('statAvgRain').innerText = `${avgActual} मिमी`;
+        const devElem = document.getElementById('statAvgDev');
+        devElem.innerText = `${avgDev}%`;
+        devElem.className = `text-3xl font-bold ${avgDev < 0 ? 'text-red-600' : 'text-green-600'}`;
+        document.getElementById('statIconDev').className = `text-3xl mb-2 ${avgDev < 0 ? 'text-red-500' : 'text-green-500'}`;
+        document.getElementById('statDevLabel').innerText = avgDev < 0 ? 'सामान्य से कम' : 'सामान्य/अधिक';
+        document.getElementById('statDeficitCount').innerText = deficitCount;
+        document.getElementById('statMaxDist').innerText = maxDist.district;
+        document.getElementById('statMaxVal').innerText = `${maxDist.actual} मिमी`;
+    }
+
+    function renderCharts(data) {
+        const isDark = document.documentElement.classList.contains('dark');
+        const layoutConfig = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Poppins', color: isDark ? '#cbd5e1' : '#334155' },
+            margin: { t: 30, b: 60, l: 40, r: 10 },
+            xaxis: { showgrid: false },
+            yaxis: { showgrid: true, gridcolor: isDark ? '#374151' : '#e2e8f0' }
+        };
+
+        // Deviation
+        const colors = data.map(d => d.deviation >= 0 ? '#10b981' : (d.deviation > -20 ? '#f59e0b' : '#ef4444'));
+        Plotly.newPlot('deviationChart', [{
+            x: data.map(d => d.district), y: data.map(d => d.deviation),
+            type: 'bar', marker: { color: colors }, hovertemplate: '<b>%{x}</b><br>विचलन: %%{y}<extra></extra>'
+        }], { ...layoutConfig, yaxis: { title: 'विचलन (%)' }, dragmode: 'pan' }, {responsive: true, displayModeBar: false});
+
+        // Top/Bottom
+        const sorted = [...data].sort((a,b) => b.actual - a.actual);
+        const top5 = sorted.slice(0, 5).reverse();
+        const bot5 = sorted.slice(-5);
+        const barLayout = { ...layoutConfig, margin: {l: 80, t: 10, b: 30, r: 10} };
+        Plotly.newPlot('topDistChart', [{
+            y: top5.map(d => d.district), x: top5.map(d => d.actual),
+            type: 'bar', orientation: 'h', marker: { color: '#059669' }
+        }], barLayout, {responsive: true, displayModeBar: false});
+        Plotly.newPlot('botDistChart', [{
+            y: bot5.map(d => d.district), x: bot5.map(d => d.actual),
+            type: 'bar', orientation: 'h', marker: { color: '#ea580c' }
+        }], barLayout, {responsive: true, displayModeBar: false});
+
+        // Pie
+        const counts = { excess: 0, normal: 0, deficit: 0, largeDef: 0 };
+        data.forEach(d => {
+            if(d.deviation > 19) counts.excess++;
+            else if(d.deviation >= -19) counts.normal++;
+            else if(d.deviation >= -59) counts.deficit++;
+            else counts.largeDef++;
+        });
+        Plotly.newPlot('pieChart', [{
+            values: [counts.excess, counts.normal, counts.deficit, counts.largeDef],
+            labels: ['अधिक', 'सामान्य', 'घाटा', 'गंभीर घाटा'],
+            type: 'pie', hole: 0.5, marker: { colors: ['#10b981', '#3b82f6', '#f59e0b', '#dc2626'] }
+        }], { ...layoutConfig, showlegend: true, legend: { orientation: 'h', y: -0.1 } }, {responsive: true});
+
+        // Line Chart
+        let lineTraces = [];
+        if (currentMonthIndex === 4) {
+            const mAgg = monthKeys.map(m => {
+                const sumAct = rawData.reduce((s, d) => s + d.monthly[m].actual, 0);
+                const sumNorm = rawData.reduce((s, d) => s + d.monthly[m].normal, 0);
+                return { m, act: sumAct/38, norm: sumNorm/38 };
+            });
+            lineTraces = [
+                { x: months.slice(0,4), y: mAgg.map(x=>x.norm), type: 'scatter', mode: 'lines+markers', name: 'सामान्य', line: {color:'#3b82f6'} },
+                { x: months.slice(0,4), y: mAgg.map(x=>x.act), type: 'scatter', mode: 'lines+markers', name: 'वास्तविक', line: {color:'#10b981'} }
+            ];
+        } else {
+            const mAgg = monthKeys.map(m => {
+                const sumAct = rawData.reduce((s, d) => s + d.monthly[m].actual, 0);
+                return { m, act: sumAct/38 };
+            });
+            const selectedM = monthKeys[currentMonthIndex];
+            const colors = monthKeys.map(m => m === selectedM ? '#ef4444' : '#10b981');
+            const sizes = monthKeys.map(m => m === selectedM ? 12 : 6);
+            lineTraces = [{
+                x: months.slice(0,4), y: mAgg.map(x=>x.act), type: 'scatter', mode: 'lines+markers',
+                marker: { size: sizes, color: colors }, line: { color: '#cbd5e1' }, name: 'औसत वर्षा'
+            }];
+        }
+        Plotly.newPlot('lineChart', lineTraces, { ...layoutConfig, yaxis: { title: 'मिमी' }, showlegend: false }, {responsive: true});
+
+        // Heatmap
+        const zValues = [];
+        const yDistricts = sorted.map(d => d.district); 
+        yDistricts.forEach(dName => {
+            const districtObj = rawData.find(r => r.district === dName);
+            zValues.push([
+                districtObj.monthly.June.actual, districtObj.monthly.July.actual,
+                districtObj.monthly.August.actual, districtObj.monthly.September.actual
+            ]);
+        });
+        Plotly.newPlot('heatmapChart', [{
+            z: zValues, x: ['जून', 'जुलाई', 'अगस्त', 'सितंबर'], y: yDistricts, type: 'heatmap', colorscale: 'Blues',
+        }], { ...layoutConfig, margin: {l: 100, b: 40, t: 20}, height: 600 }, {responsive: true});
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('dataTableBody');
+        tbody.innerHTML = '';
+        data.forEach(d => {
+            const tr = document.createElement('tr');
+            tr.className = "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition";
+            const width = Math.min(Math.abs(d.deviation) + 20, 100);
+            const colorClass = d.deviation < 0 ? 'bg-red-500' : 'bg-green-500';
+            const textClass = d.deviation < 0 ? 'text-red-600' : 'text-green-600';
+            tr.innerHTML = `
+                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>
+                <td class="px-6 py-4 text-right">${d.actual}</td>
+                <td class="px-6 py-4 text-right">${d.normal}</td>
+                <td class="px-6 py-4 text-right font-bold ${textClass}">${d.deviation}%</td>
+                <td class="px-6 py-4"><div class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden"><div class="${colorClass} h-full" style="width: ${width}%"></div></div></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        updateDashboardUI(); 
+    }
+
+    function updateDashboard() {
+        const year = document.getElementById('yearSelect').value;
+        document.getElementById('yearDisplay').innerText = year;
+        rawData = generateDetailedData();
+        currentMonthIndex = 4;
+        updateDashboardUI();
+    }
+    
+    // --- Header Scroll Logic (for transparent effect) ---
+    // window.addEventListener('scroll', () => {
+    //     const navbar = document.getElementById('navbar');
+    //     if (window.scrollY > 50) {
+    //         navbar.classList.add('scrolled');
+    //     } else {
+    //         navbar.classList.remove('scrolled');
+    //     }
+    // });
+
+    // Init
+    rawData = generateDetailedData();
+    updateDashboardUI();
+</script>
+</body>
+</html>

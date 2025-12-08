@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="hi" class="light">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>बिहार वर्षा मानचित्र विश्लेषण</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2E8B57',
+                        secondary: '#E6F4EA',
+                        darkbg: '#1a202c',
+                        carddark: '#2d3748',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap');
+        
+        body { font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif; scroll-behavior: smooth; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-track { background: #2d3748; }
+
+        /* --- Navbar Styles --- */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: sticky; 
+            top: 0;
+            z-index: 50;
+        }
+        .dark .navbar {
+            background-color: rgba(30, 41, 59, 0.9);
+        }
+
+        /* --- Gradient Text --- */
+        .gradient-text {
+            background: linear-gradient(to right, #2563eb, #0d9488); /* Blue to Teal */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+        .dark .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* --- Nav Box Style --- */
+        .nav-box {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: #4b5563;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .dark .nav-box { color: #d1d5db; }
+        
+        .nav-box:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            background-color: white;
+        }
+        .dark .nav-box:hover { background-color: #374151; }
+
+        .nav-box.active-nav {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            border: none;
+        }
+
+        /* --- Month Tabs Style --- */
+        .month-tab {
+            padding: 0.5rem 1.2rem;
+            border-radius: 9999px; /* Pill shape */
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            color: #4b5563;
+            cursor: pointer;
+        }
+        .dark .month-tab {
+            background-color: #1f2937;
+            border-color: #374151;
+            color: #d1d5db;
+        }
+        .month-tab:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-1px);
+        }
+        .dark .month-tab:hover { background-color: #374151; }
+
+        .month-tab.active-tab {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive Navigation */
+        .nav-links-container {
+            display: flex; gap: 1rem; align-items: center;
+        }
+        @media (max-width: 1023px) {
+            .nav-links-container {
+                gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; flex-grow: 1; justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+
+<nav id="navbar" class="navbar">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+        
+        <div class="flex items-center gap-3 nav-logo shrink-0">
+            <img src="assets/logo.png" alt="IMD Logo" class="h-8 w-8 object-contain dark:invert hidden sm:block"/> 
+            
+            <div class="text-3xl text-blue-600 dark:text-blue-400"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+            <div>
+                <h1 class="text-xl font-bold leading-tight gradient-text">बिहार मानसून डैशबोर्ड</h1>
+                <div class="text-xs text-gray-500 dark:text-gray-400">IMD MC Patna — व्यापक विश्लेषण</div>
+            </div>
+        </div>
+        
+        <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
+            <a href="index.html" class="nav-box">होम</a> 
+            <a href="index.html#analysis" class="nav-box">डैशबोर्ड</a>
+            <a href="district.html" class="nav-box">जिलावार</a>
+            <a href="maps.html" class="nav-box active-nav">मानचित्र</a>   
+            <a href="history.html" class="nav-box">ऐतिहासिक</a>
+        </div>
+
+        <div class="flex items-center gap-4 shrink-0">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto p-6">
+    
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+                <h2 class="text-2xl font-bold flex items-center gap-2 mb-1">
+                    <i class="fa-solid fa-map-location-dot text-blue-600"></i> 
+                    <span class="gradient-text">वर्षा मानचित्र विश्लेषण</span>
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">विभिन्न वर्षों और महीनों के लिए स्थानिक वितरण देखें।</p>
+            </div>
+            
+            <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
+                <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2">वर्ष:</label>
+                <select id="mapYear" onchange="updateMap()" class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer min-w-[100px]">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                </select>
+            </div>
+        </div>
+
+        <hr class="my-4 border-gray-100 dark:border-gray-700">
+
+        <div class="flex flex-wrap gap-3" id="monthTabsContainer">
+            <button onclick="selectMonth('Overall')" class="month-tab active-tab" data-month="Overall">कुल (Overall)</button>
+            <button onclick="selectMonth('June')" class="month-tab" data-month="June">जून</button>
+            <button onclick="selectMonth('July')" class="month-tab" data-month="July">जुलाई</button>
+            <button onclick="selectMonth('August')" class="month-tab" data-month="August">अगस्त</button>
+            <button onclick="selectMonth('September')" class="month-tab" data-month="September">सितंबर</button>
+        </div>
+    </div>
+
+    <div id="mapContainer" class="card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg min-h-[600px] flex items-center justify-center border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+        
+        <div id="mapNotice" class="text-center text-gray-500 dark:text-gray-400 py-10 font-medium">
+            <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-blue-500"></i><br>
+            मानचित्र लोड किया जा रहा है...
+        </div>
+
+        <img id="mapView" 
+             class="mx-auto max-w-full max-h-[80vh] h-auto hidden rounded-lg shadow-sm transition-transform duration-500 group-hover:scale-[1.01]" 
+             alt="वर्षा मानचित्र छवि"
+             onload="onImageLoad()"
+             onerror="onImageError()" />
+             
+        <div class="absolute bottom-6 right-6 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-4 py-2 rounded-lg shadow text-sm font-bold border border-gray-200 dark:border-gray-600">
+            <span id="labelYear">2025</span> - <span id="labelMonth" class="text-blue-600">Overall</span>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    // --- Configuration based on file structure ---
+    const mapFiles = {
+        'Overall': 'monsoon_overall_map.png',
+        'June': 'june_map.png',
+        'July': 'july_map.png',
+        'August': 'aug_map.png',
+        'September': 'sep_map.png'
+    };
+
+    let currentYear = '2025';
+    let currentMonth = 'Overall';
+
+    // --- Core Functions ---
+
+    function selectMonth(month) {
+        currentMonth = month;
+        
+        // Update Tab UI
+        document.querySelectorAll('.month-tab').forEach(btn => {
+            if(btn.getAttribute('data-month') === month) {
+                btn.classList.add('active-tab');
+            } else {
+                btn.classList.remove('active-tab');
+            }
+        });
+
+        // Update Labels
+        document.getElementById('labelMonth').innerText = month;
+
+        // Load Map
+        updateMap();
+    }
+
+    function updateMap() {
+        const yearSelect = document.getElementById('mapYear');
+        currentYear = yearSelect.value;
+        document.getElementById('labelYear').innerText = currentYear;
+
+        const img = document.getElementById('mapView');
+        const notice = document.getElementById('mapNotice');
+        
+        // Reset State
+        img.classList.add('hidden');
+        notice.classList.remove('hidden');
+        notice.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-blue-500"></i><br>लोड हो रहा है...`;
+
+        // Construct Path: maps/{year}/{filename}
+        const fileName = mapFiles[currentMonth];
+        const imagePath = `maps/${currentYear}/${fileName}`;
+
+        // Set Source
+        img.src = imagePath;
+    }
+
+    // --- Image Event Handlers ---
+
+    function onImageLoad() {
+        const img = document.getElementById('mapView');
+        const notice = document.getElementById('mapNotice');
+        
+        notice.classList.add('hidden');
+        img.classList.remove('hidden');
+        // Simple fade-in animation
+        img.style.opacity = 0;
+        setTimeout(() => img.style.opacity = 1, 50);
+    }
+
+    function onImageError() {
+        const img = document.getElementById('mapView');
+        const notice = document.getElementById('mapNotice');
+        
+        img.classList.add('hidden');
+        notice.classList.remove('hidden');
+        notice.innerHTML = `
+            <div class="text-red-500">
+                <i class="fa-solid fa-triangle-exclamation text-4xl mb-2"></i><br>
+                मानचित्र उपलब्ध नहीं है।<br>
+                <span class="text-xs text-gray-400 mt-2 block">(${currentMonth} ${currentYear})</span>
+            </div>
+        `;
+    }
+
+    // --- General Logic ---
+
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ensure default year 2025 is selected
+        const yearSelect = document.getElementById('mapYear');
+        if (!yearSelect.value) yearSelect.value = '2025';
+        
+        updateMap();
+    });
+
+</script>
+</body>
+</html>

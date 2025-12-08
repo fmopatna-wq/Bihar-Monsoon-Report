@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="hi" class="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>जिलावार विस्तृत डेटा - बिहार मानसून</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2E8B57',
+                        secondary: '#E6F4EA',
+                        darkbg: '#1a202c',
+                        carddark: '#2d3748',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap');
+        
+        body { font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif; scroll-behavior: smooth; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-track { background: #2d3748; }
+
+        /* --- Navbar Styles (Matches Index) --- */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: sticky; 
+            top: 0;
+            z-index: 50;
+        }
+        .dark .navbar {
+            background-color: rgba(30, 41, 59, 0.9);
+        }
+
+        /* --- Gradient Text --- */
+        .gradient-text {
+            background: linear-gradient(to right, #2563eb, #0d9488); /* Blue to Teal */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+        .dark .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* --- Nav Box Style --- */
+        .nav-box {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: #4b5563;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .dark .nav-box { color: #d1d5db; }
+        
+        .nav-box:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            background-color: white;
+        }
+        .dark .nav-box:hover { background-color: #374151; }
+
+        .nav-box.active-nav {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            border: none;
+        }
+
+        /* --- Month Tabs Style --- */
+        .month-tab {
+            padding: 0.5rem 1.2rem;
+            border-radius: 9999px; /* Pill shape */
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            color: #4b5563;
+            cursor: pointer;
+        }
+        .dark .month-tab {
+            background-color: #1f2937;
+            border-color: #374151;
+            color: #d1d5db;
+        }
+        .month-tab:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-1px);
+        }
+        .dark .month-tab:hover { background-color: #374151; }
+
+        .month-tab.active-tab {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive Navigation */
+        .nav-links-container {
+            display: flex; gap: 1rem; align-items: center;
+        }
+        @media (max-width: 1023px) {
+            .nav-links-container {
+                gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; flex-grow: 1; justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+
+<nav id="navbar" class="navbar">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+        
+        <div class="flex items-center gap-3 nav-logo shrink-0">
+            <img src="assets/logo.png" alt="IMD Logo" class="h-8 w-8 object-contain dark:invert hidden sm:block"/> 
+            
+            <div class="text-3xl text-blue-600 dark:text-blue-400"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+            <div>
+                <h1 class="text-xl font-bold leading-tight gradient-text">बिहार मानसून डैशबोर्ड</h1>
+                <div class="text-xs text-gray-500 dark:text-gray-400">IMD MC Patna — व्यापक विश्लेषण</div>
+            </div>
+        </div>
+        
+        <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
+            <a href="index.html" class="nav-box">होम</a> 
+            <a href="index.html#analysis" class="nav-box">डैशबोर्ड</a>
+            <a href="district.html" class="nav-box active-nav">जिलावार</a>
+            <a href="maps.html" class="nav-box">मानचित्र</a>
+            <a href="history.html" class="nav-box">ऐतिहासिक</a>
+        </div>
+
+        <div class="flex items-center gap-4 shrink-0">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <h2 class="text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-table-list text-blue-600"></i> 
+                <span class="gradient-text">विस्तृत जिला डेटा</span>
+            </h2>
+            
+            <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
+                <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2">वर्ष:</label>
+                <select id="yearSelect" onchange="renderData()" class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-6 items-center justify-between">
+            <div class="flex flex-wrap gap-2 w-full lg:w-auto" id="monthTabsContainer">
+                <button onclick="selectMonth('Overall')" class="month-tab active-tab" data-month="Overall">कुल (Overall)</button>
+                <button onclick="selectMonth('June')" class="month-tab" data-month="June">जून</button>
+                <button onclick="selectMonth('July')" class="month-tab" data-month="July">जुलाई</button>
+                <button onclick="selectMonth('August')" class="month-tab" data-month="August">अगस्त</button>
+                <button onclick="selectMonth('September')" class="month-tab" data-month="September">सितंबर</button>
+            </div>
+
+            <div class="relative w-full lg:w-72">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                </div>
+                <input type="text" id="searchInput" onkeyup="filterData()" placeholder="जिला खोजें..." 
+                    class="pl-10 w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="overflow-x-auto max-h-[70vh]">
+            <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-6 py-4 sort-header cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" data-sort="district" data-order="asc">
+                            जिला <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
+                        </th>
+                        <th class="px-6 py-4 text-right sort-header cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" data-sort="actual" data-order="desc">
+                            वास्तविक (mm) <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
+                        </th>
+                        <th class="px-6 py-4 text-right sort-header cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" data-sort="normal" data-order="desc">
+                            सामान्य (mm) <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
+                        </th>
+                        <th class="px-6 py-4 text-right sort-header cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" data-sort="deviation" data-order="desc">
+                            विचलन (%) <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
+                        </th>
+                        <th class="px-6 py-4 text-center">स्थिति</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    // --- Data and State ---
+    const monthKeys = {
+        'June': 'June', 'July': 'July', 'August': 'August', 'September': 'September', 'Overall': 'overall'
+    };
+    
+    // Default selected month
+    let currentSelectedMonth = 'Overall';
+
+    const districtNames = [
+        "ARARIA", "ARWAL", "AURANGABAD", "BANKA", "BEGUSARAI", "BHABUA", "BHAGALPUR", 
+        "BHOJPUR", "BUXAR", "DARBHANGA", "EAST CHAMPARAN", "GAYA", "GOPALGANJ", 
+        "JAHANABAD", "JAMUI", "KATIHAR", "KHAGARIA", "KISHANGANJ", "LAKHISARAI", 
+        "MADHEPURA", "MADHUBANI", "MONGHYR", "MUZAFFARPUR", "NALANDA", "NAWADA", 
+        "PATNA", "PURNEA", "ROHTAS", "SAHARSA", "SAMASTIPUR", "SARAN", "SHEIKHPURA", 
+        "SHEOHAR", "SITAMARHI", "SIWAN", "SUPAUL", "VAISHALI", "WEST CHAMPARAN"
+    ];
+
+    let rawData = generateDetailedData();
+    let currentSort = { column: 'district', order: 'asc' };
+
+    // --- Utility Functions ---
+
+    function generateDetailedData() {
+        return districtNames.map(d => {
+            const monthlyStats = {};
+            let totalActual = 0, totalNormal = 0;
+            Object.values(monthKeys).filter(k => k !== 'overall').forEach(m => {
+                const norm = Math.floor(Math.random() * (350 - 150) + 150);
+                let variance = Math.floor(Math.random() * (20 - (-60)) + (-60));
+                
+                if(d === 'KISHANGANJ') variance = 20; 
+                if(d === 'GAYA' && m === 'August') variance = 10;
+                if(d === 'SITAMARHI') variance = -50;
+
+                const act = parseFloat((norm * (1 + variance/100)).toFixed(1));
+                monthlyStats[m] = { actual: act, normal: norm };
+                totalActual += act; totalNormal += norm;
+            });
+            return {
+                district: d,
+                monthly: monthlyStats,
+                overall: { actual: parseFloat(totalActual.toFixed(1)), normal: totalNormal }
+            };
+        });
+    }
+
+    function getProcessedData(data, selectedMonth) {
+        // Map the UI month name to the internal data key
+        const internalKey = monthKeys[selectedMonth];
+        const isOverall = selectedMonth === 'Overall';
+        
+        return data.map(d => {
+            let act, norm;
+            if (isOverall) { act = d.overall.actual; norm = d.overall.normal; }
+            else { act = d.monthly[internalKey].actual; norm = d.monthly[internalKey].normal; }
+            const dev = norm === 0 ? 0 : Math.round(((act - norm) / norm) * 100);
+            return {
+                district: d.district, actual: act, normal: norm, deviation: dev,
+                fullMonthly: d.monthly 
+            };
+        });
+    }
+
+    function sortData(data, column, order) {
+        return data.sort((a, b) => {
+            let valA = a[column];
+            let valB = b[column];
+
+            if (column === 'district') {
+                valA = valA.toLowerCase();
+                valB = valB.toLowerCase();
+            }
+
+            if (valA < valB) return order === 'asc' ? -1 : 1;
+            if (valA > valB) return order === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    // --- Interaction Functions ---
+
+    // New Function to handle Month Tab Clicks
+    function selectMonth(month) {
+        currentSelectedMonth = month;
+        
+        // Update Tab UI
+        document.querySelectorAll('.month-tab').forEach(btn => {
+            if(btn.getAttribute('data-month') === month) {
+                btn.classList.add('active-tab');
+            } else {
+                btn.classList.remove('active-tab');
+            }
+        });
+
+        // Re-render Data
+        renderData();
+    }
+
+    function filterData() {
+        renderData(false); 
+    }
+
+    function renderData(resetSort = true) {
+        const searchVal = document.getElementById('searchInput').value.toLowerCase();
+        
+        // Use global currentSelectedMonth variable
+        let displayData = getProcessedData(rawData, currentSelectedMonth);
+
+        // 1. Filter
+        if (searchVal) {
+            displayData = displayData.filter(d => 
+                d.district.toLowerCase().includes(searchVal)
+            );
+        }
+
+        // 2. Sort
+        displayData = sortData(displayData, currentSort.column, currentSort.order);
+
+        // 3. Render Table
+        const tbody = document.getElementById('dataTableBody');
+        tbody.innerHTML = '';
+        
+        if (displayData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 font-semibold"><i class="fa-solid fa-circle-exclamation mr-2"></i> कोई परिणाम नहीं मिला।</td></tr>`;
+            return;
+        }
+
+        displayData.forEach(d => {
+            const tr = document.createElement('tr');
+            tr.className = "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition duration-150";
+            
+            const width = Math.min(Math.abs(d.deviation) + 20, 100);
+            const colorClass = d.deviation < 0 ? 'bg-red-500' : 'bg-green-500';
+            const textClass = d.deviation < 0 ? 'text-red-600' : 'text-green-600';
+            
+            tr.innerHTML = `
+                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>
+                <td class="px-6 py-4 text-right">${d.actual}</td>
+                <td class="px-6 py-4 text-right">${d.normal}</td>
+                <td class="px-6 py-4 text-right font-bold ${textClass}">${d.deviation > 0 ? '+' : ''}${d.deviation}%</td>
+                <td class="px-6 py-4"><div class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden"><div class="${colorClass} h-full" style="width: ${width}%"></div></div></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        updateSortIcons();
+    }
+    
+    function updateSortIcons() {
+        document.querySelectorAll('.sort-header').forEach(h => {
+            h.classList.remove('active');
+            const icon = h.querySelector('.sort-icon i');
+            icon.className = 'fa-solid fa-sort text-gray-400'; 
+
+            if (h.getAttribute('data-sort') === currentSort.column) {
+                h.classList.add('active');
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-blue-600');
+                if (currentSort.order === 'asc') {
+                    icon.className = 'fa-solid fa-sort-up text-blue-600';
+                } else {
+                    icon.className = 'fa-solid fa-sort-down text-blue-600';
+                }
+            }
+        });
+    }
+
+    // Attach sort event listeners
+    document.querySelectorAll('.sort-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const column = this.getAttribute('data-sort');
+            let order = this.getAttribute('data-order');
+
+            if (column === currentSort.column) {
+                order = order === 'asc' ? 'desc' : 'asc';
+            } else {
+                order = this.getAttribute('data-order') || 'asc'; 
+            }
+
+            currentSort = { column, order };
+            this.setAttribute('data-order', order);
+            renderData(false); 
+        });
+    });
+
+    // --- Page Initialization ---
+
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const initialHeader = document.querySelector('.sort-header[data-sort="district"]');
+        if(initialHeader) {
+            initialHeader.querySelector('.sort-icon i').className = 'fa-solid fa-sort-up';
+        }
+        renderData();
+    });
+
+</script>
+</body>
+</html>

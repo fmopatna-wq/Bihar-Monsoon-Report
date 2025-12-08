@@ -1,0 +1,148 @@
+/*
+ * Custom Styles for Bihar Monsoon Dashboard
+ * This file replaces the internal <style> block and adds Tailwind imports for external use
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 1. Smooth Scrolling and Global Fonts */
+html {
+    /* REQUIRED for smooth scrolling to sections like #analysis */
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* 2. Custom Card Styles */
+.card { 
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.card:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+}
+.dark .card { 
+    border: 1px solid rgba(255,255,255,0.1); 
+}
+
+/* 3. Custom Scrollbar */
+::-webkit-scrollbar { 
+    width: 8px; 
+    height: 8px; 
+}
+::-webkit-scrollbar-track { 
+    background: #f1f1f1; 
+}
+::-webkit-scrollbar-thumb { 
+    background: #888; 
+    border-radius: 4px; 
+}
+.dark ::-webkit-scrollbar-track { 
+    background: #2d3748; 
+}
+
+/* ... (आपके अन्य CSS नियम) ... */
+
+/* 4. Navigation Button (from old HTML style block) */
+.nav-btn {
+    @apply px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-green-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all select-none cursor-pointer;
+}
+
+/* --- NEW: Header Gradient Text Style --- */
+/* (हरा और नीला का मिश्रण: मानसून के लिए उपयुक्त) */
+.header-gradient-text {
+    /* टेक्स्ट को बैकग्राउंड की तरह ट्रीट करें */
+    -webkit-background-clip: text;
+    background-clip: text;
+    /* टेक्स्ट को ट्रांसपेरेंट करें ताकि बैकग्राउंड ग्रेडिएंट दिखे */
+    color: transparent; 
+    
+    /* ग्रेडिएंट परिभाषा (नीला/ग्रीन का मिश्रण) */
+    background-image: linear-gradient(to right, #10b981, #2563eb); /* green-500 to blue-600 */
+    
+    /* Dark mode के लिए कोई बदलाव नहीं, क्योंकि ग्रेडिएंट अच्छा दिखता है */
+}
+
+/* ... (आपके अन्य CSS नियम जैसे .active-link) ... */
+
+/* 5. Fixed/Sticky Header Styles (Improved) */
+.navbar {
+    background-color: transparent;
+    backdrop-filter: blur(0px);
+    box-shadow: none;
+    transition: all 0.3s ease;
+    /* Ensure it stays fixed at the top */
+    position: sticky; 
+    top: 0;
+    z-index: 50;
+}
+.navbar.scrolled {
+    /* Use solid colors when scrolled */
+    background-color: rgba(255, 255, 255, 0.98); 
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #e2e8f0; /* Light border */
+}
+.dark .navbar.scrolled {
+    background-color: rgba(30, 41, 59, 0.98); /* Slate Dark */
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid #475569; /* Darker border */
+}
+
+/* Responsive Navigation Links */
+.nav-links-container {
+    display: flex;
+    gap: 1.5rem; 
+}
+
+@media (max-width: 1023px) {
+    .nav-links-container {
+        gap: 0.75rem;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 4px; 
+        flex-grow: 1; 
+        justify-content: flex-start;
+    }
+}
+
+/* ... आपके अन्य CSS नियम ... */
+
+/* --- NEW: Active Link Style --- */
+.active-link {
+    /* **बदलाव: Light Mode के लिए नीले रंग के शेड्स** */
+    color: #2563eb; /* blue-600 */
+    background-color: #dbeafe; /* blue-100 */
+    padding: 6px 10px; 
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.dark .active-link {
+    /* **बदलाव: Dark Mode के लिए नीले रंग के शेड्स** */
+    color: #93c5fd; /* blue-300 */
+    background-color: #1e3a8a; /* blue-900 (थोड़ा गहरा नीला) */
+}
+
+/* Ensure hover works nicely */
+.nav-links-container a {
+    @apply p-2 rounded-lg transition-colors duration-200; 
+}
+
+/* Override hover effect for the active link */
+.active-link:hover {
+    /* सक्रिय लिंक पर होवर करने पर भी नीला ही रहे */
+    color: #2563eb !important; 
+    background-color: #dbeafe !important;
+}
+.dark .active-link:hover {
+    color: #93c5fd !important;
+    background-color: #1e3a8a !important;
+}

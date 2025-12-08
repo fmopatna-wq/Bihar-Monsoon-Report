@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="hi" class="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ऐतिहासिक वर्षा तुलना - बिहार मानसून (2025 तक)</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2E8B57',
+                        secondary: '#E6F4EA',
+                        darkbg: '#1a202c',
+                        carddark: '#2d3748',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* General Styling */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap');
+        body { 
+            font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif; 
+            scroll-behavior: smooth; 
+        }
+        
+        /* Gradient Text for Headings */
+        .gradient-text {
+            background: linear-gradient(to right, #2563eb, #0d9488); 
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+        .dark .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Chart Container for Plotly */
+        #historicalChart {
+            height: 500px;
+            width: 100%;
+        }
+        
+        /* Navigation (Kept from original prompt) */
+        .nav-box {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: #4b5563;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .dark .nav-box { color: #d1d5db; }
+        .nav-box:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            background-color: white;
+        }
+        .dark .nav-box:hover { background-color: #374151; }
+        .nav-box.active-nav {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            border: none;
+        }
+        .navbar {
+            background-color: transparent;
+            backdrop-filter: blur(0px);
+            box-shadow: none;
+            transition: all 0.3s ease;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .navbar.scrolled {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .dark .navbar.scrolled {
+            background-color: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        }
+        .nav-links-container {
+            display: flex;
+            gap: 1.5rem;
+        }
+        @media (max-width: 1023px) {
+            .nav-links-container {
+                gap: 0.75rem;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 4px;
+                flex-grow: 1;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+
+<nav id="navbar" class="navbar">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+        <div class="flex items-center gap-3 nav-logo shrink-0">
+            <img 
+                src="assets/logo.png" 
+                alt="बिहार मानसून लोगो" 
+                class="h-10 w-10"
+            >
+            <div>
+                <h1 class="text-xl font-bold leading-tight gradient-text">बिहार मानसून डैशबोर्ड</h1>
+                <div class="text-xs text-gray-500 dark:text-gray-400">IMD MC Patna — ऐतिहासिक विश्लेषण</div>
+            </div>
+        </div>
+        <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
+            <a href="index.html" class="nav-box">होम</a> 
+            <a href="index.html#analysis" class="nav-box">डैशबोर्ड</a>
+            <a href="district.html" class="nav-box">जिलावार</a> 
+            <a href="maps.html" class="nav-box">मानचित्र</a>
+            <a href="history.html" class="nav-box active-nav">ऐतिहासिक</a>
+        </div>
+        <div class="flex items-center gap-4 shrink-0">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
+
+    <section class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+        <div class="border-b border-gray-100 dark:border-gray-700 pb-4 mb-6">
+            <h3 class="text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-chart-bar text-indigo-600"></i> 
+                <span class="gradient-text">ऐतिहासिक वर्षा का तुलनात्मक अध्ययन</span>
+            </h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">वर्ष 2002 से 2025 तक बिहार में मानसूनी वर्षा का तुलनात्मक विश्लेषण</p>
+        </div>
+        
+        <div class="text-center p-4">
+            <p class="mb-4 text-lg font-semibold text-gray-700 dark:text-gray-300">
+                **वर्षा तुलना चार्ट**
+            </p>
+            <img 
+                src="Comparative study of Rainfall during last 24 Years.PNG" 
+                alt="24 वर्षों की ऐतिहासिक वर्षा तुलना" 
+                class="w-full h-auto max-w-5xl mx-auto border-2 border-gray-300 dark:border-gray-700 rounded-lg shadow-xl"
+            />
+            
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center text-sm">
+                <div class="bg-blue-50 dark:bg-gray-700 p-3 rounded-lg shadow-inner">
+                    <span class="block text-gray-500 dark:text-gray-300 font-medium">दीर्घकालिक औसत (LPA)</span>
+                    <span class="font-bold text-blue-700 dark:text-blue-300 text-lg">996.0 मिमी</span>
+                </div>
+                <div class="bg-green-50 dark:bg-gray-700 p-3 rounded-lg shadow-inner">
+                    <span class="block text-gray-500 dark:text-gray-300 font-medium">सर्वाधिक वर्षा (वर्ष)</span>
+                    <span class="font-bold text-green-700 dark:text-green-300 text-lg">2007 (1343.0 मिमी)</span>
+                </div>
+                <div class="bg-red-50 dark:bg-gray-700 p-3 rounded-lg shadow-inner">
+                    <span class="block text-gray-500 dark:text-gray-300 font-medium">सबसे सूखा (वर्ष)</span>
+                    <span class="font-bold text-red-700 dark:text-red-300 text-lg">2022 (683.3 मिमी)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+        <h3 class="text-2xl font-bold flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-chart-line text-indigo-600"></i> 
+            <span class="gradient-text">लाइव ऐतिहासिक चार्ट</span>
+        </h3>
+        <div id="historicalChart" class="w-full h-[500px]"></div>
+        
+        <div class="mt-8">
+            <h3 class="text-lg font-semibold mb-3">वर्षा वर्गीकरण $\text{Legends}$ (प्रयुक्त रंग):</h3>
+            <div id="legendContainer" class="flex flex-wrap gap-4 text-xs">
+                </div>
+        </div>
+    </section>
+
+</main>
+<script>
+    // --- INJECTED DATA FROM CSV FILES (2025 तक) ---
+    const historicalData = {
+        "years": [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+        "actual_rainfall": [1004.0, 1140.0, 934.0, 853.0, 913.0, 1343.0, 1043.0, 752.0, 796.0, 1059.0, 813.0, 722.0, 849.0, 745.0, 975.0, 937.0, 771.0, 1050.0, 1272.5, 1044.5, 683.3, 760.5, 798.2, 686.3],
+        "departures": [-2.0, 12.0, -9.0, -17.0, -11.0, 32.0, 2.0, -27.0, -23.0, 3.0, -21.0, -31.0, -18.0, -28.0, -5.0, -9.0, -25.0, 6.0, 28.0, 5.0, -31.0, -23.0, -20.0, -31.0]
+    };
+
+    // --- INJECTED LEGEND RULES FROM CSV ---
+    const legendRules = [
+        {"category": "LARGE EXCESS", "min_dep": 60, "max_dep": 1000, "color": "#0d9488", "label": "+60% या अधिक"}, 
+        {"category": "EXCESS", "min_dep": 20, "max_dep": 59, "color": "#22c55e", "label": "+20% से +59%"}, 
+        {"category": "NORMAL", "min_dep": -19, "max_dep": 19, "color": "#3b82f6", "label": "-19% से +19%"}, 
+        {"category": "DEFICIENT", "min_dep": -59, "max_dep": -20, "color": "#f97316", "label": "-59% से -20%"}, 
+        {"category": "LARGE DEFICIENT", "min_dep": -1000, "max_dep": -60, "color": "#ef4444", "label": "-60% या कम"}, 
+        {"category": "NO RAIN", "min_dep": -100, "max_dep": -100, "color": "#6b7280", "label": "-100%"}
+    ];
+    
+    // Fixed Overall LPA value based on mean of Normal column (996.0 mm)
+    const lpaValue = 996.0; 
+
+    // Helper function to determine bar color based on departure
+    function getBarColor(departure) {
+        for (const rule of legendRules) {
+            // Check if departure falls within the rule's range (inclusive of min and max)
+            if (departure >= rule.min_dep && departure <= rule.max_dep) {
+                return rule.color;
+            }
+        }
+        return '#6b7280'; // Default gray for unclassified
+    }
+
+    // Function to render the chart
+    function renderHistoricalChart() {
+        const isDark = document.documentElement.classList.contains('dark');
+        
+        const years = historicalData.years;
+        const rainfall = historicalData.actual_rainfall;
+        const departures = historicalData.departures;
+        
+        // Map colors based on departure using the legend rules
+        const colors = departures.map(getBarColor);
+
+        const layout = {
+            title: {
+                text: 'वर्षवार वास्तविक वर्षा बनाम दीर्घकालिक औसत (LPA)',
+                font: { size: 20, color: isDark ? '#f8fafc' : '#1e293b' }
+            },
+            // Dynamic theme support
+            paper_bgcolor: isDark ? '#1f2937' : 'rgba(255,255,255,0)', 
+            plot_bgcolor: isDark ? '#1f2937' : 'rgba(255,255,255,0)',
+            font: { family: 'Poppins', color: isDark ? '#cbd5e1' : '#334155' },
+            xaxis: { 
+                title: 'वर्ष', 
+                type: 'category', 
+                tickfont: { color: isDark ? '#9ca3af' : '#4b5563' },
+                linecolor: isDark ? '#374151' : '#e2e8f0',
+            },
+            yaxis: { 
+                title: 'कुल वर्षा (मिमी)', 
+                showgrid: true, 
+                gridcolor: isDark ? '#374151' : '#e2e8f0', 
+                linecolor: isDark ? '#374151' : '#e2e8f0',
+                tickfont: { color: isDark ? '#9ca3af' : '#4b5563' },
+            },
+            margin: { t: 60, b: 50, l: 60, r: 20 },
+            hovermode: 'x unified'
+        };
+
+        const trace1 = {
+            x: years, y: rainfall, type: 'bar',
+            marker: { color: colors, opacity: 0.9 }, 
+            name: 'वास्तविक वर्षा (मिमी)',
+            hovertemplate: 
+                '<b>वर्ष:</b> %{x}<br>' +
+                '<b>वर्षा:</b> %{y} मिमी<br>' +
+                '<b>विचलन:</b> %{customdata:.1f}%<extra></extra>',
+            customdata: departures
+        };
+        
+        // Trace for the horizontal LPA line
+        const trace2 = {
+            x: years, y: Array(years.length).fill(lpaValue), 
+            type: 'scatter', mode: 'lines',
+            line: { color: isDark ? '#94a3b8' : '#475569', dash: 'dash', width: 2 },
+            name: `LPA (${lpaValue} मिमी)`,
+            hovertemplate: 
+                '<b>सामान्य LPA:</b> %{y} मिमी<extra></extra>'
+        };
+
+        Plotly.newPlot('historicalChart', [trace1, trace2], layout, {responsive: true, displayModeBar: false});
+    }
+
+    // Function to render the legend key boxes
+    function renderLegends() {
+        const container = document.getElementById('legendContainer');
+        container.innerHTML = legendRules.map(rule => `
+            <div class="flex items-center gap-2 p-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                <span class="w-4 h-4 rounded-full" style="background-color: ${rule.color};"></span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">${rule.category}</span>
+                <span class="text-gray-500 dark:text-gray-400">(${rule.label})</span>
+            </div>
+        `).join('');
+    }
+    
+    // --- Dark Mode Toggle ---
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        renderHistoricalChart(); // Re-render to update plot colors
+    }
+    
+    // --- Header Scroll Logic ---
+    window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+        renderHistoricalChart();
+        renderLegends();
+    });
+</script>
+</body>
+</html>
