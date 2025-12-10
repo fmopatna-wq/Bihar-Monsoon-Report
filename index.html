@@ -190,38 +190,43 @@
 
 <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
 
-    <header id="overview" class="text-center py-6 space-y-4">
-        <h2 class="text-3xl md:text-4xl font-bold">
-            <span class="gradient-text">बिहार मानसून विश्लेषण <span id="yearDisplay">2025</span></span>
-        </h2>
+<header id="overview" class="text-center py-6 space-y-4">
+    <h2 class="text-3xl md:text-4xl font-bold">
+        <span class="gradient-text">बिहार मानसून विश्लेषण <span id="yearDisplay">2025</span></span>
+    </h2>
+    
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm inline-flex flex-wrap justify-center gap-6 mx-auto border border-gray-200 dark:border-gray-700">
         
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm inline-flex flex-col md:flex-row items-center gap-6 mx-auto border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center gap-2">
-                <label class="text-sm font-semibold text-gray-500">वर्ष:</label>
-                <select id="yearSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold">
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                </select>
-            </div>
-            <div class="h-8 w-px bg-gray-300 dark:bg-gray-600 hidden md:block"></div>
-            <div class="flex items-center gap-4">
-                <label class="text-sm font-semibold text-gray-500">अवधि:</label>
-                <select id="periodSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-32">
-                    <option value="overall_monsoon" selected>कुल (Overall)</option>
-                    <option value="september">सितंबर</option>
-                    <option value="august">अगस्त</option>
-                    <option value="july">जुलाई</option>
-                    <option value="june">जून</option>
-                </select>
-            </div>
-            </div>
-        <div class="flex justify-center items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400 mt-2">
-            <span><i class="fa-solid fa-map-location-dot"></i> कुल जिले: 38</span>
+        <div class="flex flex-col items-center">
+            <label for="yearSelect" class="text-3xl font-bold gradient-text mb-1">वर्ष:</label>
+            <select id="yearSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-32">
+                <option value="2025" selected>2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+            </select>
         </div>
-    </header>
+        
+        <div class="flex flex-col items-center">
+            <label for="periodSelect" class="text-3xl font-bold gradient-text mb-1">अवधि:</label>
+            <select id="periodSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-64">
+                <option value="overall_monsoon" selected>मानसून (जून-सितंबर)</option>
+                <option value="june">जून</option>
+                <option value="july">जुलाई</option>
+                <option value="august">अगस्त</option>
+                <option value="september">सितंबर</option>
+            </select>
+        </div>
+
+    </div>
+    
+    <div class="flex justify-center items-center gap-4 text-lg font-bold mt-2">
+        <span class="gradient-text"><i class="fa-solid fa-map-location-dot"></i> कुल जिले: 38</span>
+    </div>
+</header>
 
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl">
@@ -259,7 +264,7 @@
         <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm lg:col-span-3">
             <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
                 <i class="fa-solid fa-chart-line text-purple-600"></i> 
-                <span class="gradient-text">वास्तविक / सामान्य वर्षा और विचलन (<span class="dynamic-month-label">कुल (Overall)</span>)</span>
+                <span class="gradient-text">वास्तविक / सामान्य वर्षा और विचलन (<span class="dynamic-month-label">मानसून (जून-सितंबर)</span>)</span>
             </h3>
             <div id="comparisonChart" class="w-full h-[500px]"></div>
         </div>
@@ -267,7 +272,7 @@
         <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm lg:col-span-3">
             <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
                 <i class="fa-solid fa-chart-column text-blue-600"></i> 
-                <span class="gradient-text">जिलेवार वर्षा विचलन (<span id="monthDisplay" class="dynamic-month-label">कुल (Overall)</span>)</span>
+                <span class="gradient-text">जिलेवार वर्षा विचलन (<span id="monthDisplay" class="dynamic-month-label">मानसून (जून-सितंबर)</span>)</span>
             </h3>
             <div id="deviationChart" class="w-full h-[500px]"></div>
         </div>
@@ -333,7 +338,7 @@
     
     <section id="data-table" class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
         <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Detailed Data: <span id="tableMonthLabel" class="dynamic-month-label text-blue-600">कुल (Overall)</span></h3>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Detailed Data: <span id="tableMonthLabel" class="dynamic-month-label text-blue-600">मानसून (जून-सितंबर) </span></h3>
              <a href="district.html" class="text-sm text-blue-500 dark:text-blue-400 hover:underline mt-1 block">
                  <i class="fa-solid fa-table-list mr-1"></i> Click here for District-wise Search and Sorting.
             </a>
@@ -401,7 +406,7 @@
 
     // --- Data Mapping ---
     const monthDisplayNames = {
-        'overall_monsoon': 'कुल (Overall)',
+        'overall_monsoon': 'मानसून (जून-सितंबर)',
         'september': 'सितंबर',
         'august': 'अगस्त',
         'july': 'जुलाई',
