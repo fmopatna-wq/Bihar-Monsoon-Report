@@ -17,6 +17,13 @@
                         secondary: '#E6F4EA',
                         darkbg: '#1a202c',
                         carddark: '#2d3748',
+                        // Custom Status Colors based on user legends
+                        'status-no-rain': '#ffffff',
+                        'status-large-def': '#ffd700',
+                        'status-def': '#e53935',
+                        'status-normal': '#4caf50',
+                        'status-excess': '#4fc3f7',
+                        'status-large-excess': '#1565c0',
                     }
                 }
             }
@@ -91,6 +98,19 @@
         .nav-links-container { display: flex; gap: 1rem; align-items: center; }
         @media (max-width: 1023px) {
             .nav-links-container { gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; flex-grow: 1; justify-content: flex-start; }
+        }
+
+        /* Status cell styling */
+        .status-cell {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            color: #1f2937; /* Dark text for readability */
+        }
+        
+        .dark .status-cell {
+            color: #f9fafb; /* Light text for readability in dark mode */
         }
     </style>
 </head>
@@ -206,6 +226,25 @@
     let currentSelectedMonth = 'Overall';
     let currentSort = { column: 'district', order: 'asc' };
 
+    // --- Rain Status Categorization Logic ---
+    function getRainStatus(deviation) {
+        if (deviation === -100) {
+            return { status: 'NO RAIN', color: 'bg-status-no-rain', textColor: 'text-gray-800' };
+        } else if (deviation >= 60) {
+            return { status: 'LARGE EXCESS', color: 'bg-status-large-excess', textColor: 'text-white' };
+        } else if (deviation >= 20) {
+            return { status: 'EXCESS', color: 'bg-status-excess', textColor: 'text-gray-800' };
+        } else if (deviation >= -19) {
+            return { status: 'NORMAL', color: 'bg-status-normal', textColor: 'text-white' };
+        } else if (deviation >= -59) {
+            return { status: 'DEFICIENT', color: 'bg-status-def', textColor: 'text-white' };
+        } else if (deviation >= -99) {
+            return { status: 'LARGE DEFICIENT', color: 'bg-status-large-def', textColor: 'text-gray-800' };
+        } else {
+            return { status: 'NO DATA', color: 'bg-gray-400', textColor: 'text-gray-800' }; // Should not happen with current logic
+        }
+    }
+
     // --- Main Fetch Function ---
     async function updateDashboard() {
         const year = document.getElementById('yearSelect').value;
@@ -319,9 +358,12 @@
         }
 
         displayData.forEach(d => {
+            const statusInfo = getRainStatus(d.deviation); // Get Status based on deviation
+
             const tr = document.createElement('tr');
             tr.className = "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition duration-150";
             
+            // The existing deviation bar
             const width = Math.min(Math.abs(d.deviation) + 20, 100);
             const colorClass = d.deviation < 0 ? 'bg-red-500' : 'bg-green-500';
             const textClass = d.deviation < 0 ? 'text-red-600' : 'text-green-600';
@@ -331,7 +373,9 @@
                 <td class="px-6 py-4 text-right">${d.actual.toFixed(1)}</td>
                 <td class="px-6 py-4 text-right">${d.normal.toFixed(1)}</td>
                 <td class="px-6 py-4 text-right font-bold ${textClass}">${d.deviation > 0 ? '+' : ''}${d.deviation}%</td>
-                <td class="px-6 py-4"><div class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden"><div class="${colorClass} h-full" style="width: ${width}%"></div></div></td>
+                <td class="px-6 py-4 text-center">
+                    <span class="status-cell ${statusInfo.color} ${statusInfo.textColor}">${statusInfo.status}</span>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -339,7 +383,7 @@
         updateSortIcons();
     }
 
-    // --- Sorting Logic ---
+    // --- Sorting Logic (Unchanged) ---
     function sortData(data, column, order) {
         return data.sort((a, b) => {
             let valA = a[column];
@@ -375,7 +419,7 @@
         });
     }
 
-    // --- Interaction Handlers ---
+    // --- Interaction Handlers (Unchanged) ---
     function selectMonth(month) {
         currentSelectedMonth = month;
         
