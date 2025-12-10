@@ -50,7 +50,7 @@
             @apply px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-green-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all select-none cursor-pointer;
         }
 
-        /* --- NEW: Transparent/Sticky Header Style --- */
+        /* --- Navbar Style --- */
         .navbar {
             background-color: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
@@ -64,22 +64,23 @@
             background-color: rgba(30, 41, 59, 0.9);
         }
 
-        /* --- NEW: Gradient Text Class (For Headers) --- */
+        /* --- Gradient Text (for numbers/labels) --- */
         .gradient-text {
-            background: linear-gradient(to right, #2563eb, #0d9488); /* Blue to Teal */
+            background: linear-gradient(to right, #2563eb, #0d9488);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             display: inline-block;
         }
         .dark .gradient-text {
-            background: linear-gradient(to right, #60a5fa, #2dd4bf); /* Lighter Blue to Teal for Dark Mode */
+            background: linear-gradient(to right, #60a5fa, #2dd4bf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            display: inline-block;
         }
-
-        /* --- NEW: Nav Box Style --- */
+        
+        /* --- Nav Box Style --- */
         .nav-box {
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
@@ -87,23 +88,19 @@
             font-weight: 600;
             cursor: pointer;
             border: 1px solid transparent;
-            color: #4b5563; /* gray-600 */
+            color: #4b5563;
         }
         .dark .nav-box {
-            color: #d1d5db; /* gray-300 */
+            color: #d1d5db;
         }
-        
-        /* Hover Effect */
         .nav-box:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             transform: translateY(-2px);
             background-color: white;
         }
         .dark .nav-box:hover {
             background-color: #374151;
         }
-
-        /* Active State (Gradient Box) */
         .nav-box.active-nav {
             background: linear-gradient(to right, #2563eb, #0d9488);
             color: white !important;
@@ -111,26 +108,57 @@
             border: none;
         }
 
-        /* Responsive Navigation Handling */
         .nav-links-container {
-            display: flex;
-            gap: 1rem; 
-            align-items: center;
+            display: flex; gap: 1rem; align-items: center;
         }
-
         @media (max-width: 1023px) {
             .nav-links-container {
-                gap: 0.5rem; 
-                overflow-x: auto; 
-                white-space: nowrap; 
-                padding-bottom: 4px; 
-                flex-grow: 1; 
-                justify-content: flex-start;
+                gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; flex-grow: 1; justify-content: flex-start;
             }
         }
+
+        /* --- GLOWING CHART EFFECT (Updated for Teal Green) --- */
+        /* Target the Actual Line (Sky Blue) */
+        #comparisonChart .trace:nth-of-type(1) path.js-line {
+            filter: drop-shadow(0 0 4px rgba(66, 165, 245, 0.7)); /* Soft Blue Glow */
+        }
+        /* Target the Normal Line (Muted Red) */
+        #comparisonChart .trace:nth-of-type(2) path.js-line {
+            filter: drop-shadow(0 0 4px rgba(239, 83, 80, 0.7)); /* Soft Red Glow */
+        }
+        /* Target the Departure Line (Teal Green) */
+        #comparisonChart .trace:nth-of-type(3) path.js-line {
+            filter: drop-shadow(0 0 4px rgba(0, 188, 212, 0.8)); /* Soft Cyan/Teal Glow */
+        }
+
+        /* --- Custom Color Scheme Variables --- */
+        :root {
+            /* User's specified colors for rainfall categories */
+            --no-rain: #ffffff;      /* white (NO RAIN: -100%) */
+            --large-def: #ffd700;    /* yellow (LARGE DEFICIENT: -60% to -99%) */
+            --def: #e53935;          /* red (DEFICIENT: -20% to -59%) */
+            --normal: #4caf50;       /* green (NORMAL: -19% to +19%) */
+            --excess: #4fc3f7;       /* light blue (EXCESS: +20% to +59%) */
+            --large-excess: #1565c0; /* dark blue (LARGE EXCESS: +60% and above) */
+        }
+        
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<svg height="0" width="0" style="position: absolute;">
+    <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#0d9488;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="gradient-dark" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#2dd4bf;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+</svg>
+
 
 <nav id="navbar" class="navbar">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
@@ -145,7 +173,7 @@
         
         <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
             <a href="index.html" class="nav-box active-nav" onclick="setActive(this)">होम</a>
-            <a href="index.html#analysis" class="nav-box" onclick="setActive(this)">डैशबोर्ड</a>    
+            <a href="index.html#analysis" class="nav-box" onclick="setActive(this)">डैशबोर्ड</a>    
             <a href="district.html" class="nav-box" onclick="setActive(this)">जिलावार</a> 
             <a href="maps.html" class="nav-box" onclick="setActive(this)">मानचित्र</a>
             <a href="history.html" class="nav-box" onclick="setActive(this)">ऐतिहासिक</a>
@@ -219,6 +247,23 @@
     </section>
 
     <section id="analysis" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm lg:col-span-3">
+            <h3 class="text-lg font-bold flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-book-open text-orange-600"></i> 
+                <span class="gradient-text">Rainfall Classification (Legends)</span>
+            </h3>
+            <div id="legendTableContainer">
+                </div>
+        </div>
+        <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm lg:col-span-3">
+            <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-chart-line text-purple-600"></i> 
+                <span class="gradient-text">वास्तविक / सामान्य वर्षा और विचलन (<span class="dynamic-month-label">कुल (Overall)</span>)</span>
+            </h3>
+            <div id="comparisonChart" class="w-full h-[500px]"></div>
+        </div>
+
         <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm lg:col-span-3">
             <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
                 <i class="fa-solid fa-chart-column text-blue-600"></i> 
@@ -243,7 +288,7 @@
         <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-chart-pie text-orange-600"></i> 
-                <span class="gradient-text">प्रदर्शन वर्गीकरण</span>
+                <span class="gradient-text">Performance Classification</span>
             </h3>
             <div id="pieChart" class="w-full h-[400px]"></div>
         </div>
@@ -265,7 +310,7 @@
                 <i class="fa-solid fa-table-cells text-teal-600"></i> 
                 <span class="gradient-text">वर्षा वितरण मैट्रिक्स (Heatmap)</span>
             </h3>
-            <div id="heatmapChart" class="w-full h-[600px]">
+            <div id="heatmapChart" class="w-full h-[800px]"> 
                 <div class="text-center p-8 text-gray-500">
                     
                 </div>
@@ -288,20 +333,20 @@
     
     <section id="data-table" class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
         <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white">विस्तृत डेटा: <span id="tableMonthLabel" class="dynamic-month-label text-blue-600">कुल (Overall)</span></h3>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Detailed Data: <span id="tableMonthLabel" class="dynamic-month-label text-blue-600">कुल (Overall)</span></h3>
              <a href="district.html" class="text-sm text-blue-500 dark:text-blue-400 hover:underline mt-1 block">
-                 <i class="fa-solid fa-table-list mr-1"></i> जिलावार सर्च और सॉर्टिंग के लिए यहाँ क्लिक करें।
+                 <i class="fa-solid fa-table-list mr-1"></i> Click here for District-wise Search and Sorting.
             </a>
         </div>
         <div class="overflow-x-auto max-h-[500px]">
             <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0 z-10">
                     <tr>
-                        <th class="px-6 py-3">जिला</th>
-                        <th class="px-6 py-3 text-right">वास्तविक (मिमी)</th>
-                        <th class="px-6 py-3 text-right">सामान्य (मिमी)</th>
-                        <th class="px-6 py-3 text-right">विचलन (%)</th>
-                        <th class="px-6 py-3 text-center">स्थिति</th>
+                        <th class="px-6 py-3">District</th>
+                        <th class="px-6 py-3 text-right">Actual R/F (mm)</th>
+                        <th class="px-6 py-3 text-right">Normal R/F (mm)</th>
+                        <th class="px-6 py-3 text-right">Departure (%)</th>
+                        <th class="px-6 py-3 text-center">Status</th>
                     </tr>
                 </thead>
                 <tbody id="dataTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -311,10 +356,10 @@
     </section>
 
     <footer class="bg-slate-800 text-white p-8 rounded-xl mt-8 text-center space-y-4">
-        <h4 class="text-xl font-bold gradient-text">डेटा स्रोत और क्रेडिट</h4>
+        <h4 class="text-xl font-bold gradient-text">Data Source and Credits</h4>
         <p class="text-gray-300">India Meteorological Department: Meteorological Centre Patna</p>
         <div class="pt-4 border-t border-slate-700">
-            <p class="text-sm text-gray-400">विश्लेषण तैयार किया गया:</p>
+            <p class="text-sm text-gray-400">Analysis Prepared by:</p>
             <p class="text-lg font-semibold">© Lal Kamal</p>
         </div>
     </footer>
@@ -322,6 +367,18 @@
 </main>
 
 <script>
+    // --- Global Configuration for Plotly Charts (for linear modebar/controls) ---
+    const PLOTLY_CONFIG = {
+        responsive: true,
+        displayModeBar: true,
+        modeBarButtonsToRemove: [
+            'lasso2d', 'select2d', 'sendDataToCloud', 
+            'hoverClosestCartesian', 'hoverCompareCartesian', 'toggleSpikelines'
+        ],
+        displaylogo: false, // Remove Plotly logo
+        modebar: { orientation: 'h' } // <<<--- यह परिवर्तन मोड बार को हॉरिजॉन्टल करता है
+    };
+
     // --- UI Logic: Active Tab Switching ---
     function setActive(element) {
         document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('active-nav'));
@@ -330,17 +387,16 @@
 
     function toggleDarkMode() {
         document.documentElement.classList.toggle('dark');
-        // डार्क मोड टॉगल होने पर चार्ट को री-रेंडर करें
         const periodKey = document.getElementById('periodSelect').value;
         if (window.globalData) {
             updateDashboardUI(window.globalData);
         } else {
              updateDashboard();
         }
-        // मासिक चार्ट को भी री-रेंडर करें, periodKey के साथ
         if (window.globalMonthlyData) {
             renderMonthlyCharts(window.globalMonthlyData, periodKey);
         }
+        renderLegendTable(); 
     }
 
     // --- Data Mapping ---
@@ -352,14 +408,36 @@
         'june': 'जून'
     };
     
-    // वैश्विक वैरिएबल (Global Variable) जो लोड किए गए CSV डेटा को रखेगा
-    window.globalData = []; // Single CSV data (e.g., june.csv)
-    window.globalMonthlyData = []; // Combined Monthly CSV data (monthly_combined.csv)
+    // वैश्विक वैरिएबल
+    window.globalData = []; 
+    window.globalMonthlyData = []; 
+    
+    // --- NEW: Central Color Scheme using HEX values ---
+    const RAINFALL_COLORS_HEX = {
+        'LARGE EXCESS': '#1565c0', // dark blue (+60 and above)
+        'EXCESS': '#4fc3f7',      // light blue (+20 to +59)
+        'NORMAL': '#4caf50',      // green (-19 to +19)
+        'DEFICIENT': '#e53935',    // red (-20 to -59)
+        'LARGE DEFICIENT': '#ffd700', // yellow (-60 to -99)
+        'NO RAIN': '#ffffff',      // white (-100)
+    };
+
+    const rainfallLegends = [
+        // Updated colors and corresponding text colors for contrast
+        { name: 'LARGE EXCESS', range: '+60% and above', color: RAINFALL_COLORS_HEX['LARGE EXCESS'], count: 0, textColor: 'white' }, 
+        { name: 'EXCESS', range: '+20% to +59%', color: RAINFALL_COLORS_HEX['EXCESS'], count: 0, textColor: 'black' },        
+        { name: 'NORMAL', range: '-19% to +19%', color: RAINFALL_COLORS_HEX['NORMAL'], count: 0, textColor: 'white' },      
+        { name: 'DEFICIENT', range: '-20% to -59%', color: RAINFALL_COLORS_HEX['DEFICIENT'], count: 0, textColor: 'white' },      
+        { name: 'LARGE DEFICIENT', range: '-60% to -99%', color: RAINFALL_COLORS_HEX['LARGE DEFICIENT'], count: 0, textColor: 'black' }, 
+        { name: 'NO RAIN', range: '-100%', color: RAINFALL_COLORS_HEX['NO RAIN'], count: 0, textColor: 'black' },       
+    ];
 
     /**
      * CSV फ़ाइल को फ़ेच करता है और Papa Parse का उपयोग करके उसे JSON Array में पार्स करता है।
+     * --- IMPORTANT: Ensure these files exist in the data/2025/ directory ---
      */
     async function loadCSVData(year, periodKey) {
+        // NOTE: This path is relative and requires the CSV files to be present.
         const filePath = `data/${year}/${periodKey}.csv`; 
 
         try {
@@ -368,9 +446,7 @@
             const response = await fetch(filePath);
             
             if (!response.ok) {
-                if (periodKey === 'monthly_combined') {
-                    throw new Error(`मासिक संयुक्त डेटा फ़ाइल नहीं मिली: ${filePath}`);
-                }
+                // If the data file is missing, we must throw an error to prevent the dashboard from rendering empty charts.
                 throw new Error(`डेटा फ़ाइल नहीं मिली: ${filePath}`);
             }
             
@@ -386,7 +462,6 @@
                             reject(new Error("CSV पार्सिंग विफल रही।"));
                             return;
                         }
-                        console.log(`Successfully loaded ${results.data.length} records for ${periodKey}.`);
                         resolve(results.data);
                     },
                     error: function(err) {
@@ -397,7 +472,8 @@
 
         } catch (error) {
             console.error(`CSV लोड करने में विफलता (${periodKey}):`, error);
-            throw error;
+            // Display a message in the console and propagate the error for UI feedback
+            throw error; 
         }
     }
 
@@ -419,12 +495,27 @@
                 actual: isNaN(actual) ? 0 : actual, 
                 normal: isNaN(normal) ? 0 : normal, 
                 deviation: isNaN(deviation) ? 0 : deviation,
+                status: getRainfallStatus(deviation)
             };
-        });
+        }).filter(d => d.district !== 'Unknown'); // Filter out records with no district name
     }
 
     /**
-     * कच्चे मासिक संयुक्त CSV डेटा को प्रोसेस करता है (Line Chart और Heatmap के लिए)
+     * विचलन के आधार पर श्रेणी निर्धारित करता है।
+     * --- FIX: Logic is correct for standard IMD criteria. ---
+     */
+     function getRainfallStatus(deviation) {
+        if(deviation >= 60) return 'LARGE EXCESS';
+        if(deviation > 19) return 'EXCESS';
+        if(deviation >= -19) return 'NORMAL';
+        if(deviation >= -59) return 'DEFICIENT';
+        if(deviation === -100) return 'NO RAIN';
+        return 'LARGE DEFICIENT'; // covers -60 to -99
+    }
+
+
+    /**
+     * कच्चे मासिक संयुक्त CSV डेटा को प्रोसेस करता है
      */
     function getProcessedMonthlyData(rawData) {
         return rawData.map(d => {
@@ -439,14 +530,11 @@
                 normal: normal,
                 deviation: deviation,
             };
-        });
+        }).filter(d => d.district !== 'Unknown');
     }
 
     // --- Dashboard Control ---
 
-    /**
-     * ड्रॉपडाउन चयन के आधार पर डेटा को लोड और UI को अपडेट करता है।
-     */
     async function updateDashboard() {
         const year = document.getElementById('yearSelect').value;
         const periodKey = document.getElementById('periodSelect').value;
@@ -458,27 +546,34 @@
         document.getElementById('tableMonthLabel').innerText = monthLabel;
         document.querySelectorAll('.dynamic-month-label').forEach(el => el.innerText = monthLabel);
         
-        // 1. सिंगल CSV डेटा लोड करें (Stats, Bar, Pie, Table के लिए)
+        // 1. सिंगल CSV डेटा लोड करें
         try {
             const rawData = await loadCSVData(year, periodKey);
             window.globalData = rawData; 
             updateDashboardUI(rawData);
         } catch (error) {
             console.error("सिंगल डैशबोर्ड अपडेट में त्रुटि:", error);
+            // Show error message in the table body
             document.getElementById('dataTableBody').innerHTML = 
                 `<tr><td colspan="5" class="px-6 py-4 text-center text-red-500 font-semibold">
-                    डेटा लोड नहीं हो सका। कृपया सुनिश्चित करें कि फ़ाइल ${year}/${periodKey}.csv मौजूद है।
+                    डेटा लोड नहीं हो सका। कृपया सुनिश्चित करें कि फ़ाइल data/${year}/${periodKey}.csv मौजूद है।
                 </td></tr>`;
+            // Clear all chart areas
             renderStats([]); 
+            renderLegendTable(calculateLegendCounts([])); 
+            Plotly.purge('deviationChart'); 
+            Plotly.purge('comparisonChart'); 
+            Plotly.purge('pieChart'); 
+            Plotly.purge('topDistChart'); 
+            Plotly.purge('botDistChart'); 
+            Plotly.purge('lineChart');
+            Plotly.purge('heatmapChart');
         }
 
-        // 2. मासिक संयुक्त डेटा लोड करें (Line Chart और Heatmap के लिए)
+        // 2. मासिक संयुक्त डेटा लोड करें
         loadAndRenderMonthlyCharts(year, periodKey); 
     }
     
-    /**
-     * मासिक संयुक्त डेटा लोड करता है और Line/Heatmap चार्ट रेंडर करता है।
-     */
     async function loadAndRenderMonthlyCharts(year, selectedPeriodKey) { 
         try {
             const rawMonthlyData = await loadCSVData(year, 'monthly_combined');
@@ -486,41 +581,74 @@
             renderMonthlyCharts(window.globalMonthlyData, selectedPeriodKey); 
         } catch (error) {
             console.error("Monthly combined data load failed:", error);
-            // संदेश हटाने के लिए: Line Chart और Heatmap दोनों को साफ़ किया गया
-            document.getElementById('lineChart').innerHTML = '';
-            document.getElementById('heatmapChart').innerHTML = '';
+            // Clear monthly charts if combined data is missing
             Plotly.purge('lineChart');
             Plotly.purge('heatmapChart');
         }
     }
     
-    /**
-     * मासिक डेटा का उपयोग करके Line Chart और Heatmap को रेंडर करता है।
-     */
     function renderMonthlyCharts(data, selectedPeriodKey) { 
         if (data && data.length > 0) {
-            // Line Chart: पूरे डेटा पर मासिक औसत दिखाएगा
             renderLineChart(data);
-            
-            // Heatmap: periodKey के आधार पर फ़िल्टर किया जाएगा
             renderHeatmap(data, selectedPeriodKey); 
         }
     }
 
-    /**
-     * संसाधित डेटा का उपयोग करके सभी मुख्य UI तत्वों को अपडेट करता है।
-     */
     function updateDashboardUI(rawData) {
         const processedData = getProcessedData(rawData);
+        const counts = calculateLegendCounts(processedData);
         
+        renderLegendTable(counts); 
         renderStats(processedData);
         renderMainCharts(processedData);
         renderTable(processedData);
     }
     
-    // --- Render Logic ---
+    // --- Calculate counts for Legend Table ---
+    function calculateLegendCounts(data) {
+        const counts = { 'LARGE EXCESS': 0, 'EXCESS': 0, 'NORMAL': 0, 'DEFICIENT': 0, 'LARGE DEFICIENT': 0, 'NO RAIN': 0 };
+        data.forEach(d => {
+            const status = getRainfallStatus(d.deviation);
+            if (counts.hasOwnProperty(status)) {
+                counts[status]++;
+            }
+        });
+        return counts;
+    }
     
+    // --- Render Legend Table (Using new colors and textColor) ---
+    function renderLegendTable(counts) {
+        const container = document.getElementById('legendTableContainer');
+        
+        let htmlContent = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-2 text-center">';
+        
+        rainfallLegends.forEach(legend => {
+            const count = counts && counts[legend.name] !== undefined ? counts[legend.name] : '--';
+            // Use the predefined textColor from rainfallLegends
+            const textColor = legend.textColor; 
+
+            htmlContent += `
+                <div class="rounded-lg shadow-md overflow-hidden transition transform hover:scale-[1.02] cursor-default border border-gray-200 dark:border-gray-700">
+                    <div style="background-color: ${legend.color}; color: ${textColor};" class="font-bold text-xs py-1 px-1">
+                        ${legend.name}
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs py-1 font-mono">
+                        ${legend.range}
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 text-sm py-1.5 px-1 font-bold">
+                        <span class="gradient-text">${count}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        htmlContent += '</div>';
+        container.innerHTML = htmlContent;
+    }
+    
+    // --- Render Stats ---
     function renderStats(data) {
+        // ... (Stats rendering logic remains the same)
         if (data.length === 0) {
             document.getElementById('statAvgRain').innerText = '--';
             document.getElementById('statAvgDev').innerText = '--';
@@ -539,7 +667,7 @@
             avgDev = Math.round(((totalActual - totalNormal) / totalNormal) * 100);
         }
         
-        const deficitCount = data.filter(d => d.deviation < 0).length;
+        const deficitCount = data.filter(d => d.deviation < -19).length; 
         const maxDist = data.reduce((prev, current) => (prev.actual > current.actual) ? prev : current);
 
         document.getElementById('statAvgRain').innerText = `${avgActual} मिमी`;
@@ -549,14 +677,18 @@
         let colorClass = 'text-gray-600';
         let iconClass = 'text-gray-500';
         let labelText = 'विचलन';
-        if (avgDev < 0) {
+        if (avgDev < -19) { 
             colorClass = 'text-red-600';
             iconClass = 'text-red-500';
-            labelText = 'सामान्य से कम';
-        } else if (avgDev > 0) {
+            labelText = 'Below Normal';
+        } else if (avgDev > 19) { 
             colorClass = 'text-green-600';
             iconClass = 'text-green-500';
-            labelText = 'सामान्य/अधिक';
+            labelText = 'Normal/Above';
+        } else { 
+             colorClass = 'text-blue-600';
+             iconClass = 'text-blue-500';
+             labelText = 'In Normal Range';
         }
         
         devElem.className = `text-3xl font-bold ${colorClass}`;
@@ -571,6 +703,7 @@
     function renderMainCharts(data) {
         if (data.length === 0) {
             Plotly.purge('deviationChart'); 
+            Plotly.purge('comparisonChart'); 
             Plotly.purge('pieChart'); 
             Plotly.purge('topDistChart'); 
             Plotly.purge('botDistChart'); 
@@ -584,17 +717,104 @@
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
-            margin: { t: 30, b: 60, l: 40, r: 10 },
+            margin: { t: 30, b: 150, l: 40, r: 80 }, 
             xaxis: { showgrid: false },
             yaxis: { showgrid: true, gridcolor: isDark ? '#374151' : '#e2e8f0' }
         };
 
-        // --- 1. Deviation Chart (Bar) ---
-        const colors = data.map(d => d.deviation >= 0 ? '#10b981' : (d.deviation > -20 ? '#f59e0b' : '#ef4444'));
+        const gradientId = isDark ? 'gradient-dark' : 'gradient';
+        // Configuration for the gradient/bold axis titles (Annotation based)
+        const axisTitleConfig = {
+            xref: 'paper', yref: 'paper',
+            showarrow: false,
+            font: { 
+                family: 'Poppins', 
+                size: 14,
+                color: 'transparent', // Initial transparent
+            },
+        };
+        
+        // --- COMPARISON CHART: Actual vs Normal vs Departure ---
+        const traceActual = {
+            x: data.map(d => d.district),
+            y: data.map(d => d.actual),
+            type: 'scatter', mode: 'lines+markers', name: 'Actual R/F (mm)',
+            line: { color: '#42A5F5', width: 3, shape: 'spline' }, 
+            marker: { size: 6, color: '#42A5F5', symbol: 'circle' }
+        };
+
+        const traceNormal = {
+            x: data.map(d => d.district),
+            y: data.map(d => d.normal),
+            type: 'scatter', mode: 'lines+markers', name: 'Normal R/F (mm)',
+            line: { color: '#EF5350', width: 3, shape: 'spline', dash: 'dash' }, 
+            marker: { size: 6, color: '#EF5350', symbol: 'diamond' }
+        };
+
+        const traceDeparture = {
+            x: data.map(d => d.district),
+            y: data.map(d => d.deviation),
+            type: 'scatter', mode: 'lines+markers', name: 'Departure (%)',
+            line: { color: '#00BCD4', width: 3, shape: 'spline' },
+            marker: { size: 6, color: '#00BCD4', symbol: 'star' },
+            yaxis: 'y2'
+        };
+
+        Plotly.newPlot('comparisonChart', [traceActual, traceNormal, traceDeparture], {
+            ...layoutConfig,
+            yaxis: { 
+                title: 'वर्षा (मिमी)', 
+                titlefont: { color: 'transparent' }, // Set transparent
+                tickfont: { color: fontColor }
+            },
+            yaxis2: { 
+                title: 'विचलन (%)',
+                overlaying: 'y',
+                side: 'right', 
+                showgrid: false,
+                zeroline: true,
+                titlefont: { color: 'transparent' }, // Set transparent
+                tickfont: { color: fontColor }
+            },
+            xaxis: { 
+                tickangle: 90, 
+                automargin: true,
+                tickfont: { size: 10 } 
+            },
+            legend: { orientation: 'h', y: 1.1 },
+            dragmode: 'pan',
+            hovermode: 'x unified',
+            annotations: [
+                { ...axisTitleConfig, text: '<b>वर्षा (मिमी)</b>', x: -0.05, y: 0.5, textangle: -90, 
+                    font: { color: `url(#${gradientId})`, size: 16 } },
+                { ...axisTitleConfig, text: '<b>विचलन (%)</b>', x: 1.05, y: 0.5, textangle: 90, 
+                    font: { color: `url(#${gradientId})`, size: 16 } }
+            ]
+        }, PLOTLY_CONFIG); 
+
+        // --- 1. Deviation Chart (Bar) - USING NEW COLORS ---
+        const deviationColors = data.map(d => {
+             if(d.deviation >= 60) return RAINFALL_COLORS_HEX['LARGE EXCESS'];         
+             if(d.deviation > 19) return RAINFALL_COLORS_HEX['EXCESS'];          
+             if(d.deviation >= -19) return RAINFALL_COLORS_HEX['NORMAL'];        
+             if(d.deviation >= -59) return RAINFALL_COLORS_HEX['DEFICIENT'];        
+             if(d.deviation == -100) return RAINFALL_COLORS_HEX['NO RAIN'];       
+             return RAINFALL_COLORS_HEX['LARGE DEFICIENT']; // covers -60 to -99
+        });
+        
         Plotly.newPlot('deviationChart', [{
             x: data.map(d => d.district), y: data.map(d => d.deviation),
-            type: 'bar', marker: { color: colors }, hovertemplate: '<b>%{x}</b><br>विचलन: %{y}%<extra></extra>'
-        }], { ...layoutConfig, yaxis: { title: 'विचलन (%)' }, dragmode: 'pan' }, {responsive: true, displayModeBar: false});
+            type: 'bar', marker: { color: deviationColors }, hovertemplate: '<b>%{x}</b><br>Departure: %{y}%<extra></extra>'
+        }], { ...layoutConfig, 
+            yaxis: { title: 'Departure (%)' }, 
+            xaxis: { 
+                tickangle: 90, 
+                automargin: true,
+                tickfont: { size: 10 } 
+            },
+            dragmode: 'pan', 
+            margin: { t: 30, b: 150, l: 40, r: 10 } 
+        }, PLOTLY_CONFIG); 
 
         // --- 2. Top/Bottom Charts ---
         const sorted = [...data].sort((a,b) => b.actual - a.actual);
@@ -603,43 +823,61 @@
         
         const barLayout = { 
             ...layoutConfig, 
-            margin: {l: 80, t: 10, b: 30, r: 10}, 
-            xaxis: { title: 'वास्तविक वर्षा (मिमी)'} 
+            margin: {l: 100, t: 10, b: 30, r: 10}, 
+            xaxis: { title: 'Actual R/F (mm)'},
+            height: 400 
         };
         
         Plotly.newPlot('topDistChart', [{
             y: top5.map(d => d.district), x: top5.map(d => d.actual),
             type: 'bar', orientation: 'h', marker: { color: '#059669' },
-            hovertemplate: '<b>%{y}</b>: %{x} मिमी<extra>टॉप 5</extra>'
-        }], barLayout, {responsive: true, displayModeBar: false});
+            hovertemplate: '<b>%{y}</b>: %{x} mm<extra>Top 5</extra>'
+        }], barLayout, PLOTLY_CONFIG); 
         
         Plotly.newPlot('botDistChart', [{
             y: bot5.map(d => d.district), x: bot5.map(d => d.actual),
             type: 'bar', orientation: 'h', marker: { color: '#ea580c' },
-            hovertemplate: '<b>%{y}</b>: %{x} मिमी<extra>बॉटम 5</extra>'
-        }], barLayout, {responsive: true, displayModeBar: false});
+            hovertemplate: '<b>%{y}</b>: %{x} mm<extra>Bottom 5</extra>'
+        }], barLayout, PLOTLY_CONFIG); 
 
-        // --- 3. Pie Chart (वर्गीकरण) ---
-        const counts = { excess: 0, normal: 0, deficit: 0, largeDef: 0 };
-        data.forEach(d => {
-            if(d.deviation > 19) counts.excess++;
-            else if(d.deviation >= -19) counts.normal++;
-            else if(d.deviation >= -59) counts.deficit++;
-            else counts.largeDef++;
-        });
+        // --- 3. Pie Chart - USING NEW COLORS ---
+        const counts = calculateLegendCounts(data);
         
-        const pieValues = [counts.excess, counts.normal, counts.deficit, counts.largeDef].filter(v => v > 0);
-        const pieLabels = ['अधिक (+20% से अधिक)', 'सामान्य (-19% से +19%)', 'घाटा (-20% से -59%)', 'गंभीर घाटा (-60% से कम)'].filter((_, i) => [counts.excess, counts.normal, counts.deficit, counts.largeDef][i] > 0);
-        
+        const pieData = [
+            { label: 'LARGE EXCESS (+60% or more)', value: counts['LARGE EXCESS'], color: RAINFALL_COLORS_HEX['LARGE EXCESS'] },
+            { label: 'EXCESS (+20% to +59%)', value: counts['EXCESS'], color: RAINFALL_COLORS_HEX['EXCESS'] },
+            { label: 'NORMAL (-19% to +19%)', value: counts['NORMAL'], color: RAINFALL_COLORS_HEX['NORMAL'] },
+            { label: 'DEFICIENT (-20% to -59%)', value: counts['DEFICIENT'], color: RAINFALL_COLORS_HEX['DEFICIENT'] },
+            { label: 'LARGE DEFICIENT (-60% to -99%)', value: counts['LARGE DEFICIENT'], color: RAINFALL_COLORS_HEX['LARGE DEFICIENT'] },
+            { label: 'NO RAIN (-100%)', value: counts['NO RAIN'], color: RAINFALL_COLORS_HEX['NO RAIN'] },
+        ].filter(d => d.value > 0).sort((a, b) => b.value - a.value); 
+
+        const pieValues = pieData.map(d => d.value);
+        const pieLabels = pieData.map(d => `${d.label} (${d.value})`); 
+        const pieColors = pieData.map(d => d.color);
+
         Plotly.newPlot('pieChart', [{
             values: pieValues,
             labels: pieLabels,
             type: 'pie', hole: 0.5, 
-            marker: { colors: ['#10b981', '#3b82f6', '#f59e0b', '#dc2626'] }
-        }], { ...layoutConfig, showlegend: true, legend: { orientation: 'h', y: -0.1 } }, {responsive: true});
+            marker: { colors: pieColors },
+            textinfo: 'percent', 
+            automargin: true 
+        }], { 
+            ...layoutConfig, 
+            showlegend: true, 
+            legend: { 
+                orientation: 'v', 
+                y: 0.5, 
+                x: 1.05,
+                bgcolor: 'rgba(0,0,0,0)',
+                bordercolor: 'rgba(0,0,0,0)'
+            },
+            margin: { l: 20, r: 150, t: 30, b: 30 }
+        }, PLOTLY_CONFIG); 
     }
 
-    // --- Line Chart (वर्षा प्रवृत्ति) ---
+    // --- Line Chart (Updated axis formatting) ---
     function renderLineChart(data) {
         const monthlyAverages = {};
         const monthOrder = ['June', 'July', 'August', 'September'];
@@ -659,17 +897,18 @@
 
         const isDark = document.documentElement.classList.contains('dark');
         const fontColor = isDark ? '#cbd5e1' : '#334155';
-        
+        const gradientId = isDark ? 'gradient-dark' : 'gradient';
+
         Plotly.newPlot('lineChart', [
             {
                 x: plotMonths, y: avgActuals,
-                mode: 'lines+markers', name: 'वास्तविक औसत',
+                mode: 'lines+markers', name: 'Actual Average',
                 line: { color: '#2563eb', width: 3 },
                 marker: { size: 8 }
             },
             {
                 x: plotMonths, y: avgNormals,
-                mode: 'lines+markers', name: 'सामान्य औसत',
+                mode: 'lines+markers', name: 'Normal Average',
                 line: { color: '#0d9488', dash: 'dash', width: 2 },
                 marker: { size: 6 }
             }
@@ -678,15 +917,24 @@
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
             margin: { t: 30, b: 60, l: 40, r: 10 },
-            title: { text: 'मासिक वर्षा प्रवृत्ति (क्षेत्रीय औसत)', font: { size: 16 } },
-            xaxis: { title: 'महीना', showgrid: false },
-            yaxis: { title: 'वर्षा (मिमी)', showgrid: true, gridcolor: isDark ? '#374151' : '#e2e8f0' },
-            // **Legend को बॉटम में रखा गया है (y: -0.2)**
-            legend: { orientation: 'h', y: -0.2 } 
-        }, { responsive: true, displayModeBar: false });
+            title: { text: 'Monthly Rainfall Trend (Regional Avg)', font: { size: 16 } },
+            xaxis: { title: 'Month', showgrid: false },
+            yaxis: { 
+                title: 'वर्षा (मिमी)', 
+                showgrid: true, 
+                gridcolor: isDark ? '#374151' : '#e2e8f0',
+                titlefont: { color: 'transparent' } // Set transparent
+            },
+            legend: { orientation: 'h', y: -0.2 },
+            annotations: [
+                { xref: 'paper', yref: 'paper', text: '<b>वर्षा (मिमी)</b>', x: -0.05, y: 0.5, textangle: -90, 
+                    font: { color: `url(#${gradientId})`, size: 16 }
+                }
+            ]
+        }, PLOTLY_CONFIG); 
     }
 
-    // --- Heatmap Chart (वर्षा वितरण) ---
+    // --- Heatmap Chart (Interactive Modebar) - USING NEW COLORS ---
     function renderHeatmap(data, selectedPeriodKey) {
         const isDark = document.documentElement.classList.contains('dark');
         const fontColor = isDark ? '#cbd5e1' : '#334155';
@@ -697,96 +945,111 @@
         if (allMonthsOrder.map(m => m.toLowerCase()).includes(selectedPeriodKey.toLowerCase())) {
             const capitalizedMonth = selectedPeriodKey.charAt(0).toUpperCase() + selectedPeriodKey.slice(1).toLowerCase();
             monthsToShow = [capitalizedMonth];
-        } 
-        
-        const districtNames = Array.from(new Set(data.map(d => d.district))).sort();
-        const deviationMatrix = [];
+        }
 
-        districtNames.forEach(district => {
-            const row = [];
-            monthsToShow.forEach(month => {
+        const districts = [...new Set(data.map(d => d.district))].sort();
+        
+        const zData = districts.map(district => {
+            return monthsToShow.map(month => {
                 const record = data.find(d => d.district === district && d.month === month);
-                row.push(record ? record.deviation : null); 
+                return record ? record.deviation : null;
             });
-            deviationMatrix.push(row);
         });
 
-        const colorscale = [
-            [0.0, '#b91c1c'], 
-            [0.4, '#f87171'], 
-            [0.6, '#fde047'], 
-            [0.8, '#4ade80'], 
-            [1.0, '#16a34a']  
+        // Normalize z value (-100 to 100) to a [0, 1] range for Plotly's colorscale stops
+        // stop = (value + 100) / 200
+        const customColorScale = [
+            // -100% (NO RAIN) -> white
+            [0.00, RAINFALL_COLORS_HEX['NO RAIN']], 
+
+            // -99% (LARGE DEFICIENT) -> yellow
+            [(-99 + 100) / 200, RAINFALL_COLORS_HEX['LARGE DEFICIENT']], 
+            // -60% (LARGE DEFICIENT) -> yellow
+            [(-60 + 100) / 200, RAINFALL_COLORS_HEX['LARGE DEFICIENT']], 
+
+            // -59% (DEFICIENT) -> red
+            [(-59 + 100) / 200, RAINFALL_COLORS_HEX['DEFICIENT']], 
+            // -20% (DEFICIENT) -> red
+            [(-20 + 100) / 200, RAINFALL_COLORS_HEX['DEFICIENT']], 
+
+            // -19% (NORMAL) -> green
+            [(-19 + 100) / 200, RAINFALL_COLORS_HEX['NORMAL']], 
+            // +19% (NORMAL) -> green
+            [(19 + 100) / 200, RAINFALL_COLORS_HEX['NORMAL']], 
+
+            // +20% (EXCESS) -> light blue
+            [(20 + 100) / 200, RAINFALL_COLORS_HEX['EXCESS']], 
+            // +59% (EXCESS) -> light blue
+            [(59 + 100) / 200, RAINFALL_COLORS_HEX['EXCESS']], 
+
+            // +60% (LARGE EXCESS) -> dark blue
+            [(60 + 100) / 200, RAINFALL_COLORS_HEX['LARGE EXCESS']], 
+            // +100% (LARGE EXCESS) -> dark blue
+            [1.00, RAINFALL_COLORS_HEX['LARGE EXCESS']],
         ];
-        
+
+
         Plotly.newPlot('heatmapChart', [{
-            z: deviationMatrix, 
-            x: monthsToShow, 
-            y: districtNames,
+            z: zData,
+            x: monthsToShow,
+            y: districts,
             type: 'heatmap',
-            colorscale: colorscale,
-            zmin: -100, 
-            zmax: 100,
-            colorbar: {
-                title: 'विचलन (%)',
-                titleside: 'right',
-                tickvals: [-80, -40, 0, 40, 80],
-                ticktext: ['गंभीर घाटा', 'घाटा', 'सामान्य', 'अधिक', 'बहुत अधिक'],
-                yanchor: 'middle',
-                y: 0.5,
-            },
-            hovertemplate: 'जिला: %{y}<br>महीना: %{x}<br>विचलन: %{z}%<extra></extra>'
+            colorscale: customColorScale, // Using your custom colors
+            zmin: -100, zmax: 100, // Important for deviation
+            hoverongaps: false,
+            hovertemplate: '<b>%{y}</b><br>%{x}: %{z}%<extra></extra>'
         }], {
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
-            // **टॉप मार्जिन 70px किया गया है**
-            margin: { t: 70, b: 60, l: 100, r: 10 }, 
-            title: { text: 'मासिक विचलन Heatmap (जिलावार)', font: { size: 16 } },
-            xaxis: { side: 'top', tickangle: -45, showgrid: false },
-            yaxis: { automargin: true, tickangle: 0, showgrid: false }
-        }, { responsive: true, displayModeBar: false });
+            margin: { t: 30, b: 100, l: 100, r: 20 },
+            xaxis: { side: 'top' }
+        }, PLOTLY_CONFIG); 
     }
-
+    
+    // --- Render Table (Updated status logic and color coding) - USING NEW COLORS ---
     function renderTable(data) {
         const tbody = document.getElementById('dataTableBody');
         tbody.innerHTML = '';
-
-        if (data.length === 0) {
-             tbody.innerHTML = 
-                `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">इस चयन के लिए कोई डेटा नहीं मिला।</td></tr>`;
-            return;
-        }
+        
+        if (data.length === 0) return;
 
         data.forEach(d => {
             const tr = document.createElement('tr');
-            tr.className = "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition";
+            tr.className = "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700";
             
-            const absDev = Math.abs(d.deviation);
-            const width = Math.min(absDev + 20, 100); 
+            const statusText = d.status;
             
-            const colorClass = d.deviation < 0 ? 'bg-red-500' : 'bg-green-500';
-            const textClass = d.deviation < 0 ? 'text-red-600' : 'text-green-600';
+            // Use RAINFALL_COLORS_HEX for background color lookup
+            const bgColor = RAINFALL_COLORS_HEX[statusText];
             
+            // Determine text color for contrast based on the new scheme
+            let textColor = 'black'; 
+            if (statusText === 'LARGE EXCESS' || statusText === 'DEFICIENT' || statusText === 'NORMAL') {
+                textColor = 'white'; // Dark backgrounds: dark blue, red, green
+            } else {
+                textColor = 'black'; // Light backgrounds: light blue, yellow, white
+            }
+            
+
+            const cellStyle = `background-color: ${bgColor}; color: ${textColor};`;
+
             tr.innerHTML = `
-                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>
-                <td class="px-6 py-4 text-right">${d.actual.toFixed(1)}</td>
+                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">${d.district}</td>
+                <td class="px-6 py-4 text-right">${d.actual}</td>
                 <td class="px-6 py-4 text-right">${d.normal}</td>
-                <td class="px-6 py-4 text-right font-bold ${textClass}">${d.deviation}%</td>
-                <td class="px-6 py-4">
-                    <div class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
-                        <div class="${colorClass} h-full" style="width: ${width}%"></div>
-                    </div>
-                </td>
+                <td class="px-6 py-4 text-right font-bold">${d.deviation > 0 ? '+' : ''}${d.deviation}%</td>
+                <td class="px-6 py-4 text-center font-bold" style="${cellStyle}">${statusText}</td>
             `;
             tbody.appendChild(tr);
         });
     }
-
-    // Init (आरंभ करना)
+    
+    // Initialize Dashboard
     document.addEventListener('DOMContentLoaded', () => {
-        updateDashboard(); 
+        updateDashboard();
     });
+
 </script>
 </body>
 </html>

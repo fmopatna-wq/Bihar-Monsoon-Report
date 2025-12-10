@@ -34,7 +34,7 @@
         ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
         .dark ::-webkit-scrollbar-track { background: #2d3748; }
 
-        /* --- Navbar Styles (Matches Index) --- */
+        /* --- Navbar Styles --- */
         .navbar {
             background-color: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
@@ -44,13 +44,11 @@
             top: 0;
             z-index: 50;
         }
-        .dark .navbar {
-            background-color: rgba(30, 41, 59, 0.9);
-        }
+        .dark .navbar { background-color: rgba(30, 41, 59, 0.9); }
 
         /* --- Gradient Text --- */
         .gradient-text {
-            background: linear-gradient(to right, #2563eb, #0d9488); /* Blue to Teal */
+            background: linear-gradient(to right, #2563eb, #0d9488);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -63,72 +61,36 @@
             background-clip: text;
         }
 
-        /* --- Nav Box Style --- */
+        /* --- Nav Box & Tabs --- */
         .nav-box {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid transparent;
-            color: #4b5563;
-            text-decoration: none;
-            display: inline-block;
+            padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease;
+            font-weight: 600; cursor: pointer; border: 1px solid transparent;
+            color: #4b5563; text-decoration: none; display: inline-block;
         }
         .dark .nav-box { color: #d1d5db; }
-        
-        .nav-box:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-            background-color: white;
-        }
+        .nav-box:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transform: translateY(-2px); background-color: white; }
         .dark .nav-box:hover { background-color: #374151; }
-
         .nav-box.active-nav {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            color: white !important;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-            border: none;
+            background: linear-gradient(to right, #2563eb, #0d9488); color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); border: none;
         }
 
-        /* --- Month Tabs Style --- */
         .month-tab {
-            padding: 0.5rem 1.2rem;
-            border-radius: 9999px; /* Pill shape */
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            border: 1px solid #e5e7eb;
-            background-color: white;
-            color: #4b5563;
-            cursor: pointer;
+            padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.875rem;
+            font-weight: 600; transition: all 0.2s ease; border: 1px solid #e5e7eb;
+            background-color: white; color: #4b5563; cursor: pointer;
         }
-        .dark .month-tab {
-            background-color: #1f2937;
-            border-color: #374151;
-            color: #d1d5db;
-        }
-        .month-tab:hover {
-            background-color: #f3f4f6;
-            transform: translateY(-1px);
-        }
+        .dark .month-tab { background-color: #1f2937; border-color: #374151; color: #d1d5db; }
+        .month-tab:hover { background-color: #f3f4f6; transform: translateY(-1px); }
         .dark .month-tab:hover { background-color: #374151; }
-
         .month-tab.active-tab {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to right, #2563eb, #0d9488); color: white;
+            border-color: transparent; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        /* Responsive Navigation */
-        .nav-links-container {
-            display: flex; gap: 1rem; align-items: center;
-        }
+        .nav-links-container { display: flex; gap: 1rem; align-items: center; }
         @media (max-width: 1023px) {
-            .nav-links-container {
-                gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; flex-grow: 1; justify-content: flex-start;
-            }
+            .nav-links-container { gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; flex-grow: 1; justify-content: flex-start; }
         }
     </style>
 </head>
@@ -136,10 +98,8 @@
 
 <nav id="navbar" class="navbar">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
-        
         <div class="flex items-center gap-3 nav-logo shrink-0">
             <img src="assets/logo.png" alt="IMD Logo" class="h-8 w-8 object-contain dark:invert hidden sm:block"/> 
-            
             <div class="text-3xl text-blue-600 dark:text-blue-400"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
             <div>
                 <h1 class="text-xl font-bold leading-tight gradient-text">बिहार मानसून डैशबोर्ड</h1>
@@ -175,9 +135,12 @@
             
             <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
                 <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2">वर्ष:</label>
-                <select id="yearSelect" onchange="renderData()" class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
-                    <option value="2025">2025</option>
+                <select id="yearSelect" onchange="updateDashboard()" class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
+                    <option value="2025" selected>2025</option>
                     <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
                 </select>
             </div>
         </div>
@@ -201,7 +164,15 @@
         </div>
     </div>
 
-    <div class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700">
+    <div id="errorContainer" class="hidden text-center py-10 bg-white dark:bg-gray-800 rounded-xl border border-red-200 dark:border-red-900/50">
+        <div class="inline-flex bg-red-100 dark:bg-red-900/30 p-4 rounded-full mb-4">
+            <i class="fa-solid fa-database text-4xl text-red-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">डेटा उपलब्ध नहीं है</h3>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">चयनित वर्ष या महीने के लिए फाइल मौजूद नहीं है।</p>
+    </div>
+
+    <div id="dataCard" class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700">
         <div class="overflow-x-auto max-h-[70vh]">
             <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0 z-10">
@@ -230,125 +201,115 @@
 </main>
 
 <script>
-    // --- Data and State ---
-    const monthKeys = {
-        'June': 'June', 'July': 'July', 'August': 'August', 'September': 'September', 'Overall': 'overall'
-    };
-    
-    // Default selected month
+    // --- State Variables ---
+    let currentData = [];
     let currentSelectedMonth = 'Overall';
-
-    const districtNames = [
-        "ARARIA", "ARWAL", "AURANGABAD", "BANKA", "BEGUSARAI", "BHABUA", "BHAGALPUR", 
-        "BHOJPUR", "BUXAR", "DARBHANGA", "EAST CHAMPARAN", "GAYA", "GOPALGANJ", 
-        "JAHANABAD", "JAMUI", "KATIHAR", "KHAGARIA", "KISHANGANJ", "LAKHISARAI", 
-        "MADHEPURA", "MADHUBANI", "MONGHYR", "MUZAFFARPUR", "NALANDA", "NAWADA", 
-        "PATNA", "PURNEA", "ROHTAS", "SAHARSA", "SAMASTIPUR", "SARAN", "SHEIKHPURA", 
-        "SHEOHAR", "SITAMARHI", "SIWAN", "SUPAUL", "VAISHALI", "WEST CHAMPARAN"
-    ];
-
-    let rawData = generateDetailedData();
     let currentSort = { column: 'district', order: 'asc' };
 
-    // --- Utility Functions ---
+    // --- Main Fetch Function ---
+    async function updateDashboard() {
+        const year = document.getElementById('yearSelect').value;
+        const month = currentSelectedMonth;
+        
+        // Construct filename based on your folder structure
+        // If Overall -> overall_monsoon.csv
+        // If June -> june.csv, etc.
+        let filename = '';
+        if (month === 'Overall') {
+            filename = 'overall_monsoon.csv';
+        } else {
+            filename = `${month.toLowerCase()}.csv`;
+        }
 
-    function generateDetailedData() {
-        return districtNames.map(d => {
-            const monthlyStats = {};
-            let totalActual = 0, totalNormal = 0;
-            Object.values(monthKeys).filter(k => k !== 'overall').forEach(m => {
-                const norm = Math.floor(Math.random() * (350 - 150) + 150);
-                let variance = Math.floor(Math.random() * (20 - (-60)) + (-60));
-                
-                if(d === 'KISHANGANJ') variance = 20; 
-                if(d === 'GAYA' && m === 'August') variance = 10;
-                if(d === 'SITAMARHI') variance = -50;
+        const filePath = `data/${year}/${filename}`;
 
-                const act = parseFloat((norm * (1 + variance/100)).toFixed(1));
-                monthlyStats[m] = { actual: act, normal: norm };
-                totalActual += act; totalNormal += norm;
+        // UI Updates before fetch
+        const tableBody = document.getElementById('dataTableBody');
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500"></i><br>डेटा लोड हो रहा है...</td></tr>`;
+        document.getElementById('errorContainer').classList.add('hidden');
+        document.getElementById('dataCard').classList.remove('hidden');
+
+        try {
+            const response = await fetch(filePath);
+            
+            if (!response.ok) {
+                throw new Error("File not found");
+            }
+
+            const csvText = await response.text();
+            const parsedData = parseCSV(csvText);
+            
+            if(parsedData.length === 0) throw new Error("Empty Data");
+
+            currentData = parsedData;
+            renderData(); // Show data
+
+        } catch (error) {
+            console.error("Error loading data:", error);
+            // Show Error Message
+            document.getElementById('dataCard').classList.add('hidden');
+            document.getElementById('errorContainer').classList.remove('hidden');
+        }
+    }
+
+    // --- CSV Parser Helper ---
+    function parseCSV(csv) {
+        const lines = csv.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) return [];
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        
+        // Find column indices loosely (in case CSV headers change slightly)
+        const distIndex = headers.findIndex(h => h.includes('district'));
+        const actIndex = headers.findIndex(h => h.includes('actual'));
+        const normIndex = headers.findIndex(h => h.includes('normal'));
+        const depIndex = headers.findIndex(h => h.includes('dep') || h.includes('dev') || h.includes('%'));
+
+        if (distIndex === -1 || actIndex === -1) return []; // Invalid CSV format
+
+        const result = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const row = lines[i].split(',');
+            if (row.length < headers.length) continue;
+
+            const district = row[distIndex].trim().replace(/"/g, ''); // Remove quotes
+            const actual = parseFloat(row[actIndex]);
+            const normal = parseFloat(row[normIndex]);
+            
+            // Calculate deviation if missing, or parse it
+            let deviation = 0;
+            if (depIndex !== -1 && row[depIndex]) {
+                deviation = parseFloat(row[depIndex]);
+            } else if (normal > 0) {
+                deviation = ((actual - normal) / normal) * 100;
+            }
+
+            if (!district) continue;
+
+            result.push({
+                district: district,
+                actual: isNaN(actual) ? 0 : actual,
+                normal: isNaN(normal) ? 0 : normal,
+                deviation: isNaN(deviation) ? 0 : Math.round(deviation)
             });
-            return {
-                district: d,
-                monthly: monthlyStats,
-                overall: { actual: parseFloat(totalActual.toFixed(1)), normal: totalNormal }
-            };
-        });
+        }
+        return result;
     }
 
-    function getProcessedData(data, selectedMonth) {
-        // Map the UI month name to the internal data key
-        const internalKey = monthKeys[selectedMonth];
-        const isOverall = selectedMonth === 'Overall';
-        
-        return data.map(d => {
-            let act, norm;
-            if (isOverall) { act = d.overall.actual; norm = d.overall.normal; }
-            else { act = d.monthly[internalKey].actual; norm = d.monthly[internalKey].normal; }
-            const dev = norm === 0 ? 0 : Math.round(((act - norm) / norm) * 100);
-            return {
-                district: d.district, actual: act, normal: norm, deviation: dev,
-                fullMonthly: d.monthly 
-            };
-        });
-    }
-
-    function sortData(data, column, order) {
-        return data.sort((a, b) => {
-            let valA = a[column];
-            let valB = b[column];
-
-            if (column === 'district') {
-                valA = valA.toLowerCase();
-                valB = valB.toLowerCase();
-            }
-
-            if (valA < valB) return order === 'asc' ? -1 : 1;
-            if (valA > valB) return order === 'asc' ? 1 : -1;
-            return 0;
-        });
-    }
-
-    // --- Interaction Functions ---
-
-    // New Function to handle Month Tab Clicks
-    function selectMonth(month) {
-        currentSelectedMonth = month;
-        
-        // Update Tab UI
-        document.querySelectorAll('.month-tab').forEach(btn => {
-            if(btn.getAttribute('data-month') === month) {
-                btn.classList.add('active-tab');
-            } else {
-                btn.classList.remove('active-tab');
-            }
-        });
-
-        // Re-render Data
-        renderData();
-    }
-
-    function filterData() {
-        renderData(false); 
-    }
-
-    function renderData(resetSort = true) {
+    // --- Rendering Logic ---
+    function renderData() {
         const searchVal = document.getElementById('searchInput').value.toLowerCase();
         
-        // Use global currentSelectedMonth variable
-        let displayData = getProcessedData(rawData, currentSelectedMonth);
-
         // 1. Filter
-        if (searchVal) {
-            displayData = displayData.filter(d => 
-                d.district.toLowerCase().includes(searchVal)
-            );
-        }
+        let displayData = currentData.filter(d => 
+            d.district.toLowerCase().includes(searchVal)
+        );
 
         // 2. Sort
         displayData = sortData(displayData, currentSort.column, currentSort.order);
 
-        // 3. Render Table
+        // 3. Render HTML
         const tbody = document.getElementById('dataTableBody');
         tbody.innerHTML = '';
         
@@ -367,8 +328,8 @@
             
             tr.innerHTML = `
                 <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>
-                <td class="px-6 py-4 text-right">${d.actual}</td>
-                <td class="px-6 py-4 text-right">${d.normal}</td>
+                <td class="px-6 py-4 text-right">${d.actual.toFixed(1)}</td>
+                <td class="px-6 py-4 text-right">${d.normal.toFixed(1)}</td>
                 <td class="px-6 py-4 text-right font-bold ${textClass}">${d.deviation > 0 ? '+' : ''}${d.deviation}%</td>
                 <td class="px-6 py-4"><div class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden"><div class="${colorClass} h-full" style="width: ${width}%"></div></div></td>
             `;
@@ -377,7 +338,24 @@
         
         updateSortIcons();
     }
-    
+
+    // --- Sorting Logic ---
+    function sortData(data, column, order) {
+        return data.sort((a, b) => {
+            let valA = a[column];
+            let valB = b[column];
+
+            if (column === 'district') {
+                valA = valA.toLowerCase();
+                valB = valB.toLowerCase();
+            }
+
+            if (valA < valB) return order === 'asc' ? -1 : 1;
+            if (valA > valB) return order === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
     function updateSortIcons() {
         document.querySelectorAll('.sort-header').forEach(h => {
             h.classList.remove('active');
@@ -397,7 +375,32 @@
         });
     }
 
-    // Attach sort event listeners
+    // --- Interaction Handlers ---
+    function selectMonth(month) {
+        currentSelectedMonth = month;
+        
+        // Update Tabs UI
+        document.querySelectorAll('.month-tab').forEach(btn => {
+            if(btn.getAttribute('data-month') === month) {
+                btn.classList.add('active-tab');
+            } else {
+                btn.classList.remove('active-tab');
+            }
+        });
+
+        // Trigger Fetch
+        updateDashboard();
+    }
+
+    function filterData() {
+        renderData(); 
+    }
+
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+    }
+
+    // Event Listeners for Sorting
     document.querySelectorAll('.sort-header').forEach(header => {
         header.addEventListener('click', function() {
             const column = this.getAttribute('data-sort');
@@ -411,22 +414,13 @@
 
             currentSort = { column, order };
             this.setAttribute('data-order', order);
-            renderData(false); 
+            renderData(); 
         });
     });
 
-    // --- Page Initialization ---
-
-    function toggleDarkMode() {
-        document.documentElement.classList.toggle('dark');
-    }
-
+    // --- Initialize ---
     document.addEventListener('DOMContentLoaded', () => {
-        const initialHeader = document.querySelector('.sort-header[data-sort="district"]');
-        if(initialHeader) {
-            initialHeader.querySelector('.sort-icon i').className = 'fa-solid fa-sort-up';
-        }
-        renderData();
+        updateDashboard(); // Initial Load
     });
 
 </script>
