@@ -12,13 +12,8 @@
         theme: {
             extend: {
                 colors: {
-                    // --- नया बैकग्राउंड कलर टोकन यहाँ है ---
-                    'app-bg': '#F0F9FF', // Light Mode के लिए हल्का नीला (Sky 50)
-                    
-                    // यदि आप Dark Mode के लिए भी अलग बेस बैकग्राउंड कलर रखना चाहते हैं:
-                    'dark-app-bg': '#030712', // Dark Mode के लिए गहरा काला (Gray 950)
-                    // ------------------------------------------
-
+                    'app-bg': '#F0F9FF', 
+                    'dark-app-bg': '#030712', 
                     primary: '#2E8B57',
                     secondary: '#E6F4EA',
                     darkbg: '#1a202c',
@@ -29,6 +24,7 @@
     }
 </script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -177,22 +173,23 @@
                 <select id="yearSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold">
                     <option value="2025">2025</option>
                     <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
                 </select>
             </div>
             <div class="h-8 w-px bg-gray-300 dark:bg-gray-600 hidden md:block"></div>
             <div class="flex items-center gap-4">
-                <button onclick="changeMonth(-1)" class="nav-btn group">
-                    <i class="fa-solid fa-chevron-left text-gray-500 group-hover:text-blue-600"></i>
-                </button>
-                <div class="text-center w-32">
-                    <div class="text-xs text-gray-400 uppercase tracking-wider">चयनित अवधि</div>
-                    <div id="monthDisplay" class="text-xl font-bold text-blue-700 dark:text-blue-400">कुल (Overall)</div>
-                </div>
-                <button onclick="changeMonth(1)" class="nav-btn group">
-                    <i class="fa-solid fa-chevron-right text-gray-500 group-hover:text-blue-600"></i>
-                </button>
+                <label class="text-sm font-semibold text-gray-500">अवधि:</label>
+                <select id="periodSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-32">
+                    <option value="overall_monsoon" selected>कुल (Overall)</option>
+                    <option value="september">सितंबर</option>
+                    <option value="august">अगस्त</option>
+                    <option value="july">जुलाई</option>
+                    <option value="june">जून</option>
+                </select>
             </div>
-        </div>
+            </div>
         <div class="flex justify-center items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400 mt-2">
             <span><i class="fa-solid fa-map-location-dot"></i> कुल जिले: 38</span>
         </div>
@@ -225,7 +222,7 @@
         <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm lg:col-span-3">
             <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
                 <i class="fa-solid fa-chart-column text-blue-600"></i> 
-                <span class="gradient-text">जिलेवार वर्षा विचलन (<span class="dynamic-month-label"></span>)</span>
+                <span class="gradient-text">जिलेवार वर्षा विचलन (<span id="monthDisplay" class="dynamic-month-label">कुल (Overall)</span>)</span>
             </h3>
             <div id="deviationChart" class="w-full h-[500px]"></div>
         </div>
@@ -237,7 +234,11 @@
                 <i class="fa-solid fa-chart-area text-blue-600"></i> 
                 <span class="gradient-text">वर्षा प्रवृत्ति / तुलना</span>
             </h3>
-            <div id="lineChart" class="w-full h-[400px]"></div>
+            <div id="lineChart" class="w-full h-[400px]">
+                <div class="text-center p-8 text-gray-500">
+                    
+                </div>
+            </div>
         </div>
         <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
@@ -264,7 +265,11 @@
                 <i class="fa-solid fa-table-cells text-teal-600"></i> 
                 <span class="gradient-text">वर्षा वितरण मैट्रिक्स (Heatmap)</span>
             </h3>
-            <div id="heatmapChart" class="w-full h-[600px]"></div>
+            <div id="heatmapChart" class="w-full h-[600px]">
+                <div class="text-center p-8 text-gray-500">
+                    
+                </div>
+            </div>
         </div>
     </section>
     
@@ -283,7 +288,7 @@
     
     <section id="data-table" class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
         <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white">विस्तृत डेटा: <span class="dynamic-month-label text-blue-600"></span></h3>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">विस्तृत डेटा: <span id="tableMonthLabel" class="dynamic-month-label text-blue-600">कुल (Overall)</span></h3>
              <a href="district.html" class="text-sm text-blue-500 dark:text-blue-400 hover:underline mt-1 block">
                  <i class="fa-solid fa-table-list mr-1"></i> जिलावार सर्च और सॉर्टिंग के लिए यहाँ क्लिक करें।
             </a>
@@ -319,138 +324,302 @@
 <script>
     // --- UI Logic: Active Tab Switching ---
     function setActive(element) {
-        // Remove active class from all links
         document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('active-nav'));
-        // Add active class to clicked link
         element.classList.add('active-nav');
     }
 
-    // --- 1. Config ---
-    const months = ['जून', 'जुलाई', 'अगस्त', 'सितंबर', 'कुल (Overall)'];
-    const monthKeys = ['June', 'July', 'August', 'September'];
-    let currentMonthIndex = 4;
-    let rawData = [];
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        // डार्क मोड टॉगल होने पर चार्ट को री-रेंडर करें
+        const periodKey = document.getElementById('periodSelect').value;
+        if (window.globalData) {
+            updateDashboardUI(window.globalData);
+        } else {
+             updateDashboard();
+        }
+        // मासिक चार्ट को भी री-रेंडर करें, periodKey के साथ
+        if (window.globalMonthlyData) {
+            renderMonthlyCharts(window.globalMonthlyData, periodKey);
+        }
+    }
 
-    const districtNames = [
-        "ARARIA", "ARWAL", "AURANGABAD", "BANKA", "BEGUSARAI", "BHABUA", "BHAGALPUR", 
-        "BHOJPUR", "BUXAR", "DARBHANGA", "EAST CHAMPARAN", "GAYA", "GOPALGANJ", 
-        "JAHANABAD", "JAMUI", "KATIHAR", "KHAGARIA", "KISHANGANJ", "LAKHISARAI", 
-        "MADHEPURA", "MADHUBANI", "MONGHYR", "MUZAFFARPUR", "NALANDA", "NAWADA", 
-        "PATNA", "PURNEA", "ROHTAS", "SAHARSA", "SAMASTIPUR", "SARAN", "SHEIKHPURA", 
-        "SHEOHAR", "SITAMARHI", "SIWAN", "SUPAUL", "VAISHALI", "WEST CHAMPARAN"
-    ];
+    // --- Data Mapping ---
+    const monthDisplayNames = {
+        'overall_monsoon': 'कुल (Overall)',
+        'september': 'सितंबर',
+        'august': 'अगस्त',
+        'july': 'जुलाई',
+        'june': 'जून'
+    };
+    
+    // वैश्विक वैरिएबल (Global Variable) जो लोड किए गए CSV डेटा को रखेगा
+    window.globalData = []; // Single CSV data (e.g., june.csv)
+    window.globalMonthlyData = []; // Combined Monthly CSV data (monthly_combined.csv)
 
-    // --- 2. Data Logic ---
-    function generateDetailedData() {
-        // Dummy data generation logic (as provided)
-        return districtNames.map(d => {
-            const monthlyStats = {};
-            let totalActual = 0, totalNormal = 0;
-            monthKeys.forEach(m => {
-                const norm = Math.floor(Math.random() * (350 - 150) + 150);
-                let variance = Math.floor(Math.random() * (20 - (-60)) + (-60));
-                
-                if(d === 'KISHANGANJ') variance = 20; 
-                if(d === 'GAYA' && m === 'August') variance = 10;
-                if(d === 'SITAMARHI') variance = -50;
+    /**
+     * CSV फ़ाइल को फ़ेच करता है और Papa Parse का उपयोग करके उसे JSON Array में पार्स करता है।
+     */
+    async function loadCSVData(year, periodKey) {
+        const filePath = `data/${year}/${periodKey}.csv`; 
 
-                const act = parseFloat((norm * (1 + variance/100)).toFixed(1));
-                monthlyStats[m] = { actual: act, normal: norm };
-                totalActual += act; totalNormal += norm;
+        try {
+            console.log(`Fetching data from: ${filePath}`);
+            
+            const response = await fetch(filePath);
+            
+            if (!response.ok) {
+                if (periodKey === 'monthly_combined') {
+                    throw new Error(`मासिक संयुक्त डेटा फ़ाइल नहीं मिली: ${filePath}`);
+                }
+                throw new Error(`डेटा फ़ाइल नहीं मिली: ${filePath}`);
+            }
+            
+            const csvText = await response.text();
+            
+            return new Promise((resolve, reject) => {
+                Papa.parse(csvText, {
+                    header: true, 
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        if (results.errors.length) {
+                            console.error("Papa Parse त्रुटियाँ:", results.errors);
+                            reject(new Error("CSV पार्सिंग विफल रही।"));
+                            return;
+                        }
+                        console.log(`Successfully loaded ${results.data.length} records for ${periodKey}.`);
+                        resolve(results.data);
+                    },
+                    error: function(err) {
+                        reject(err);
+                    }
+                });
             });
-            return {
-                district: d,
-                monthly: monthlyStats,
-                overall: { actual: parseFloat(totalActual.toFixed(1)), normal: totalNormal }
-            };
-        });
+
+        } catch (error) {
+            console.error(`CSV लोड करने में विफलता (${periodKey}):`, error);
+            throw error;
+        }
     }
 
-    function getProcessedData() {
-        const isOverall = currentMonthIndex === 4;
-        const selectedMonthKey = isOverall ? null : monthKeys[currentMonthIndex];
+    /**
+     * कच्चे सिंगल-मंथ CSV डेटा को विज़ुअलाइज़ेशन के लिए आवश्यक फ़ॉर्मेट में प्रोसेस करता है।
+     */
+    function getProcessedData(rawData) {
         return rawData.map(d => {
-            let act, norm;
-            if (isOverall) { act = d.overall.actual; norm = d.overall.normal; }
-            else { act = d.monthly[selectedMonthKey].actual; norm = d.monthly[selectedMonthKey].normal; }
-            const dev = norm === 0 ? 0 : Math.round(((act - norm) / norm) * 100);
+            const actualStr = d['Actual R/F (mm)'];
+            const normalStr = d['Normal R/F (mm)'];
+            const deviationStr = d['Departure']; 
+
+            const actual = parseFloat(actualStr);
+            const normal = parseFloat(normalStr);
+            const deviation = parseInt(deviationStr);
+            
             return {
-                district: d.district, actual: act, normal: norm, deviation: dev,
-                fullMonthly: d.monthly 
+                district: d['DISTRICT NAME'] ? d['DISTRICT NAME'].trim() : 'Unknown', 
+                actual: isNaN(actual) ? 0 : actual, 
+                normal: isNaN(normal) ? 0 : normal, 
+                deviation: isNaN(deviation) ? 0 : deviation,
             };
         });
     }
 
-    // --- 3. Render Logic ---
-    function changeMonth(direction) {
-        currentMonthIndex += direction;
-        if (currentMonthIndex < 0) currentMonthIndex = months.length - 1;
-        if (currentMonthIndex >= months.length) currentMonthIndex = 0;
-        updateDashboardUI();
+    /**
+     * कच्चे मासिक संयुक्त CSV डेटा को प्रोसेस करता है (Line Chart और Heatmap के लिए)
+     */
+    function getProcessedMonthlyData(rawData) {
+        return rawData.map(d => {
+            const actual = parseFloat(d['Actual R/F (mm)']) || 0;
+            const normal = parseFloat(d['Normal R/F (mm)']) || 0;
+            const deviation = parseInt(d['Departure']) || 0;
+            
+            return {
+                district: d['DISTRICT NAME'] ? d['DISTRICT NAME'].trim() : 'Unknown',
+                month: d['MONTH'] ? d['MONTH'].trim() : 'Unknown',
+                actual: actual,
+                normal: normal,
+                deviation: deviation,
+            };
+        });
     }
 
-    function updateDashboardUI() {
-        const monthLabel = months[currentMonthIndex];
+    // --- Dashboard Control ---
+
+    /**
+     * ड्रॉपडाउन चयन के आधार पर डेटा को लोड और UI को अपडेट करता है।
+     */
+    async function updateDashboard() {
+        const year = document.getElementById('yearSelect').value;
+        const periodKey = document.getElementById('periodSelect').value;
+        const monthLabel = monthDisplayNames[periodKey] || periodKey;
+        
+        // UI लेबल अपडेट करें
+        document.getElementById('yearDisplay').innerText = year;
         document.getElementById('monthDisplay').innerText = monthLabel;
+        document.getElementById('tableMonthLabel').innerText = monthLabel;
         document.querySelectorAll('.dynamic-month-label').forEach(el => el.innerText = monthLabel);
-        const data = getProcessedData();
-        renderStats(data);
-        renderCharts(data);
-        renderTable(data);
+        
+        // 1. सिंगल CSV डेटा लोड करें (Stats, Bar, Pie, Table के लिए)
+        try {
+            const rawData = await loadCSVData(year, periodKey);
+            window.globalData = rawData; 
+            updateDashboardUI(rawData);
+        } catch (error) {
+            console.error("सिंगल डैशबोर्ड अपडेट में त्रुटि:", error);
+            document.getElementById('dataTableBody').innerHTML = 
+                `<tr><td colspan="5" class="px-6 py-4 text-center text-red-500 font-semibold">
+                    डेटा लोड नहीं हो सका। कृपया सुनिश्चित करें कि फ़ाइल ${year}/${periodKey}.csv मौजूद है।
+                </td></tr>`;
+            renderStats([]); 
+        }
+
+        // 2. मासिक संयुक्त डेटा लोड करें (Line Chart और Heatmap के लिए)
+        loadAndRenderMonthlyCharts(year, periodKey); 
+    }
+    
+    /**
+     * मासिक संयुक्त डेटा लोड करता है और Line/Heatmap चार्ट रेंडर करता है।
+     */
+    async function loadAndRenderMonthlyCharts(year, selectedPeriodKey) { 
+        try {
+            const rawMonthlyData = await loadCSVData(year, 'monthly_combined');
+            window.globalMonthlyData = getProcessedMonthlyData(rawMonthlyData);
+            renderMonthlyCharts(window.globalMonthlyData, selectedPeriodKey); 
+        } catch (error) {
+            console.error("Monthly combined data load failed:", error);
+            // संदेश हटाने के लिए: Line Chart और Heatmap दोनों को साफ़ किया गया
+            document.getElementById('lineChart').innerHTML = '';
+            document.getElementById('heatmapChart').innerHTML = '';
+            Plotly.purge('lineChart');
+            Plotly.purge('heatmapChart');
+        }
+    }
+    
+    /**
+     * मासिक डेटा का उपयोग करके Line Chart और Heatmap को रेंडर करता है।
+     */
+    function renderMonthlyCharts(data, selectedPeriodKey) { 
+        if (data && data.length > 0) {
+            // Line Chart: पूरे डेटा पर मासिक औसत दिखाएगा
+            renderLineChart(data);
+            
+            // Heatmap: periodKey के आधार पर फ़िल्टर किया जाएगा
+            renderHeatmap(data, selectedPeriodKey); 
+        }
     }
 
+    /**
+     * संसाधित डेटा का उपयोग करके सभी मुख्य UI तत्वों को अपडेट करता है।
+     */
+    function updateDashboardUI(rawData) {
+        const processedData = getProcessedData(rawData);
+        
+        renderStats(processedData);
+        renderMainCharts(processedData);
+        renderTable(processedData);
+    }
+    
+    // --- Render Logic ---
+    
     function renderStats(data) {
+        if (data.length === 0) {
+            document.getElementById('statAvgRain').innerText = '--';
+            document.getElementById('statAvgDev').innerText = '--';
+            document.getElementById('statDeficitCount').innerText = '--';
+            document.getElementById('statMaxDist').innerText = '--';
+            document.getElementById('statMaxVal').innerText = '--';
+            return;
+        }
+
         const totalActual = data.reduce((sum, d) => sum + d.actual, 0);
         const totalNormal = data.reduce((sum, d) => sum + d.normal, 0);
-        const avgActual = (totalActual / 38).toFixed(1);
-        const avgDev = Math.round(((totalActual - totalNormal) / totalNormal) * 100);
+        const avgActual = (totalActual / data.length).toFixed(1);
+        
+        let avgDev = 0;
+        if (totalNormal > 0) {
+            avgDev = Math.round(((totalActual - totalNormal) / totalNormal) * 100);
+        }
+        
         const deficitCount = data.filter(d => d.deviation < 0).length;
         const maxDist = data.reduce((prev, current) => (prev.actual > current.actual) ? prev : current);
 
         document.getElementById('statAvgRain').innerText = `${avgActual} मिमी`;
         const devElem = document.getElementById('statAvgDev');
         devElem.innerText = `${avgDev}%`;
-        devElem.className = `text-3xl font-bold ${avgDev < 0 ? 'text-red-600' : 'text-green-600'}`;
-        document.getElementById('statIconDev').className = `text-3xl mb-2 ${avgDev < 0 ? 'text-red-500' : 'text-green-500'}`;
-        document.getElementById('statDevLabel').innerText = avgDev < 0 ? 'सामान्य से कम' : 'सामान्य/अधिक';
+        
+        let colorClass = 'text-gray-600';
+        let iconClass = 'text-gray-500';
+        let labelText = 'विचलन';
+        if (avgDev < 0) {
+            colorClass = 'text-red-600';
+            iconClass = 'text-red-500';
+            labelText = 'सामान्य से कम';
+        } else if (avgDev > 0) {
+            colorClass = 'text-green-600';
+            iconClass = 'text-green-500';
+            labelText = 'सामान्य/अधिक';
+        }
+        
+        devElem.className = `text-3xl font-bold ${colorClass}`;
+        document.getElementById('statIconDev').className = `text-3xl mb-2 ${iconClass}`;
+        document.getElementById('statDevLabel').innerText = labelText;
+        
         document.getElementById('statDeficitCount').innerText = deficitCount;
         document.getElementById('statMaxDist').innerText = maxDist.district;
         document.getElementById('statMaxVal').innerText = `${maxDist.actual} मिमी`;
     }
 
-    function renderCharts(data) {
+    function renderMainCharts(data) {
+        if (data.length === 0) {
+            Plotly.purge('deviationChart'); 
+            Plotly.purge('pieChart'); 
+            Plotly.purge('topDistChart'); 
+            Plotly.purge('botDistChart'); 
+            return;
+        }
+        
         const isDark = document.documentElement.classList.contains('dark');
+        const fontColor = isDark ? '#cbd5e1' : '#334155';
+        
         const layoutConfig = {
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
-            font: { family: 'Poppins', color: isDark ? '#cbd5e1' : '#334155' },
+            font: { family: 'Poppins', color: fontColor },
             margin: { t: 30, b: 60, l: 40, r: 10 },
             xaxis: { showgrid: false },
             yaxis: { showgrid: true, gridcolor: isDark ? '#374151' : '#e2e8f0' }
         };
 
-        // Deviation
+        // --- 1. Deviation Chart (Bar) ---
         const colors = data.map(d => d.deviation >= 0 ? '#10b981' : (d.deviation > -20 ? '#f59e0b' : '#ef4444'));
         Plotly.newPlot('deviationChart', [{
             x: data.map(d => d.district), y: data.map(d => d.deviation),
-            type: 'bar', marker: { color: colors }, hovertemplate: '<b>%{x}</b><br>विचलन: %%{y}<extra></extra>'
+            type: 'bar', marker: { color: colors }, hovertemplate: '<b>%{x}</b><br>विचलन: %{y}%<extra></extra>'
         }], { ...layoutConfig, yaxis: { title: 'विचलन (%)' }, dragmode: 'pan' }, {responsive: true, displayModeBar: false});
 
-        // Top/Bottom
+        // --- 2. Top/Bottom Charts ---
         const sorted = [...data].sort((a,b) => b.actual - a.actual);
         const top5 = sorted.slice(0, 5).reverse();
         const bot5 = sorted.slice(-5);
-        const barLayout = { ...layoutConfig, margin: {l: 80, t: 10, b: 30, r: 10} };
+        
+        const barLayout = { 
+            ...layoutConfig, 
+            margin: {l: 80, t: 10, b: 30, r: 10}, 
+            xaxis: { title: 'वास्तविक वर्षा (मिमी)'} 
+        };
+        
         Plotly.newPlot('topDistChart', [{
             y: top5.map(d => d.district), x: top5.map(d => d.actual),
-            type: 'bar', orientation: 'h', marker: { color: '#059669' }
+            type: 'bar', orientation: 'h', marker: { color: '#059669' },
+            hovertemplate: '<b>%{y}</b>: %{x} मिमी<extra>टॉप 5</extra>'
         }], barLayout, {responsive: true, displayModeBar: false});
+        
         Plotly.newPlot('botDistChart', [{
             y: bot5.map(d => d.district), x: bot5.map(d => d.actual),
-            type: 'bar', orientation: 'h', marker: { color: '#ea580c' }
+            type: 'bar', orientation: 'h', marker: { color: '#ea580c' },
+            hovertemplate: '<b>%{y}</b>: %{x} मिमी<extra>बॉटम 5</extra>'
         }], barLayout, {responsive: true, displayModeBar: false});
 
-        // Pie
+        // --- 3. Pie Chart (वर्गीकरण) ---
         const counts = { excess: 0, normal: 0, deficit: 0, largeDef: 0 };
         data.forEach(d => {
             if(d.deviation > 19) counts.excess++;
@@ -458,100 +627,166 @@
             else if(d.deviation >= -59) counts.deficit++;
             else counts.largeDef++;
         });
+        
+        const pieValues = [counts.excess, counts.normal, counts.deficit, counts.largeDef].filter(v => v > 0);
+        const pieLabels = ['अधिक (+20% से अधिक)', 'सामान्य (-19% से +19%)', 'घाटा (-20% से -59%)', 'गंभीर घाटा (-60% से कम)'].filter((_, i) => [counts.excess, counts.normal, counts.deficit, counts.largeDef][i] > 0);
+        
         Plotly.newPlot('pieChart', [{
-            values: [counts.excess, counts.normal, counts.deficit, counts.largeDef],
-            labels: ['अधिक', 'सामान्य', 'घाटा', 'गंभीर घाटा'],
-            type: 'pie', hole: 0.5, marker: { colors: ['#10b981', '#3b82f6', '#f59e0b', '#dc2626'] }
+            values: pieValues,
+            labels: pieLabels,
+            type: 'pie', hole: 0.5, 
+            marker: { colors: ['#10b981', '#3b82f6', '#f59e0b', '#dc2626'] }
         }], { ...layoutConfig, showlegend: true, legend: { orientation: 'h', y: -0.1 } }, {responsive: true});
+    }
 
-        // Line Chart
-        let lineTraces = [];
-        if (currentMonthIndex === 4) {
-            const mAgg = monthKeys.map(m => {
-                const sumAct = rawData.reduce((s, d) => s + d.monthly[m].actual, 0);
-                const sumNorm = rawData.reduce((s, d) => s + d.monthly[m].normal, 0);
-                return { m, act: sumAct/38, norm: sumNorm/38 };
-            });
-            lineTraces = [
-                { x: months.slice(0,4), y: mAgg.map(x=>x.norm), type: 'scatter', mode: 'lines+markers', name: 'सामान्य', line: {color:'#3b82f6'} },
-                { x: months.slice(0,4), y: mAgg.map(x=>x.act), type: 'scatter', mode: 'lines+markers', name: 'वास्तविक', line: {color:'#10b981'} }
-            ];
-        } else {
-            const mAgg = monthKeys.map(m => {
-                const sumAct = rawData.reduce((s, d) => s + d.monthly[m].actual, 0);
-                return { m, act: sumAct/38 };
-            });
-            const selectedM = monthKeys[currentMonthIndex];
-            const colors = monthKeys.map(m => m === selectedM ? '#ef4444' : '#10b981');
-            const sizes = monthKeys.map(m => m === selectedM ? 12 : 6);
-            lineTraces = [{
-                x: months.slice(0,4), y: mAgg.map(x=>x.act), type: 'scatter', mode: 'lines+markers',
-                marker: { size: sizes, color: colors }, line: { color: '#cbd5e1' }, name: 'औसत वर्षा'
-            }];
-        }
-        Plotly.newPlot('lineChart', lineTraces, { ...layoutConfig, yaxis: { title: 'मिमी' }, showlegend: false }, {responsive: true});
-
-        // Heatmap
-        const zValues = [];
-        const yDistricts = sorted.map(d => d.district); 
-        yDistricts.forEach(dName => {
-            const districtObj = rawData.find(r => r.district === dName);
-            zValues.push([
-                districtObj.monthly.June.actual, districtObj.monthly.July.actual,
-                districtObj.monthly.August.actual, districtObj.monthly.September.actual
-            ]);
+    // --- Line Chart (वर्षा प्रवृत्ति) ---
+    function renderLineChart(data) {
+        const monthlyAverages = {};
+        const monthOrder = ['June', 'July', 'August', 'September'];
+        
+        data.forEach(d => {
+            if (!monthlyAverages[d.month]) {
+                monthlyAverages[d.month] = { totalActual: 0, totalNormal: 0, count: 0 };
+            }
+            monthlyAverages[d.month].totalActual += d.actual;
+            monthlyAverages[d.month].totalNormal += d.normal;
+            monthlyAverages[d.month].count++;
         });
+
+        const plotMonths = monthOrder.filter(m => monthlyAverages[m]);
+        const avgActuals = plotMonths.map(m => (monthlyAverages[m].totalActual / monthlyAverages[m].count).toFixed(1));
+        const avgNormals = plotMonths.map(m => (monthlyAverages[m].totalNormal / monthlyAverages[m].count).toFixed(1));
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const fontColor = isDark ? '#cbd5e1' : '#334155';
+        
+        Plotly.newPlot('lineChart', [
+            {
+                x: plotMonths, y: avgActuals,
+                mode: 'lines+markers', name: 'वास्तविक औसत',
+                line: { color: '#2563eb', width: 3 },
+                marker: { size: 8 }
+            },
+            {
+                x: plotMonths, y: avgNormals,
+                mode: 'lines+markers', name: 'सामान्य औसत',
+                line: { color: '#0d9488', dash: 'dash', width: 2 },
+                marker: { size: 6 }
+            }
+        ], {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Poppins', color: fontColor },
+            margin: { t: 30, b: 60, l: 40, r: 10 },
+            title: { text: 'मासिक वर्षा प्रवृत्ति (क्षेत्रीय औसत)', font: { size: 16 } },
+            xaxis: { title: 'महीना', showgrid: false },
+            yaxis: { title: 'वर्षा (मिमी)', showgrid: true, gridcolor: isDark ? '#374151' : '#e2e8f0' },
+            // **Legend को बॉटम में रखा गया है (y: -0.2)**
+            legend: { orientation: 'h', y: -0.2 } 
+        }, { responsive: true, displayModeBar: false });
+    }
+
+    // --- Heatmap Chart (वर्षा वितरण) ---
+    function renderHeatmap(data, selectedPeriodKey) {
+        const isDark = document.documentElement.classList.contains('dark');
+        const fontColor = isDark ? '#cbd5e1' : '#334155';
+        
+        const allMonthsOrder = ['June', 'July', 'August', 'September'];
+        let monthsToShow = allMonthsOrder;
+
+        if (allMonthsOrder.map(m => m.toLowerCase()).includes(selectedPeriodKey.toLowerCase())) {
+            const capitalizedMonth = selectedPeriodKey.charAt(0).toUpperCase() + selectedPeriodKey.slice(1).toLowerCase();
+            monthsToShow = [capitalizedMonth];
+        } 
+        
+        const districtNames = Array.from(new Set(data.map(d => d.district))).sort();
+        const deviationMatrix = [];
+
+        districtNames.forEach(district => {
+            const row = [];
+            monthsToShow.forEach(month => {
+                const record = data.find(d => d.district === district && d.month === month);
+                row.push(record ? record.deviation : null); 
+            });
+            deviationMatrix.push(row);
+        });
+
+        const colorscale = [
+            [0.0, '#b91c1c'], 
+            [0.4, '#f87171'], 
+            [0.6, '#fde047'], 
+            [0.8, '#4ade80'], 
+            [1.0, '#16a34a']  
+        ];
+        
         Plotly.newPlot('heatmapChart', [{
-            z: zValues, x: ['जून', 'जुलाई', 'अगस्त', 'सितंबर'], y: yDistricts, type: 'heatmap', colorscale: 'Blues',
-        }], { ...layoutConfig, margin: {l: 100, b: 40, t: 20}, height: 600 }, {responsive: true});
+            z: deviationMatrix, 
+            x: monthsToShow, 
+            y: districtNames,
+            type: 'heatmap',
+            colorscale: colorscale,
+            zmin: -100, 
+            zmax: 100,
+            colorbar: {
+                title: 'विचलन (%)',
+                titleside: 'right',
+                tickvals: [-80, -40, 0, 40, 80],
+                ticktext: ['गंभीर घाटा', 'घाटा', 'सामान्य', 'अधिक', 'बहुत अधिक'],
+                yanchor: 'middle',
+                y: 0.5,
+            },
+            hovertemplate: 'जिला: %{y}<br>महीना: %{x}<br>विचलन: %{z}%<extra></extra>'
+        }], {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Poppins', color: fontColor },
+            // **टॉप मार्जिन 70px किया गया है**
+            margin: { t: 70, b: 60, l: 100, r: 10 }, 
+            title: { text: 'मासिक विचलन Heatmap (जिलावार)', font: { size: 16 } },
+            xaxis: { side: 'top', tickangle: -45, showgrid: false },
+            yaxis: { automargin: true, tickangle: 0, showgrid: false }
+        }, { responsive: true, displayModeBar: false });
     }
 
     function renderTable(data) {
         const tbody = document.getElementById('dataTableBody');
         tbody.innerHTML = '';
+
+        if (data.length === 0) {
+             tbody.innerHTML = 
+                `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">इस चयन के लिए कोई डेटा नहीं मिला।</td></tr>`;
+            return;
+        }
+
         data.forEach(d => {
             const tr = document.createElement('tr');
             tr.className = "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition";
-            const width = Math.min(Math.abs(d.deviation) + 20, 100);
+            
+            const absDev = Math.abs(d.deviation);
+            const width = Math.min(absDev + 20, 100); 
+            
             const colorClass = d.deviation < 0 ? 'bg-red-500' : 'bg-green-500';
             const textClass = d.deviation < 0 ? 'text-red-600' : 'text-green-600';
+            
             tr.innerHTML = `
                 <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>
-                <td class="px-6 py-4 text-right">${d.actual}</td>
+                <td class="px-6 py-4 text-right">${d.actual.toFixed(1)}</td>
                 <td class="px-6 py-4 text-right">${d.normal}</td>
                 <td class="px-6 py-4 text-right font-bold ${textClass}">${d.deviation}%</td>
-                <td class="px-6 py-4"><div class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden"><div class="${colorClass} h-full" style="width: ${width}%"></div></div></td>
+                <td class="px-6 py-4">
+                    <div class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
+                        <div class="${colorClass} h-full" style="width: ${width}%"></div>
+                    </div>
+                </td>
             `;
             tbody.appendChild(tr);
         });
     }
 
-    function toggleDarkMode() {
-        document.documentElement.classList.toggle('dark');
-        updateDashboardUI(); 
-    }
-
-    function updateDashboard() {
-        const year = document.getElementById('yearSelect').value;
-        document.getElementById('yearDisplay').innerText = year;
-        rawData = generateDetailedData();
-        currentMonthIndex = 4;
-        updateDashboardUI();
-    }
-    
-    // --- Header Scroll Logic (for transparent effect) ---
-    // window.addEventListener('scroll', () => {
-    //     const navbar = document.getElementById('navbar');
-    //     if (window.scrollY > 50) {
-    //         navbar.classList.add('scrolled');
-    //     } else {
-    //         navbar.classList.remove('scrolled');
-    //     }
-    // });
-
-    // Init
-    rawData = generateDetailedData();
-    updateDashboardUI();
+    // Init (आरंभ करना)
+    document.addEventListener('DOMContentLoaded', () => {
+        updateDashboard(); 
+    });
 </script>
 </body>
 </html>
