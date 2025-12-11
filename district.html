@@ -112,6 +112,51 @@
         .dark .status-cell {
             color: #f9fafb; /* Light text for readability in dark mode */
         }
+
+        /* Custom Dropdown/Checkbox Box */
+        .district-checkbox-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .district-checkbox-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 250px;
+            max-height: 300px; /* Limit height */
+            overflow-y: auto; /* Enable scrolling */
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 20;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            right: 0; /* Align to the right for better view on smaller screens */
+        }
+
+        .dark .district-checkbox-content {
+            background-color: #1f2937;
+            border: 1px solid #374151;
+        }
+
+        .district-checkbox-content.show {
+            display: block;
+        }
+
+        .district-checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .district-checkbox-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .dark .district-checkbox-item:hover {
+            background-color: #374151;
+        }
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
@@ -153,15 +198,28 @@
                 <span class="gradient-text">विस्तृत जिला डेटा</span>
             </h2>
             
-            <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
-                <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2">वर्ष:</label>
-                <select id="yearSelect" onchange="updateDashboard()" class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
-                    <option value="2025" selected>2025</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                </select>
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="district-checkbox-dropdown">
+                    <button id="districtDropdownBtn" onclick="toggleDistrictDropdown()" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check"></i> 
+                        <span id="dropdownBtnText">सभी जिले</span>
+                        <i class="fa-solid fa-caret-down ml-1"></i>
+                    </button>
+
+                    <div id="districtCheckboxContent" class="district-checkbox-content">
+                        </div>
+                </div>
+                <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2">वर्ष:</label>
+                    <select id="yearSelect" onchange="updateDashboard()" class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
+                        <option value="2025" selected>2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -225,7 +283,12 @@
     let currentData = [];
     let currentSelectedMonth = 'Overall';
     let currentSort = { column: 'district', order: 'asc' };
-
+    let availableDistricts = []; // Will store all unique district names
+    let selectedDistricts = []; // Stores districts currently selected by checkbox
+    
+    // UPDATED PRIORITY LIST: Patna, Gaya, Bhagalpur, Purnea, West Champaran
+    const DEFAULT_TOP_DISTRICTS = ['Patna', 'Gaya', 'Bhagalpur', 'Purnea', 'West Champaran']; 
+    
     // --- Rain Status Categorization Logic ---
     function getRainStatus(deviation) {
         if (deviation === -100) {
@@ -241,7 +304,143 @@
         } else if (deviation >= -99) {
             return { status: 'LARGE DEFICIENT', color: 'bg-status-large-def', textColor: 'text-gray-800' };
         } else {
-            return { status: 'NO DATA', color: 'bg-gray-400', textColor: 'text-gray-800' }; // Should not happen with current logic
+            return { status: 'NO DATA', color: 'bg-gray-400', textColor: 'text-gray-800' };
+        }
+    }
+
+    // --- District Checkbox Logic ---
+
+    function getSortedDistricts(allDistricts) {
+        const topDistrictsLower = DEFAULT_TOP_DISTRICTS.map(d => d.toLowerCase());
+        
+        // 1. Identify districts that match the priority list (case-insensitive)
+        const priorityMatches = allDistricts.filter(d => topDistrictsLower.includes(d.toLowerCase()));
+        
+        // 2. Sort the matched districts based on the original DEFAULT_TOP_DISTRICTS order
+        priorityMatches.sort((a, b) => {
+            const indexA = topDistrictsLower.indexOf(a.toLowerCase());
+            const indexB = topDistrictsLower.indexOf(b.toLowerCase());
+            return indexA - indexB;
+        });
+
+        // 3. Get the remaining districts
+        let remainingDistricts = allDistricts.filter(d => !topDistrictsLower.includes(d.toLowerCase()));
+        
+        // 4. Sort remaining alphabetically
+        remainingDistricts.sort((a, b) => a.localeCompare(b, 'hi', {sensitivity: 'base'}));
+
+        return [...priorityMatches, ...remainingDistricts];
+    }
+
+    function generateDistrictCheckboxes() {
+        const container = document.getElementById('districtCheckboxContent');
+        container.innerHTML = '';
+        
+        // 1. Get all unique districts
+        const allDistricts = [...new Set(currentData.map(d => d.district))];
+        availableDistricts = getSortedDistricts(allDistricts);
+
+        // Default selection: all districts if none selected
+        if (selectedDistricts.length === 0 || !selectedDistricts.every(d => availableDistricts.includes(d))) {
+             selectedDistricts = availableDistricts;
+        }
+
+
+        // Add Select/Deselect All button
+        const selectAll = document.createElement('div');
+        selectAll.className = 'district-checkbox-item border-b dark:border-gray-700 font-bold bg-gray-50 dark:bg-gray-800';
+        selectAll.innerHTML = `
+            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)" class="form-checkbox h-4 w-4 text-blue-600 rounded mr-3 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600">
+            <label for="selectAllCheckbox" class="text-sm text-gray-900 dark:text-gray-100 cursor-pointer">सभी चुनें / अचुनें</label>
+        `;
+        container.appendChild(selectAll);
+
+
+        availableDistricts.forEach(district => {
+            const isChecked = selectedDistricts.includes(district);
+            const item = document.createElement('div');
+            item.className = 'district-checkbox-item';
+            
+            // Note: Replace spaces in district name for ID creation
+            const safeId = `chk-${district.replace(/\s/g, '-')}`; 
+
+            item.innerHTML = `
+                <input type="checkbox" id="${safeId}" value="${district}" ${isChecked ? 'checked' : ''} 
+                       onchange="handleDistrictSelection(this)"
+                       class="form-checkbox h-4 w-4 text-blue-600 rounded mr-3 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600">
+                <label for="${safeId}" class="text-sm text-gray-900 dark:text-gray-100 cursor-pointer">${district}</label>
+            `;
+            container.appendChild(item);
+        });
+
+        // Update 'Select All' state
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = selectedDistricts.length === availableDistricts.length && availableDistricts.length > 0;
+        }
+        
+        // Update button text
+        updateDropdownButtonText();
+    }
+    
+    function toggleSelectAll(checked) {
+        const checkboxes = document.querySelectorAll('#districtCheckboxContent input[type="checkbox"]:not(#selectAllCheckbox)');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = checked;
+        });
+
+        if (checked) {
+            selectedDistricts = availableDistricts;
+        } else {
+            selectedDistricts = [];
+        }
+
+        renderData();
+        updateDropdownButtonText();
+    }
+
+    function handleDistrictSelection(checkbox) {
+        const district = checkbox.value;
+        if (checkbox.checked) {
+            if (!selectedDistricts.includes(district)) {
+                selectedDistricts.push(district);
+            }
+        } else {
+            selectedDistricts = selectedDistricts.filter(d => d !== district);
+        }
+
+        // Update Select All checkbox state
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = selectedDistricts.length === availableDistricts.length && availableDistricts.length > 0;
+        }
+
+        renderData();
+        updateDropdownButtonText();
+    }
+    
+    function updateDropdownButtonText() {
+        const btnText = document.getElementById('dropdownBtnText');
+        if (selectedDistricts.length === 0) {
+            btnText.textContent = 'कोई जिला नहीं';
+        } else if (selectedDistricts.length === availableDistricts.length && availableDistricts.length > 0) {
+            btnText.textContent = 'सभी जिले';
+        } else {
+            btnText.textContent = `${selectedDistricts.length} जिले चयनित`;
+        }
+    }
+
+    function toggleDistrictDropdown() {
+        document.getElementById('districtCheckboxContent').classList.toggle('show');
+    }
+
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function(event) {
+        if (!event.target.matches('#districtDropdownBtn') && !event.target.closest('.district-checkbox-dropdown')) {
+            const dropdown = document.getElementById('districtCheckboxContent');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
         }
     }
 
@@ -250,9 +449,6 @@
         const year = document.getElementById('yearSelect').value;
         const month = currentSelectedMonth;
         
-        // Construct filename based on your folder structure
-        // If Overall -> overall_monsoon.csv
-        // If June -> june.csv, etc.
         let filename = '';
         if (month === 'Overall') {
             filename = 'overall_monsoon.csv';
@@ -281,6 +477,18 @@
             if(parsedData.length === 0) throw new Error("Empty Data");
 
             currentData = parsedData;
+            
+            // If the current selection is empty or contains districts not in the new data, reset to all.
+            const newAvailableDistricts = [...new Set(currentData.map(d => d.district))];
+            
+            // Check if selectedDistricts are a valid subset of new data or if we need to reset to all
+            const needToResetSelection = selectedDistricts.length === 0 || !selectedDistricts.every(d => newAvailableDistricts.includes(d));
+            
+            if (needToResetSelection) {
+                 selectedDistricts = newAvailableDistricts; 
+            }
+
+            generateDistrictCheckboxes(); // Update checkboxes based on new data and retain selection if possible
             renderData(); // Show data
 
         } catch (error) {
@@ -288,23 +496,26 @@
             // Show Error Message
             document.getElementById('dataCard').classList.add('hidden');
             document.getElementById('errorContainer').classList.remove('hidden');
+            // Clear available districts and selection
+            availableDistricts = [];
+            selectedDistricts = [];
+            generateDistrictCheckboxes(); // Update checkbox view to reflect error state
         }
     }
 
-    // --- CSV Parser Helper ---
+    // --- CSV Parser Helper (Unchanged) ---
     function parseCSV(csv) {
         const lines = csv.split('\n').filter(line => line.trim() !== '');
         if (lines.length < 2) return [];
 
         const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
         
-        // Find column indices loosely (in case CSV headers change slightly)
         const distIndex = headers.findIndex(h => h.includes('district'));
         const actIndex = headers.findIndex(h => h.includes('actual'));
         const normIndex = headers.findIndex(h => h.includes('normal'));
         const depIndex = headers.findIndex(h => h.includes('dep') || h.includes('dev') || h.includes('%'));
 
-        if (distIndex === -1 || actIndex === -1) return []; // Invalid CSV format
+        if (distIndex === -1 || actIndex === -1) return [];
 
         const result = [];
         
@@ -312,11 +523,11 @@
             const row = lines[i].split(',');
             if (row.length < headers.length) continue;
 
-            const district = row[distIndex].trim().replace(/"/g, ''); // Remove quotes
+            // Important: Trim and clean up district names from CSV data
+            const district = row[distIndex].trim().replace(/"/g, ''); 
             const actual = parseFloat(row[actIndex]);
             const normal = parseFloat(row[normIndex]);
             
-            // Calculate deviation if missing, or parse it
             let deviation = 0;
             if (depIndex !== -1 && row[depIndex]) {
                 deviation = parseFloat(row[depIndex]);
@@ -336,13 +547,13 @@
         return result;
     }
 
-    // --- Rendering Logic ---
+    // --- Rendering Logic (Modified to include district selection) ---
     function renderData() {
         const searchVal = document.getElementById('searchInput').value.toLowerCase();
         
-        // 1. Filter
+        // 1. Filter by search AND selectedDistricts
         let displayData = currentData.filter(d => 
-            d.district.toLowerCase().includes(searchVal)
+            d.district.toLowerCase().includes(searchVal) && selectedDistricts.includes(d.district)
         );
 
         // 2. Sort
@@ -353,20 +564,17 @@
         tbody.innerHTML = '';
         
         if (displayData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 font-semibold"><i class="fa-solid fa-circle-exclamation mr-2"></i> कोई परिणाम नहीं मिला।</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 font-semibold"><i class="fa-solid fa-circle-exclamation mr-2"></i> चयनित जिलों या खोज के आधार पर कोई परिणाम नहीं मिला।</td></tr>`;
             return;
         }
 
         displayData.forEach(d => {
-            const statusInfo = getRainStatus(d.deviation); // Get Status based on deviation
+            const statusInfo = getRainStatus(d.deviation);
 
             const tr = document.createElement('tr');
             tr.className = "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition duration-150";
             
-            // The existing deviation bar
-            const width = Math.min(Math.abs(d.deviation) + 20, 100);
-            const colorClass = d.deviation < 0 ? 'bg-red-500' : 'bg-green-500';
-            const textClass = d.deviation < 0 ? 'text-red-600' : 'text-green-600';
+            const textClass = d.deviation < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
             
             tr.innerHTML = `
                 <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>

@@ -7,26 +7,26 @@ const DISTRICTS_TO_BOLD = ['ARARIA', 'GAYA', 'PATNA', 'WEST CHAMPARAN'];
 
 // --- NEW: Central Color Scheme using HEX values ---
 const RAINFALL_COLORS_HEX = {
-    'LARGE EXCESS': '#1565c0', // dark blue (+60 and above)
-    'EXCESS': '#4fc3f7',      // light blue (+20 to +59)
-    'NORMAL': '#4caf50',      // green (-19 to +19)
-    'DEFICIENT': '#e53935',    // red (-20 to -59)
-    'LARGE DEFICIENT': '#ffd700', // yellow (-60 to -99)
-    'NO RAIN': '#ffffff',      // white (-100)
-    'MISSING': '#9CA3AF'       // gray (for null/NaN)
+    'LARGE EXCESS': '#1565c0', // dark blue (+60 and above)
+    'EXCESS': '#4fc3f7',      // light blue (+20 to +59)
+    'NORMAL': '#4caf50',      // green (-19 to +19)
+    'DEFICIENT': '#e53935',    // red (-20 to -59)
+    'LARGE DEFICIENT': '#ffd700', // yellow (-60 to -99)
+    'NO RAIN': '#ffffff',      // white (-100)
+    'MISSING': '#9CA3AF'       // gray (for null/NaN)
 };
 
 /**
- * विचलन के आधार पर श्रेणी निर्धारित करता है। (IMD standard criteria)
- */
+ * विचलन के आधार पर श्रेणी निर्धारित करता है। (IMD standard criteria)
+ */
 function getRainfallStatus(deviation) {
-    if (deviation === null || isNaN(deviation)) return 'MISSING';
-    if (deviation >= 60) return 'LARGE EXCESS';
-    if (deviation > 19) return 'EXCESS';
-    if (deviation >= -19) return 'NORMAL';
-    if (deviation >= -59) return 'DEFICIENT';
-    if (deviation === -100) return 'NO RAIN';
-    return 'LARGE DEFICIENT'; // covers -60 to -99
+    if (deviation === null || isNaN(deviation)) return 'MISSING';
+    if (deviation >= 60) return 'LARGE EXCESS';
+    if (deviation > 19) return 'EXCESS';
+    if (deviation >= -19) return 'NORMAL';
+    if (deviation >= -59) return 'DEFICIENT';
+    if (deviation === -100) return 'NO RAIN';
+    return 'LARGE DEFICIENT'; // covers -60 to -99
 }
 
 // Month filename mapping
@@ -154,83 +154,89 @@ async function loadMonthData(year, month) {
 }
 
 function renderBarChart(districts, actuals, normals) {
-    // New bolding logic for X-axis ticks
-    const isDark = document.documentElement.classList.contains('dark');
-    const fontColor = isDark ? '#cbd5e1' : '#334155';
-    const boldColor = isDark ? '#60A5FA' : '#1D4ED8'; 
+    // New bolding logic for X-axis ticks
+    const isDark = document.documentElement.classList.contains('dark');
+    const fontColor = isDark ? '#cbd5e1' : '#334155';
+    const boldColor = isDark ? '#60A5FA' : '#1D4ED8'; 
 
-    const tickFontColors = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? boldColor : fontColor);
-    const tickFontWeights = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? 900 : 'normal');
-    const tickFontSizes = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? 11 : 10);
-    // End bolding logic
+    const tickFontColors = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? boldColor : fontColor);
+    const tickFontWeights = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? 900 : 'normal');
+    const tickFontSizes = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? 11 : 10);
+    // End bolding logic
 
     const x = districts;
     const trace1 = { x, y: actuals, name: 'Actual', type: 'bar', marker: { color: '#2563eb' } };
     const trace2 = { x, y: normals, name: 'Normal', type: 'bar', marker: { color: '#0d9488' } };
     const layout = {
         barmode: 'group',
-        margin: { t: 30, b: 160 },
+        // FIX: Left margin increased from 60 to 80
+        margin: { t: 30, b: 160, l: 80 }, 
+        yaxis: { title: 'Rainfall (mm)' }, // Added Y-axis title for clarity
         xaxis: { 
-            tickangle: -45, 
-            automargin: true,
-            // Custom font applied here
-            tickfont: {
-                size: tickFontSizes,
-                color: tickFontColors,
-                weight: tickFontWeights
-            }
-        },
+            tickangle: -45, 
+            automargin: true,
+            // Custom font applied here
+            tickfont: {
+                size: tickFontSizes,
+                color: tickFontColors,
+                weight: tickFontWeights
+            }
+        },
         legend: { orientation: 'h', y: 1.05 },
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        font: { color: fontColor }
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: fontColor }
     };
     Plotly.react('barChart', [trace1, trace2], layout, {responsive:true});
 }
 
 /**
- * Departure Chart (Bar) - NEW COLOR LOGIC APPLIED
- */
+ * Departure Chart (Bar) - NEW COLOR LOGIC APPLIED
+ */
 function renderDepChart(districts, deps) {
-    // New bolding logic for X-axis ticks
-    const isDark = document.documentElement.classList.contains('dark');
-    const fontColor = isDark ? '#cbd5e1' : '#334155';
-    const boldColor = isDark ? '#60A5FA' : '#1D4ED8'; 
+    // New bolding logic for X-axis ticks
+    const isDark = document.documentElement.classList.contains('dark');
+    const fontColor = isDark ? '#cbd5e1' : '#334155';
+    const boldColor = isDark ? '#60A5FA' : '#1D4ED8'; 
 
-    const tickFontColors = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? boldColor : fontColor);
-    const tickFontWeights = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? 900 : 'normal');
-    const tickFontSizes = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? 11 : 10);
-    // End bolding logic
+    const tickFontColors = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? boldColor : fontColor);
+    const tickFontWeights = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? 900 : 'normal');
+    const tickFontSizes = districts.map(d => DISTRICTS_TO_BOLD.includes(d.toUpperCase()) ? 11 : 10);
+    // End bolding logic
 
     const colors = deps.map(v => {
-        const status = getRainfallStatus(v);
-        return RAINFALL_COLORS_HEX[status] || RAINFALL_COLORS_HEX['MISSING'];
+        const status = getRainfallStatus(v);
+        // NOTE: This chart uses IMD classification colors for bars, which is highly informative.
+        // If you want a unified brown color for the bars, change the next line to:
+        // return '#A0522D'; // Sienna/Brown
+        return RAINFALL_COLORS_HEX[status] || RAINFALL_COLORS_HEX['MISSING'];
     });
 
     const data = [{ x: districts, y: deps, type: 'bar', marker:{ color: colors } }];
     const layout = { 
-        margin:{t:30, b:160}, 
-        xaxis:{
-            tickangle:-45, 
-            automargin:true,
-            // Custom font applied here
-            tickfont: {
-                size: tickFontSizes,
-                color: tickFontColors,
-                weight: tickFontWeights
-            }
-        }, 
-        yaxis:{title:'Departure %'},
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        font: { color: fontColor }
-    };
+        // FIX: Left margin increased from 60 to 80
+        margin:{t:30, b:160, l:80}, 
+        xaxis:{
+            tickangle:-45, 
+            automargin:true,
+            // Custom font applied here
+            tickfont: {
+                size: tickFontSizes,
+                color: tickFontColors,
+                weight: tickFontWeights
+            }
+        }, 
+        yaxis:{title:'Departure %'},
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: fontColor }
+    };
     Plotly.react('depChart', data, layout, {responsive:true});
 }
 
 /**
- * Detail Table Rendering - NEW COLOR LOGIC APPLIED (Cell Background & Row Bolding)
- */
+ * Detail Table Rendering - NEW COLOR LOGIC APPLIED (Cell Background & Row Bolding)
+ */
 function renderTable(districts, actuals, normals, deps) {
     const container = document.getElementById('tableArea');
     const tbl = document.createElement('table');
@@ -254,23 +260,23 @@ function renderTable(districts, actuals, normals, deps) {
         const n = normals[i]===null? '—': normals[i].toFixed(1);
         const dp = deps[i]===null? '—': `${deps[i] > 0 ? '+' : ''}${deps[i]}%`;
         
-        // Determine status, background color, and text color for contrast
-        const statusText = getRainfallStatus(deps[i]);
-        const bgColor = RAINFALL_COLORS_HEX[statusText];
-        
-        let textColor = 'black'; 
-        if (statusText === 'LARGE EXCESS' || statusText === 'DEFICIENT' || statusText === 'NORMAL' || statusText === 'MISSING') {
-            textColor = 'white'; // White text for dark/non-white backgrounds
-        } 
-        // NO RAIN (white) and LARGE DEFICIENT (yellow) use black text
+        // Determine status, background color, and text color for contrast
+        const statusText = getRainfallStatus(deps[i]);
+        const bgColor = RAINFALL_COLORS_HEX[statusText];
+        
+        let textColor = 'black'; 
+        if (statusText === 'LARGE EXCESS' || statusText === 'DEFICIENT' || statusText === 'NORMAL' || statusText === 'MISSING') {
+            textColor = 'white'; // White text for dark/non-white backgrounds
+        } 
+        // NO RAIN (white) and LARGE DEFICIENT (yellow) use black text
 
-        const departureCellStyle = `background-color: ${bgColor}; color: ${textColor};`;
+        const departureCellStyle = `background-color: ${bgColor}; color: ${textColor};`;
 
-        // ** NEW TABLE ROW BOLD LOGIC **
-        const isBoldRow = DISTRICTS_TO_BOLD.includes(d.toUpperCase());
-        const districtTextClass = isBoldRow ? 'font-extrabold text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-white';
-        const rowClass = isBoldRow ? 'bg-blue-50/50 dark:bg-gray-700/50' : '';
-        
+        // ** NEW TABLE ROW BOLD LOGIC **
+        const isBoldRow = DISTRICTS_TO_BOLD.includes(d.toUpperCase());
+        const districtTextClass = isBoldRow ? 'font-extrabold text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-white';
+        const rowClass = isBoldRow ? 'bg-blue-50/50 dark:bg-gray-700/50' : '';
+        
         const tr = document.createElement('tr');
         tr.className = `${rowClass} border-b hover:bg-gray-50 dark:hover:bg-gray-700`;
         tr.innerHTML = `
@@ -299,8 +305,8 @@ function toggleDarkMode() {
     } else {
         localStorage.setItem('theme', 'light');
     }
-    // Charts need to be re-rendered to respect new background/font colors
-    const year = document.getElementById('yearSelect').value;
+    // Charts need to be re-rendered to respect new background/font colors
+    const year = document.getElementById('yearSelect').value;
     const month = document.getElementById('monthSelect').value;
     loadMonthData(year, month);
 }

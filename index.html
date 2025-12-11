@@ -722,7 +722,7 @@
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
-            margin: { t: 30, b: 150, l: 40, r: 80 }, 
+            // default margin removed, using custom margins below
             xaxis: { showgrid: false },
             yaxis: { showgrid: true, gridcolor: isDark ? '#374151' : '#e2e8f0' }
         };
@@ -767,6 +767,8 @@
 
         Plotly.newPlot('comparisonChart', [traceActual, traceNormal, traceDeparture], {
             ...layoutConfig,
+            // START: CHANGES FOR COMPARISON CHART
+            margin: { t: 30, b: 150, l: 80, r: 80 }, // Increased Left margin from 40 to 80
             yaxis: { 
                 title: 'वर्षा (मिमी)', 
                 titlefont: { color: 'transparent' }, // Set transparent
@@ -795,6 +797,7 @@
                 { ...axisTitleConfig, text: '<b>विचलन (%)</b>', x: 1.05, y: 0.5, textangle: 90, 
                     font: { color: `url(#${gradientId})`, size: 16 } }
             ]
+            // END: CHANGES FOR COMPARISON CHART
         }, PLOTLY_CONFIG); 
 
         // --- 1. Deviation Chart (Bar) - USING NEW COLORS ---
@@ -811,14 +814,24 @@
             x: data.map(d => d.district), y: data.map(d => d.deviation),
             type: 'bar', marker: { color: deviationColors }, hovertemplate: '<b>%{x}</b><br>Departure: %{y}%<extra></extra>'
         }], { ...layoutConfig, 
-            yaxis: { title: 'Departure (%)' }, 
+            // START: CHANGES FOR DEVIATION CHART
+            margin: { t: 30, b: 150, l: 80, r: 10 }, // Increased Left margin from 40 to 80
+            yaxis: { 
+                title: 'Departure (%)',
+                titlefont: { color: 'transparent' } // Set transparent
+            }, 
             xaxis: { 
                 tickangle: 90, 
                 automargin: true,
                 tickfont: { size: 10 } 
             },
             dragmode: 'pan', 
-            margin: { t: 30, b: 150, l: 40, r: 10 } 
+            annotations: [
+                { ...axisTitleConfig, text: '<b>विचलन (%)</b>', x: -0.05, y: 0.5, textangle: -90, 
+                    font: { color: `url(#${gradientId})`, size: 16 }
+                }
+            ]
+            // END: CHANGES FOR DEVIATION CHART
         }, PLOTLY_CONFIG); 
 
         // --- 2. Top/Bottom Charts ---
@@ -921,7 +934,8 @@
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
-            margin: { t: 30, b: 60, l: 40, r: 10 },
+            // START: CHANGES FOR LINE CHART
+            margin: { t: 30, b: 60, l: 80, r: 10 }, // Increased Left margin from 40 to 80
             title: { text: 'Monthly Rainfall Trend (Regional Avg)', font: { size: 16 } },
             xaxis: { title: 'Month', showgrid: false },
             yaxis: { 
@@ -936,6 +950,7 @@
                     font: { color: `url(#${gradientId})`, size: 16 }
                 }
             ]
+            // END: CHANGES FOR LINE CHART
         }, PLOTLY_CONFIG); 
     }
 
@@ -1007,8 +1022,10 @@
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
-            margin: { t: 30, b: 100, l: 100, r: 20 },
+            // START: CHANGES FOR HEATMAP
+            margin: { t: 30, b: 100, l: 120, r: 20 }, // Increased Left margin from 100 to 120 for district names
             xaxis: { side: 'top' }
+            // END: CHANGES FOR HEATMAP
         }, PLOTLY_CONFIG); 
     }
     
