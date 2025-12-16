@@ -147,7 +147,11 @@ body {
     background-color: #1e3a8a !important;
 }
 
-/* Target the Departure Line (Green) */
-#comparisonChart .trace:nth-of-type(3) path.js-line {
-    filter: drop-shadow(0 0 6px rgba(0, 255, 128, 0.7)); /* Green Glow */
-}
+/* Target the Departure Line */
+        #comparisonChart .trace:nth-of-type(3) path.js-line {
+            /* Gradient Stroke लागू करें */
+            stroke: url(#departure-gradient) !important; 
+            
+            /* Glow filter को हल्के हरे रंग से मैच करें (Lime Green) */
+            filter: drop-shadow(0 0 4px rgba(50, 205, 50, 0.8)); 
+        }

@@ -172,13 +172,14 @@
             </div>
         </div>
         
-        <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
-            <a href="index.html" class="nav-box">होम</a> 
-            <a href="index.html#analysis" class="nav-box">डैशबोर्ड</a>
-            <a href="district.html" class="nav-box active-nav">जिलावार</a>
-            <a href="maps.html" class="nav-box">मानचित्र</a>
-            <a href="history.html" class="nav-box">ऐतिहासिक</a>
-        </div>
+ <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
+    <a href="index.html" class="nav-box" onclick="setActive(this)">होम</a>
+    <a href="index.html#analysis" class="nav-box" onclick="setActive(this)">डैशबोर्ड</a>    
+    <a href="district.html" class="nav-box active-nav" onclick="setActive(this)">जिलावार</a> 
+    <a href="maps.html" class="nav-box" onclick="setActive(this)">मानचित्र</a>
+    <a href="history.html" class="nav-box" onclick="setActive(this)">ऐतिहासिक</a>
+    <a href="comparison.html" class="nav-box" onclick="setActive(this)">तुलना</a>
+</div>
 
         <div class="flex items-center gap-4 shrink-0">
             <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
@@ -210,16 +211,22 @@
                     <div id="districtCheckboxContent" class="district-checkbox-content">
                         </div>
                 </div>
-                <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
-                    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2">वर्ष:</label>
-                    <select id="yearSelect" onchange="updateDashboard()" class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
-                        <option value="2025" selected>2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                    </select>
-                </div>
+<div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
+    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2">वर्ष:</label>
+    <select id="yearSelect" onchange="updateDashboard()" class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
+        <option value="2025" selected>2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+        <option value="2015">2015</option>
+    </select>
+</div>
             </div>
         </div>
 

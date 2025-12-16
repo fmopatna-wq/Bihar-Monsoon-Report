@@ -128,13 +128,17 @@
                 <div class="text-xs text-gray-500 dark:text-gray-400">IMD MC Patna — ऐतिहासिक विश्लेषण</div>
             </div>
         </div>
-        <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
-            <a href="index.html" class="nav-box">होम</a> 
-            <a href="index.html#analysis" class="nav-box">डैशबोर्ड</a>
-            <a href="district.html" class="nav-box">जिलावार</a> 
-            <a href="maps.html" class="nav-box">मानचित्र</a>
-            <a href="history.html" class="nav-box active-nav">ऐतिहासिक</a>
-        </div>
+
+ <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
+    <a href="index.html" class="nav-box" onclick="setActive(this)">होम</a>
+    <a href="index.html#analysis" class="nav-box" onclick="setActive(this)">डैशबोर्ड</a>    
+    <a href="district.html" class="nav-box" onclick="setActive(this)">जिलावार</a> 
+    <a href="maps.html" class="nav-box" onclick="setActive(this)">मानचित्र</a>
+    <a href="history.html" class="nav-box active-nav" onclick="setActive(this)">ऐतिहासिक</a>
+    <a href="comparison.html" class="nav-box" onclick="setActive(this)">तुलना</a>
+</div>
+
+
         <div class="flex items-center gap-4 shrink-0">
             <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                 <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>

@@ -142,15 +142,59 @@
             --large-excess: #1565c0; /* dark blue (LARGE EXCESS: +60% and above) */
         }
         
+        /* =====================================================
+           Plotly Modebar – Graph ke upar single horizontal line
+           (Chat GPT Solution Applied)
+           ===================================================== */
+        /* Graph wrapper */
+        .plotly-container {
+            position: relative;
+            padding-top: 46px; /* modebar ke liye jagah */
+        }
+
+        /* Modebar positioning */
+        .plotly .modebar {
+            position: absolute !important;
+            top: 0 !important;
+            right: 12px !important;
+
+            display: flex !important;
+            flex-direction: row !important;
+
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 8px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 50;
+        }
+
+        /* Buttons spacing */
+        .plotly .modebar-btn {
+            margin: 0 4px !important;
+        }
+
+        /* Hover par hi visible ho */
+        .plotly .modebar {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .plotly-container:hover .modebar {
+            opacity: 1;
+        }
+
+        /* Dark mode friendly (agar dark theme use hota ho) */
+        .dark .plotly .modebar {
+            background: rgba(30, 41, 59, 0.95);
+        }
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
 <svg height="0" width="0" style="position: absolute;">
     <defs>
-        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#0d9488;stop-opacity:1" />
+        <linearGradient id="departure-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:rgba(0, 100, 0, 1);stop-opacity:1" /> 
+            <stop offset="100%" style="stop-color:rgba(50, 205, 50, 1);stop-opacity:1" /> 
         </linearGradient>
         <linearGradient id="gradient-dark" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
@@ -173,10 +217,11 @@
         
         <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
             <a href="index.html" class="nav-box active-nav" onclick="setActive(this)">होम</a>
-            <a href="index.html#analysis" class="nav-box" onclick="setActive(this)">डैशबोर्ड</a>    
+            <a href="#analysis" class="nav-box" onclick="smoothScrollToAnalysis(event)">डैशबोर्ड</a>    
             <a href="district.html" class="nav-box" onclick="setActive(this)">जिलावार</a> 
             <a href="maps.html" class="nav-box" onclick="setActive(this)">मानचित्र</a>
             <a href="history.html" class="nav-box" onclick="setActive(this)">ऐतिहासिक</a>
+            <a href="comparison.html" class="nav-box" onclick="setActive(this)">तुलना</a>
         </div>
 
         <div class="flex items-center gap-4 shrink-0">
@@ -197,18 +242,22 @@
     
     <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm inline-flex flex-wrap justify-center gap-6 mx-auto border border-gray-200 dark:border-gray-700">
         
-        <div class="flex flex-col items-center">
-            <label for="yearSelect" class="text-3xl font-bold gradient-text mb-1">वर्ष:</label>
-            <select id="yearSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-32">
-                <option value="2025" selected>2025</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-                <option value="2021">2021</option>
-                <option value="2020">2020</option>
-                <option value="2019">2019</option>
-            </select>
-        </div>
+<div class="flex flex-col items-center">
+    <label for="yearSelect" class="text-3xl font-bold gradient-text mb-1">वर्ष:</label>
+    <select id="yearSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-32">
+        <option value="2025" selected>2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+        <option value="2015">2015</option>
+    </select>
+</div>
         
         <div class="flex flex-col items-center">
             <label for="periodSelect" class="text-3xl font-bold gradient-text mb-1">अवधि:</label>
@@ -266,7 +315,9 @@
                 <i class="fa-solid fa-chart-line text-purple-600"></i> 
                 <span class="gradient-text">वास्तविक / सामान्य वर्षा और विचलन (<span class="dynamic-month-label">मानसून (जून-सितंबर)</span>)</span>
             </h3>
-            <div id="comparisonChart" class="w-full h-[500px]"></div>
+            <div class="plotly-container">
+                <div id="comparisonChart" class="w-full h-[500px]"></div>
+            </div>
         </div>
 
         <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm lg:col-span-3">
@@ -274,7 +325,9 @@
                 <i class="fa-solid fa-chart-column text-blue-600"></i> 
                 <span class="gradient-text">जिलेवार वर्षा विचलन (<span id="monthDisplay" class="dynamic-month-label">मानसून (जून-सितंबर)</span>)</span>
             </h3>
-            <div id="deviationChart" class="w-full h-[500px]"></div>
+            <div class="plotly-container">
+                <div id="deviationChart" class="w-full h-[500px]"></div>
+            </div>
         </div>
     </section>
 
@@ -284,9 +337,11 @@
                 <i class="fa-solid fa-chart-area text-blue-600"></i> 
                 <span class="gradient-text">वर्षा प्रवृत्ति / तुलना</span>
             </h3>
-            <div id="lineChart" class="w-full h-[400px]">
-                <div class="text-center p-8 text-gray-500">
-                    
+            <div class="plotly-container">
+                <div id="lineChart" class="w-full h-[400px]">
+                    <div class="text-center p-8 text-gray-500">
+                        
+                    </div>
                 </div>
             </div>
         </div>
@@ -295,7 +350,9 @@
                 <i class="fa-solid fa-chart-pie text-orange-600"></i> 
                 <span class="gradient-text">Performance Classification</span>
             </h3>
-            <div id="pieChart" class="w-full h-[400px]"></div>
+            <div class="plotly-container">
+                <div id="pieChart" class="w-full h-[400px]"></div>
+            </div>
         </div>
     </section>
 
@@ -306,8 +363,12 @@
                 <span class="gradient-text">टॉप 5 और बॉटम 5 जिले</span>
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div id="topDistChart" class="h-[400px]"></div>
-                <div id="botDistChart" class="h-[400px]"></div>
+                <div class="plotly-container">
+                    <div id="topDistChart" class="h-[400px]"></div>
+                </div>
+                <div class="plotly-container">
+                    <div id="botDistChart" class="h-[400px]"></div>
+                </div>
             </div>
         </div>
         <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
@@ -315,9 +376,11 @@
                 <i class="fa-solid fa-table-cells text-teal-600"></i> 
                 <span class="gradient-text">वर्षा वितरण मैट्रिक्स (Heatmap)</span>
             </h3>
-            <div id="heatmapChart" class="w-full h-[800px]"> 
-                <div class="text-center p-8 text-gray-500">
-                    
+            <div class="plotly-container">
+                <div id="heatmapChart" class="w-full h-[800px]"> 
+                    <div class="text-center p-8 text-gray-500">
+                        
+                    </div>
                 </div>
             </div>
         </div>
@@ -372,16 +435,15 @@
 </main>
 
 <script>
-    // --- Global Configuration for Plotly Charts (for linear modebar/controls) ---
+    // --- Global Configuration for Plotly Charts (now simplified as CSS handles position/hover) ---
     const PLOTLY_CONFIG = {
         responsive: true,
-        displayModeBar: true,
+        displayModeBar: true, // CSS will control hover visibility and positioning
         modeBarButtonsToRemove: [
             'lasso2d', 'select2d', 'sendDataToCloud', 
             'hoverClosestCartesian', 'hoverCompareCartesian', 'toggleSpikelines'
         ],
         displaylogo: false, // Remove Plotly logo
-        modebar: { orientation: 'h' } // <<<--- यह परिवर्तन मोड बार को हॉरिजॉन्टल करता है
     };
 
     // --- UI Logic: Active Tab Switching ---
@@ -389,6 +451,22 @@
         document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('active-nav'));
         element.classList.add('active-nav');
     }
+    
+    // --- NEW: Smooth Scroll Function for Dashboard ---
+    function smoothScrollToAnalysis(event) {
+        event.preventDefault(); 
+        setActive(event.currentTarget); // Set the link as active
+        const targetElement = document.getElementById('analysis');
+        if (targetElement) {
+            targetElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start', // Scrolls to align the top of the element with the top of the view
+                // Adding a small delay or offset is complex with scrollIntoView and pure JS, 
+                // but this implements the smooth motion as requested.
+            });
+        }
+    }
+    // --------------------------------------------------
 
     function toggleDarkMode() {
         document.documentElement.classList.toggle('dark');
@@ -545,11 +623,14 @@
         const periodKey = document.getElementById('periodSelect').value;
         const monthLabel = monthDisplayNames[periodKey] || periodKey;
         
+        // MODIFIED: Year added to the dynamic label
+        const fullLabel = `${monthLabel} - ${year}`;
+        
         // UI लेबल अपडेट करें
         document.getElementById('yearDisplay').innerText = year;
-        document.getElementById('monthDisplay').innerText = monthLabel;
-        document.getElementById('tableMonthLabel').innerText = monthLabel;
-        document.querySelectorAll('.dynamic-month-label').forEach(el => el.innerText = monthLabel);
+        document.getElementById('monthDisplay').innerText = fullLabel; // UPDATED
+        document.getElementById('tableMonthLabel').innerText = fullLabel; // UPDATED
+        document.querySelectorAll('.dynamic-month-label').forEach(el => el.innerText = fullLabel); // UPDATED
         
         // 1. सिंगल CSV डेटा लोड करें
         try {
@@ -756,13 +837,29 @@
             marker: { size: 6, color: '#EF5350', symbol: 'diamond' }
         };
 
+// 🎨 GRADIENT COLOR PICKER (CHANGE THESE RGBA VALUES!)
+        // ----------------------------------------------------
+        // UPDATED: Dark Green (Start Color)
+        const GRADIENT_START_COLOR = 'rgba(0, 100, 0, 1)'; 
+        // UPDATED: Lime Green (End Color)
+        const GRADIENT_END_COLOR = 'rgba(50, 205, 50, 1)';   
+        // UPDATED: Lime Green Glow (Match End Color)
+        const GLOW_COLOR_RGBA = 'rgba(50, 205, 50, 0.8)';     
+        // ----------------------------------------------------
+
+        // Departure (Deviation) as a line, on a secondary Y-axis
         const traceDeparture = {
             x: data.map(d => d.district),
             y: data.map(d => d.deviation),
-            type: 'scatter', mode: 'lines+markers', name: 'Departure (%)',
-            line: { color: '#00BCD4', width: 3, shape: 'spline' },
-            marker: { size: 6, color: '#00BCD4', symbol: 'star' },
-            yaxis: 'y2'
+            type: 'scatter', 
+            mode: 'lines+markers', 
+            name: 'Departure (%)',
+            // Plotly को एक रंग दें (END COLOR) जिसे CSS से SVG ग्रेडिएंट से ओवरराइड किया जा सके
+            line: { color: GRADIENT_END_COLOR, width: 2.5, shape: 'spline' }, 
+            // Marker को END COLOR से मैच करें
+            marker: { size: 7, color: GRADIENT_END_COLOR, symbol: 'diamond-open' },
+            yaxis: 'y2',
+            hovertemplate: '<b>%{x}</b><br>विचलन: %{y}%<extra></extra>' 
         };
 
         Plotly.newPlot('comparisonChart', [traceActual, traceNormal, traceDeparture], {

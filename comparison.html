@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="hi" class="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>बिहार मानसून - वर्ष तुलना</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    // Tailwind CSS Configuration
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    'app-bg': '#F0F9FF', 
+                    'dark-app-bg': '#030712', 
+                    primary: '#2E8B57',
+                    secondary: '#E6F4EA',
+                    darkbg: '#1a202c',
+                    carddark: '#2d3748',
+                }
+            }
+        }
+    }
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Replicating key styles for visual consistency */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap');
+        
+        body { font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif; scroll-behavior: smooth; }
+        
+        .card { 
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .dark .card { border: 1px solid rgba(255,255,255,0.1); }
+        
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: sticky; 
+            top: 0;
+            z-index: 50;
+        }
+        .dark .navbar {
+            background-color: rgba(30, 41, 59, 0.9);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+        .dark .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+        
+        .nav-box {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: #4b5563;
+        }
+        .dark .nav-box {
+            color: #d1d5db;
+        }
+        .nav-box:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            background-color: white;
+        }
+        .dark .nav-box:hover {
+            background-color: #374151;
+        }
+        .nav-box.active-nav {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            border: none;
+        }
+        
+    </style>
+</head>
+<body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<svg height="0" width="0" style="position: absolute;">
+    <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#0d9488;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="gradient-dark" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#2dd4bf;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+</svg>
+
+
+<nav id="navbar" class="navbar">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+        
+        <div class="flex items-center gap-3 nav-logo shrink-0">
+            <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">IMD</div> 
+            <div>
+                <h1 class="text-xl font-bold leading-tight gradient-text">बिहार मानसून तुलना</h1>
+                <div class="text-xs text-gray-500 dark:text-gray-400">IMD MC Patna — वर्ष-दर-वर्ष तुलना</div>
+            </div>
+        </div>
+        
+
+ <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
+    <a href="index.html" class="nav-box" onclick="setActive(this)">होम</a>
+    <a href="index.html#analysis" class="nav-box" onclick="setActive(this)">डैशबोर्ड</a>    
+    <a href="district.html" class="nav-box" onclick="setActive(this)">जिलावार</a> 
+    <a href="maps.html" class="nav-box" onclick="setActive(this)">मानचित्र</a>
+    <a href="history.html" class="nav-box" onclick="setActive(this)">ऐतिहासिक</a>
+    <a href="comparison.html" class="nav-box active-nav" onclick="setActive(this)">तुलना</a>
+</div>
+        
+
+
+        <div class="flex items-center gap-4 shrink-0">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
+
+<header class="text-center py-6 space-y-4">
+    <h2 class="text-3xl md:text-4xl font-bold">
+        <span class="gradient-text"><span id="year1Display">2025</span> vs <span id="year2Display">2024</span> वास्तविक वर्षा (Actual Rainfall) तुलना</span>
+    </h2>
+    
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm inline-flex flex-wrap justify-center gap-6 mx-auto border border-gray-200 dark:border-gray-700">
+        
+        <div class="flex flex-col items-center">
+            <label for="year1Select" class="text-3xl font-bold gradient-text mb-1">वर्ष 1:</label>
+            <select id="year1Select" onchange="updateComparison()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-32">
+                <option value="2025" selected>2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+                <option value="2018">2018</option>
+                <option value="2017">2017</option>
+                <option value="2016">2016</option>
+                <option value="2015">2015</option>
+            </select>
+        </div>
+        
+        <div class="flex flex-col items-center">
+            <label for="year2Select" class="text-3xl font-bold gradient-text mb-1">वर्ष 2:</label>
+            <select id="year2Select" onchange="updateComparison()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-32">
+                <option value="2025">2025</option>
+                <option value="2024" selected>2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+                <option value="2018">2018</option>
+                <option value="2017">2017</option>
+                <option value="2016">2016</option>
+                <option value="2015">2015</option>
+            </select>
+        </div>
+        
+        <div class="flex flex-col items-center">
+            <label for="periodSelect" class="text-3xl font-bold gradient-text mb-1">अवधि:</label>
+            <select id="periodSelect" onchange="updateComparison()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-64">
+                <option value="overall_monsoon" selected>मानसून (जून-सितंबर)</option>
+                <option value="june">जून</option>
+                <option value="july">जुलाई</option>
+                <option value="august">अगस्त</option>
+                <option value="september">सितंबर</option>
+            </select>
+        </div>
+    </div>
+</header>
+
+<div id="fileStatus" class="mt-4 p-4 text-sm rounded-xl bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-700">
+    <p>फाइल लोडिंग स्थिति यहां दिखाई देगी।</p>
+    <p class="mt-2 text-red-600 dark:text-red-400 font-semibold">यदि डेटा लोड नहीं होता है, तो कृपया यहां **Error** या **Warning** संदेश देखें।</p>
+</div>
+<section id="chart-section-1" class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+    <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-chart-line text-blue-600"></i> 
+        <span class="gradient-text" id="districtComparisonTitle">जिलेवार Actual Rainfall तुलना (<span id="compPeriodActual">मानसून (जून-सितंबर)</span>)</span>
+    </h3>
+    <div id="actualComparisonChart" class="w-full h-[500px]"></div>
+</section>
+
+<section id="chart-section-2" class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+    <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-chart-bar text-teal-600"></i> 
+        <span class="gradient-text" id="differenceChartTitle">जिलेवार वास्तविक वर्षा अंतर (<span id="compPeriodDiff">मानसून (जून-सितंबर)</span>)</span>
+    </h3>
+    <div id="differenceBarChart" class="w-full h-[500px]"></div>
+</section>
+
+<section id="chart-section-3" class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+    <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-timeline text-red-600"></i> 
+        <span class="gradient-text" id="monthlyTrendTitle">मासिक वास्तविक वर्षा प्रवृत्ति तुलना (कुल योग)</span>
+    </h3>
+    <div id="monthlyTrendChart" class="w-full h-[500px]"></div>
+</section>
+
+<section id="chart-section-4" class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+    <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-braille text-purple-600"></i> 
+        <span class="gradient-text" id="heatmapMainTitle">वर्षा वितरण मैट्रिक्स (Heatmap - वास्तविक वर्षा)</span>
+    </h3>
+    <div id="heatmapChart" class="w-full h-[700px]"></div>
+</section>
+
+<section id="comparison-table" class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Detailed Comparison: <span class="text-blue-600" id="compTablePeriod">मानसून (जून-सितंबर)</span></h3>
+            
+            <input type="text" id="searchTable" onkeyup="filterComparisonTable()" 
+                    placeholder="जिला खोजें (Search District)..."
+                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm" />
+        </div>
+        
+        <div class="overflow-x-auto max-h-[500px]">
+            <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-6 py-3">District</th>
+                        <th class="px-6 py-3 text-right" id="thActual1">Actual (mm) <span id="thYear1">2025</span></th>
+                        <th class="px-6 py-3 text-right" id="thActual2">Actual (mm) <span id="thYear2">2024</span></th>
+                        <th class="px-6 py-3 text-right" id="thDiff">Difference (Y1 - Y2)</th>
+                        <th class="px-6 py-3 text-center" id="thStatus1">Status (Y1 Dev)</th>
+                        <th class="px-6 py-3 text-center" id="thStatus2">Status (Y2 Dev)</th>
+                    </tr>
+                </thead>
+                <tbody id="comparisonTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">डेटा लोड हो रहा है...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <footer class="bg-slate-800 text-white p-8 rounded-xl mt-8 text-center space-y-4">
+        <h4 class="text-xl font-bold gradient-text">Data Source and Credits</h4>
+        <p class="text-gray-300">India Meteorological Department: Meteorological Centre Patna</p>
+        <div class="pt-4 border-t border-slate-700">
+            <p class="text-sm text-gray-400">Analysis Prepared by:</p>
+            <p class="text-lg font-semibold">© Lal Kamal</p>
+        </div>
+    </footer>
+
+</main>
+
+<script>
+    // --- Global Configuration ---
+    const PLOTLY_CONFIG = {
+        responsive: true,
+        displayModeBar: true,
+        modeBarButtonsToRemove: [
+            'lasso2d', 'select2d', 'sendDataToCloud', 
+            'hoverClosestCartesian', 'hoverCompareCartesian', 'toggleSpikelines'
+        ],
+        displaylogo: false, 
+        modebar: { orientation: 'h' }
+    };
+    
+    // Global map to track file statuses
+    const FILE_STATUS_MAP = {};
+
+    // --- Data Mapping ---
+    const monthDisplayNames = {
+        'overall_monsoon': 'मानसून (जून-सितंबर)',
+        'september': 'सितंबर', 'august': 'अगस्त',
+        'july': 'जुलाई', 'june': 'जून'
+    };
+    // All possible monsoon month keys
+    const ALL_MONSOON_MONTH_KEYS = ['Jun', 'Jul', 'Aug', 'Sep']; 
+    
+    // Maps period key (e.g., 'july') to the list of months to include (e.g., ['Jun', 'Jul'])
+    const MONTHS_MAP = {
+        'overall_monsoon': ['Jun', 'Jul', 'Aug', 'Sep'],
+        'june': ['Jun'],
+        'july': ['Jun', 'Jul'],
+        'august': ['Jun', 'Jul', 'Aug'],
+        'september': ['Jun', 'Jul', 'Aug', 'Sep']
+    };
+
+    const RAINFALL_COLORS_HEX = {
+        'LARGE EXCESS': '#1565c0', // dark blue
+        'EXCESS': '#4fc3f7',       // light blue
+        'NORMAL': '#4caf50',       // green
+        'DEFICIENT': '#e53935',    // red
+        'LARGE DEFICIENT': '#ffd700', // yellow
+        'NO RAIN': '#ffffff',      // white
+        'N/A': '#9ca3af'           // Gray for Not Available
+    };
+
+    // --- Utility Functions ---
+    function setActive(element) {
+        document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('active-nav'));
+        element.classList.add('active-nav');
+    }
+
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        updateComparison(); 
+    }
+
+    function getRainfallStatus(deviation) {
+        if (deviation === null || isNaN(deviation)) return 'N/A';
+        if(deviation >= 60) return 'LARGE EXCESS';
+        if(deviation > 19) return 'EXCESS';
+        if(deviation >= -19) return 'NORMAL';
+        if(deviation >= -59) return 'DEFICIENT';
+        if(deviation === -100) return 'NO RAIN';
+        return 'LARGE DEFICIENT'; 
+    }
+    
+    function getRainfallStatusTextColor(statusText) {
+        if (statusText === 'LARGE EXCESS' || statusText === 'DEFICIENT' || statusText === 'NORMAL' || statusText === 'N/A') {
+            return 'white'; 
+        } else {
+            return 'black'; 
+        }
+    }
+
+    // **सुधारित `getProcessedData` फ़ंक्शन**
+    function getProcessedData(rawData) {
+        return rawData.map(d => {
+            // Priority 1: 'Actual R/F (mm)' (Based on user confirmation)
+            const actualRainfall = d['Actual R/F (mm)'] ? parseFloat(d['Actual R/F (mm)'].toString().replace(/[^0-9-.]/g, '')) : 
+                                 null;
+            
+            const departure = d['Departure'] ? d['Departure'].toString().replace(/[^0-9-.]/g, '') : null;
+            const deviation = departure !== null && departure !== '' ? parseInt(departure) : null; 
+            
+            const monthlyRain = {};
+            
+            // केवल तभी मासिक डेटा पढ़ने का प्रयास करें जब मासिक कॉलम मौजूद हों (जो केवल overall_monsoon.csv में होने चाहिए)
+            let hasMonthlyData = false;
+            ALL_MONSOON_MONTH_KEYS.forEach(month => { 
+                if (d[month] !== undefined) {
+                    const val = d[month].toString().replace(/[^0-9-.]/g, '');
+                    monthlyRain[month] = parseFloat(val) || 0;
+                    hasMonthlyData = true;
+                }
+            });
+            
+            // यदि मासिक डेटा नहीं मिला (जैसे जून, जुलाई फ़ाइल), तो इसे खाली रखें
+            const finalMonthlyRain = hasMonthlyData ? monthlyRain : {};
+
+            return {
+                district: d['DISTRICT NAME'] ? d['DISTRICT NAME'].trim() : 'Unknown', 
+                actual: actualRainfall, 
+                deviation: deviation,
+                status: getRainfallStatus(deviation), 
+                monthly: finalMonthlyRain // Only includes monthly data if available in the source file
+            };
+        }).filter(d => d.district !== 'Unknown' && d.district !== 'BIHAR STATE'); 
+    }
+    
+    // **अपडेटेड फ़ाइल लोडिंग फ़ंक्शन**
+    async function loadCSVData(year, periodKey) {
+        const safePeriodKey = periodKey.toLowerCase(); 
+        const filePath = `data/${year}/${safePeriodKey}.csv`; 
+        
+        try {
+            const response = await fetch(filePath);
+            
+            if (!response.ok) {
+                FILE_STATUS_MAP[filePath] = { 
+                    status: 'Error', 
+                    message: `HTTP Status ${response.status} (${response.status === 404 ? 'फ़ाइल नहीं मिली/गलत पथ' : 'अन्य त्रुटि'})` 
+                };
+                return []; 
+            }
+            
+            const csvText = await response.text();
+            
+            return new Promise((resolve) => {
+                Papa.parse(csvText, {
+                    header: true, 
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        if (results.data.length === 0) {
+                            FILE_STATUS_MAP[filePath] = { 
+                                status: 'Warning', 
+                                message: `सफलतापूर्वक लोड हुआ, लेकिन डेटा खाली है (Rows: 0)` 
+                            };
+                            resolve([]);
+                        } else {
+                            FILE_STATUS_MAP[filePath] = { 
+                                status: 'Success', 
+                                message: `सफलतापूर्वक लोड हुआ (Rows: ${results.data.length})` 
+                            };
+                            resolve(results.data);
+                        }
+                    },
+                    error: function(err) {
+                        FILE_STATUS_MAP[filePath] = { 
+                            status: 'Fatal Error', 
+                            message: `Parsing Failed: ${err.message}` 
+                        };
+                        resolve([]);
+                    }
+                });
+            });
+
+        } catch (error) {
+            FILE_STATUS_MAP[filePath] = { 
+                status: 'Fatal Error', 
+                message: `नेटवर्क/फ़ाइल लोड त्रुटि: ${error.message}` 
+            };
+            return [];
+        }
+    }
+    // **अपडेटेड फ़ाइल लोडिंग फ़ंक्शन समाप्त**
+
+    // **नई UI स्थिति अपडेट फ़ंक्शन**
+    function updateFileStatusUI() {
+        const statusDiv = document.getElementById('fileStatus');
+        let html = '<strong class="text-blue-800 dark:text-blue-200">CSV फ़ाइल लोडिंग स्थिति:</strong><ul class="list-disc ml-4 mt-2 space-y-1">';
+        
+        // Helper to map status to Tailwind classes
+        const statusClass = {
+            'Success': 'text-green-600',
+            'Warning': 'text-yellow-600',
+            'Error': 'text-red-600',
+            'Fatal Error': 'text-red-600 font-bold'
+        };
+
+        for (const [path, statusInfo] of Object.entries(FILE_STATUS_MAP)) {
+            const className = statusClass[statusInfo.status] || 'text-gray-600';
+            html += `<li class="break-all"><code class="text-xs">${path}:</code> <span class="${className}">${statusInfo.message}</span></li>`;
+        }
+        
+        html += '</ul>';
+        html += '<p class="mt-2 text-red-600 dark:text-red-400 font-semibold">यदि कोई फ़ाइल **Error (404)** दिखाती है, तो इसका मतलब है कि वह **गलत पथ पर है या मौजूद नहीं है**। फ़ाइल पथ (case-sensitivity) की जाँच करें।</p>';
+        statusDiv.innerHTML = html;
+    }
+
+
+    // --- Core Comparison Logic ---
+    async function updateComparison() {
+        const year1 = document.getElementById('year1Select').value;
+        const year2 = document.getElementById('year2Select').value;
+        const periodKey = document.getElementById('periodSelect').value;
+        const monthLabel = monthDisplayNames[periodKey] || periodKey;
+        
+        const displayMonths = MONTHS_MAP[periodKey] || [];
+
+        // UI Labels Update
+        document.getElementById('year1Display').innerText = year1;
+        document.getElementById('year2Display').innerText = year2;
+        document.getElementById('compTablePeriod').innerText = monthLabel;
+        document.getElementById('compPeriodActual').innerText = monthLabel; 
+        document.getElementById('compPeriodDiff').innerText = monthLabel;   
+        document.getElementById('thYear1').innerText = `${year1}`;
+        document.getElementById('thYear2').innerText = `${year2}`;
+        
+        document.getElementById('searchTable').value = '';
+        document.getElementById('comparisonTableBody').innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">डेटा लोड हो रहा है...</td></tr>`;
+        
+        // Clear status map for new check and display initial status
+        Object.keys(FILE_STATUS_MAP).forEach(key => delete FILE_STATUS_MAP[key]);
+        document.getElementById('fileStatus').innerHTML = '<p class="text-blue-800 dark:text-blue-200">फाइल लोडिंग स्थिति की जाँच की जा रही है...</p>';
+
+        // 1. Load CUMULATIVE Data (for Chart 1, 2 and Table) - Use selected period
+        // Note: This data must have 'Actual R/F (mm)' and 'Departure' columns.
+        const rawPeriodData1 = await loadCSVData(year1, periodKey);
+        const data1 = getProcessedData(rawPeriodData1);
+
+        const rawPeriodData2 = await loadCSVData(year2, periodKey);
+        const data2 = getProcessedData(rawPeriodData2);
+        
+        // 2. Load MONTHLY BREAKDOWN Data (for Chart 3 & 4) - Always load 'overall_monsoon' to get all month data
+        // Note: This data must have 'Jun', 'Jul', 'Aug', 'Sep' columns.
+        const MONSOON_KEY = 'overall_monsoon';
+        
+        const rawMonthlyData1 = await loadCSVData(year1, MONSOON_KEY);
+        const monthlyData1 = getProcessedData(rawMonthlyData1);
+
+        const rawMonthlyData2 = await loadCSVData(year2, MONSOON_KEY);
+        const monthlyData2 = getProcessedData(rawMonthlyData2);
+        
+        // **फ़ाइल लोडिंग स्थिति को अपडेट करें**
+        updateFileStatusUI();
+
+
+        // Process Data
+        const comparisonData = matchAndCombineData(data1, data2);
+        // Combine monthly data only for the districts available in comparisonData to avoid errors
+        const monthlyComparisonData = matchAndCombineMonthlyData(monthlyData1, monthlyData2, comparisonData);
+
+        // Render UI Components
+        renderActualComparisonChart(comparisonData, year1, year2, monthLabel); 
+        renderDifferenceBarChart(comparisonData, year1, year2, monthLabel); 
+        
+        renderMonthlyTrendChart(monthlyComparisonData, year1, year2, displayMonths, monthLabel); 
+        renderHeatmapChart(monthlyComparisonData, year1, year2, displayMonths, monthLabel); 
+        
+        // Check for basic cumulative data availability
+        if (comparisonData.length === 0) {
+             const errorMessage = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500 font-semibold">
+                चेतावनी: वास्तविक वर्षा डेटा उपलब्ध नहीं है। कृपया फ़ाइल लोडिंग स्थिति की जाँच करें।
+             </td></tr>`;
+             document.getElementById('comparisonTableBody').innerHTML = errorMessage;
+             // Clear all charts
+             Plotly.purge(document.getElementById('actualComparisonChart'));
+             Plotly.purge(document.getElementById('differenceBarChart'));
+             Plotly.purge(document.getElementById('monthlyTrendChart'));
+             Plotly.purge(document.getElementById('heatmapChart'));
+             document.getElementById('actualComparisonChart').innerHTML = '<p class="text-center py-10 text-red-500 font-semibold">तुलना के लिए वास्तविक वर्षा डेटा उपलब्ध नहीं है।</p>';
+             document.getElementById('differenceBarChart').innerHTML = '<p class="text-center py-10 text-red-500 font-semibold">तुलना के लिए वर्षा अंतर डेटा उपलब्ध नहीं है।</p>';
+             document.getElementById('monthlyTrendChart').innerHTML = '<p class="text-center py-10 text-red-500 font-semibold">मासिक वर्षा ट्रेंड डेटा उपलब्ध नहीं है।</p>';
+             document.getElementById('heatmapChart').innerHTML = '<p class="text-center py-10 text-red-500 font-semibold">मासिक वर्षा वितरण डेटा उपलब्ध नहीं है।</p>';
+
+
+        } else {
+             renderComparisonTable(comparisonData, year1, year2);
+        }
+    }
+    
+    // Function to combine Monthly Data for Charts 3 and 4
+    function matchAndCombineMonthlyData(data1, data2, baseComparisonData) {
+        const map1 = new Map(data1.map(d => [d.district, d]));
+        const map2 = new Map(data2.map(d => [d.district, d]));
+        
+        return baseComparisonData.map(d => {
+            // Use monthly data only if the respective file was loaded successfully and contained monthly columns
+            const d1 = map1.get(d.district) || { monthly: {} };
+            const d2 = map2.get(d.district) || { monthly: {} };
+            
+            return {
+                district: d.district,
+                monthly1: d1.monthly,
+                monthly2: d2.monthly,
+            };
+        });
+    }
+
+    // Calculates Actual Rainfall Difference (FIXED to return number/null)
+    function matchAndCombineData(data1, data2) {
+        const map1 = new Map(data1.map(d => [d.district, d]));
+        const map2 = new Map(data2.map(d => [d.district, d]));
+
+        const allDistricts = [...new Set([
+            ...map1.keys(), 
+            ...map2.keys()
+        ])].sort();
+        
+        return allDistricts.map(district => {
+            const d1 = map1.get(district) || { deviation: null, status: 'N/A', actual: null }; 
+            const d2 = map2.get(district) || { deviation: null, status: 'N/A', actual: null }; 
+            
+            let actualDiff = 'N/A'; 
+            if (d1.actual !== null && d2.actual !== null) {
+                actualDiff = (d1.actual - d2.actual).toFixed(1); 
+            }
+            
+            return {
+                district: district,
+                deviation1: d1.deviation,
+                status1: d1.status,
+                deviation2: d2.deviation,
+                status2: d2.status,
+                actualDifference: actualDiff, 
+                actual1: d1.actual,
+                actual2: d2.actual,
+            };
+        }).filter(d => d.district !== 'Unknown' && (d.actual1 !== null || d.actual2 !== null));
+    }
+
+    // --- Chart 1: Actual Rainfall Comparison (Bar + Difference Line) ---
+    function renderActualComparisonChart(data, year1, year2, periodLabel) {
+        const chartDiv = document.getElementById('actualComparisonChart');
+        // Filter out rows where actual rainfall is null for both years
+        const chartData = data.filter(d => d.actual1 !== null || d.actual2 !== null);
+        
+        // Set Heading
+        document.getElementById('districtComparisonTitle').innerHTML = `जिलेवार Actual Rainfall तुलना: ${year1} vs ${year2} ${periodLabel}`;
+
+        if (chartData.length === 0) { Plotly.purge(chartDiv); chartDiv.innerHTML = '<p class="text-center py-10 text-red-500 font-semibold">तुलना के लिए Actual Rainfall डेटा उपलब्ध नहीं है।</p>'; return; }
+        
+        const isDark = document.documentElement.classList.contains('dark');
+        const fontColor = isDark ? '#cbd5e1' : '#334155';
+        const Y1_COLOR = isDark ? '#2dd4bf' : '#0d9488'; // Teal/Green
+        const Y2_COLOR = isDark ? 'rgba(99, 102, 241, 1)' : 'rgba(37, 99, 235, 1)'; // Indigo/Blue
+        const DIFF_COLOR = 'rgba(239, 83, 80, 1)'; // Red/Tomato
+
+        const traceActual1 = {
+            x: chartData.map(d => d.district),
+            y: chartData.map(d => d.actual1),
+            type: 'bar', name: `${year1} Actual`,
+            marker: { color: Y1_COLOR },
+            hovertemplate: `<b>%{x}</b><br>${year1} वर्षा: %{y} मिमी<extra></extra>`,
+            yaxis: 'y1'
+        };
+
+        const traceActual2 = {
+            x: chartData.map(d => d.district),
+            y: chartData.map(d => d.actual2),
+            type: 'bar', name: `${year2} Actual`,
+            marker: { color: Y2_COLOR }, 
+            hovertemplate: `<b>%{x}</b><br>${year2} वर्षा: %{y} मिमी<extra></extra>`,
+            yaxis: 'y1'
+        };
+        
+        const traceDifference = {
+            x: chartData.map(d => d.district),
+            y: chartData.map(d => {
+                 const diff = parseFloat(d.actualDifference);
+                 return isNaN(diff) ? null : diff;
+            }),
+            type: 'scatter', mode: 'lines+markers', name: 'Difference (Y1-Y2)',
+            yaxis: 'y2', // Use secondary Y-axis
+            line: { color: DIFF_COLOR, width: 2, shape: 'spline' },
+            marker: { size: 5, color: DIFF_COLOR },
+            hovertemplate: `<b>%{x}</b><br>अंतर: %{y} मिमी<extra></extra>`,
+        };
+        
+        const layoutConfig = {
+            barmode: 'group',
+            title: '', // Title set outside
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Poppins', color: fontColor },
+            margin: { t: 40, b: 150, l: 80, r: 80 }, 
+            xaxis: { tickangle: 45, automargin: true, tickfont: { size: 10 } },
+            yaxis: { 
+                title: `Actual R/F (mm)`, 
+                showgrid: true, zeroline: true, 
+                gridcolor: isDark ? '#374151' : '#e2e8f0',
+                side: 'left',
+                color: Y1_COLOR
+            },
+            yaxis2: {
+                title: 'Difference (mm)',
+                overlaying: 'y',
+                side: 'right',
+                color: DIFF_COLOR,
+                showgrid: false,
+                zeroline: false,
+                automargin: true
+            },
+            legend: { orientation: 'h', y: 1.05 }
+        };
+
+        Plotly.newPlot(chartDiv, [traceActual1, traceActual2, traceDifference], layoutConfig, PLOTLY_CONFIG);
+    }
+
+
+    // --- Chart 2: District-wise Actual Rainfall Difference Bar Chart ---
+    function renderDifferenceBarChart(data, year1, year2, periodLabel) {
+        const chartDiv = document.getElementById('differenceBarChart');
+        const chartData = data.filter(d => d.actualDifference !== 'N/A' && d.actualDifference !== null);
+
+        // Set Heading
+        document.getElementById('differenceChartTitle').innerHTML = `जिलेवार वास्तविक वर्षा अंतर: ${year1} vs ${year2} ${periodLabel}`;
+
+        if (chartData.length === 0) { Plotly.purge(chartDiv); chartDiv.innerHTML = '<p class="text-center py-10 text-red-500 font-semibold">तुलना के लिए वर्षा अंतर डेटा उपलब्ध नहीं है।</p>'; return; }
+        
+        const isDark = document.documentElement.classList.contains('dark');
+        const fontColor = isDark ? '#cbd5e1' : '#334155';
+        
+        const traceDiff = {
+            x: chartData.map(d => d.district),
+            y: chartData.map(d => parseFloat(d.actualDifference)),
+            type: 'bar',
+            name: `वर्षा अंतर (${year1} - ${year2} मिमी)`,
+            marker: {
+                color: chartData.map(d => {
+                    const diff = parseFloat(d.actualDifference);
+                    return diff >= 0 ? 'rgba(76, 175, 80, 1)' : 'rgba(239, 83, 80, 1)'; // Green/Red
+                })
+            },
+            hovertemplate: `<b>%{x}</b><br>वर्षा अंतर: %{y} मिमी<extra></extra>`
+        };
+
+        const layoutConfig = {
+            title: '', // Title set outside
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Poppins', color: fontColor },
+            margin: { t: 40, b: 150, l: 80, r: 10 }, 
+            yaxis: { 
+                title: 'अंतर (Actual R/F mm)', 
+                showgrid: true, zeroline: true, 
+                gridcolor: isDark ? '#374151' : '#e2e8f0'
+            },
+            xaxis: { tickangle: 45, automargin: true, tickfont: { size: 10 } }
+        };
+
+        Plotly.newPlot(chartDiv, [traceDiff], layoutConfig, PLOTLY_CONFIG);
+    }
+
+    // --- Chart 3: Monthly Trend Comparison (LINE CHART - Uses Total Actual Rainfall) ---
+    function renderMonthlyTrendChart(data, year1, year2, displayMonths, periodLabel) {
+        const chartDiv = document.getElementById('monthlyTrendChart');
+        const monthsToShow = displayMonths.filter(m => ALL_MONSOON_MONTH_KEYS.includes(m));
+
+        const monthlyTotals1 = {};
+        const monthlyTotals2 = {};
+
+        monthsToShow.forEach(month => {
+            // Ensure we only sum up if the month key exists in the monthly object (i.e., data was loaded from overall_monsoon.csv)
+            monthlyTotals1[month] = data.reduce((sum, d) => sum + (d.monthly1[month] || 0), 0).toFixed(1);
+            monthlyTotals2[month] = data.reduce((sum, d) => sum + (d.monthly2[month] || 0), 0).toFixed(1);
+        });
+        
+        const totalRain1 = monthsToShow.map(month => parseFloat(monthlyTotals1[month]));
+        const totalRain2 = monthsToShow.map(month => parseFloat(monthlyTotals2[month]));
+        
+        // Set Heading
+        document.getElementById('monthlyTrendTitle').innerHTML = `मासिक वास्तविक वर्षा प्रवृत्ति तुलना: ${year1} vs ${year2} ${periodLabel}`;
+
+        // Check for meaningful data (if all months are 0)
+        const hasData = totalRain1.some(y => y > 0) || totalRain2.some(y => y > 0);
+
+        if (!hasData) {
+             Plotly.purge(chartDiv); 
+             chartDiv.innerHTML = `<p class="text-center py-10 text-yellow-500 font-semibold">मासिक वर्षा ट्रेंड डेटा उपलब्ध नहीं है। (कृपया सुनिश्चित करें कि data/${year1}/overall_monsoon.csv फ़ाइलें मौजूद हैं)</p>`; 
+             return;
+        }
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const fontColor = isDark ? '#cbd5e1' : '#334155';
+        
+        const traceMonth1 = {
+            x: monthsToShow, y: totalRain1, type: 'scatter', mode: 'lines+markers', name: `${year1} कुल वर्षा`,
+            line: { color: 'rgba(0, 188, 212, 1)', width: 3 },
+            marker: { size: 8 },
+            hovertemplate: `<b>%{x}</b><br>${year1} वर्षा: %{y} मिमी<extra></extra>`
+        };
+
+        const traceMonth2 = {
+            x: monthsToShow, y: totalRain2, type: 'scatter', mode: 'lines+markers', name: `${year2} कुल वर्षा`,
+            line: { color: 'rgba(239, 83, 80, 1)', width: 3, dash: 'dot' },
+            marker: { size: 8 },
+            hovertemplate: `<b>%{x}</b><br>${year2} वर्षा: %{y} मिमी<extra></extra>`
+        };
+
+        const layoutConfig = {
+            title: '', // Title set outside
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Poppins', color: fontColor },
+            margin: { t: 40, b: 80, l: 80, r: 10 }, 
+            xaxis: { title: 'महीना' },
+            yaxis: { 
+                title: 'कुल वास्तविक वर्षा (Actual R/F mm)', 
+                showgrid: true, zeroline: true, 
+                gridcolor: isDark ? '#374151' : '#e2e8f0'
+            },
+            legend: { orientation: 'h', y: 1.05 }
+        };
+
+        Plotly.newPlot(chartDiv, [traceMonth1, traceMonth2], layoutConfig, PLOTLY_CONFIG);
+    }
+
+    // --- Chart 4: Rainfall Distribution Matrix (Heatmap - Uses Actual Rainfall) ---
+    function renderHeatmapChart(data, year1, year2, displayMonths, periodLabel) {
+        const chartDiv = document.getElementById('heatmapChart');
+        const chartData = data.filter(d => d.district); 
+        const monthsToShow = displayMonths.filter(m => ALL_MONSOON_MONTH_KEYS.includes(m));
+
+        // Set Heading
+        document.getElementById('heatmapMainTitle').innerHTML = `वर्षा वितरण मैट्रिक्स (Heatmap - वास्तविक वर्षा): ${year1} vs ${year2} ${periodLabel}`;
+
+        if (chartData.length === 0) { Plotly.purge(chartDiv); chartDiv.innerHTML = '<p class="text-center py-10 text-red-500 font-semibold">तुलना के लिए डेटा उपलब्ध नहीं है।</p>'; return; }
+        
+        // Prepare zData for Year 1 Heatmap (District vs Month Rainfall)
+        const zData = chartData.map(d => {
+            // Note: Heatmap currently only shows Year 1 data due to Plotly's structure for Z-axis
+            return monthsToShow.map(month => d.monthly1[month] || 0);
+        });
+        
+        // Check if any district has data for the currently selected period/months
+        const hasData = zData.flat().some(y => y > 0);
+
+        if (!hasData) {
+             Plotly.purge(chartDiv); 
+             chartDiv.innerHTML = `<p class="text-center py-10 text-yellow-500 font-semibold">मासिक वर्षा वितरण डेटा उपलब्ध नहीं है। (कृपया सुनिश्चित करें कि data/${year1}/overall_monsoon.csv फ़ाइलें मौजूद हैं)</p>`; 
+             return;
+        }
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const fontColor = isDark ? '#cbd5e1' : '#334155';
+        
+        const traceHeatmap = {
+            z: zData,
+            x: monthsToShow, 
+            y: chartData.map(d => d.district),
+            type: 'heatmap',
+            colorscale: isDark ? 'Jet' : 'Viridis', 
+            colorbar: { title: 'Actual R/F (mm)', titlefont: { color: fontColor }, tickfont: { color: fontColor } },
+            hovertemplate: `<b>जिला: %{y}</b><br>माह: %{x}<br>वास्तविक वर्षा: %{z} मिमी<extra></extra>`
+        };
+
+        const layoutConfig = {
+            title: '', // Title set outside
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Poppins', color: fontColor },
+            margin: { t: 40, b: 80, l: 120, r: 10 }, 
+            xaxis: { automargin: true, tickangle: 0 },
+            yaxis: { automargin: true }
+        };
+
+        Plotly.newPlot(chartDiv, [traceHeatmap], layoutConfig, PLOTLY_CONFIG);
+    }
+    
+    // --- Render Comparison Table ---
+    function renderComparisonTable(data, year1, year2) {
+        const tbody = document.getElementById('comparisonTableBody');
+        tbody.innerHTML = '';
+        
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500 font-semibold">तुलना के लिए पर्याप्त डेटा नहीं मिला।</td></tr>`;
+            return;
+        }
+
+        // Update the table headers for the Actual and Status columns
+        document.getElementById('thActual1').innerHTML = `Actual (mm) ${year1}`;
+        document.getElementById('thActual2').innerHTML = `Actual (mm) ${year2}`;
+        
+        data.forEach(d => {
+            const tr = document.createElement('tr');
+            tr.className = "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700";
+            
+            // Status and Deviation are shown IF 'Departure' column exists and provides data
+            const statusText1 = d.status1;
+            const bgColor1 = RAINFALL_COLORS_HEX[statusText1] || 'transparent';
+            const textColor1 = getRainfallStatusTextColor(statusText1);
+            const cellStyle1 = `background-color: ${bgColor1}; color: ${textColor1};`;
+            const statusCellContent1 = `${statusText1}`;
+
+
+            const statusText2 = d.status2;
+            const bgColor2 = RAINFALL_COLORS_HEX[statusText2] || 'transparent';
+            const textColor2 = getRainfallStatusTextColor(statusText2);
+            const cellStyle2 = `background-color: ${bgColor2}; color: ${textColor2};`;
+            const statusCellContent2 = `${statusText2}`;
+
+            
+            let diffClass = 'text-gray-600 dark:text-gray-300';
+            let diffText = 'N/A';
+            const actual1 = d.actual1 !== null ? d.actual1.toFixed(1) : 'N/A';
+            const actual2 = d.actual2 !== null ? d.actual2.toFixed(1) : 'N/A';
+
+            if (d.actualDifference !== 'N/A') {
+                const diffValue = parseFloat(d.actualDifference);
+                diffText = (diffValue > 0 ? '+' : '') + d.actualDifference;
+                if (diffValue > 0) {
+                    diffClass = 'text-green-600 font-bold';
+                } else if (diffValue < 0) {
+                    diffClass = 'text-red-600 font-bold';
+                } else {
+                    diffClass = 'text-yellow-600 font-bold';
+                }
+            }
+            
+            tr.innerHTML = `
+                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">${d.district}</td>
+                <td class="px-6 py-4 text-right">${actual1}</td>
+                <td class="px-6 py-4 text-right">${actual2}</td>
+                <td class="px-6 py-4 text-right ${diffClass}">${diffText}</td>
+                <td class="px-6 py-4 text-center font-bold" style="${cellStyle1}">${statusCellContent1}</td>
+                <td class="px-6 py-4 text-center font-bold" style="${cellStyle2}">${statusCellContent2}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        // Final UI tweak based on Deviation data availability
+        const isDeviationAvailable = data.some(d => d.deviation1 !== null || d.deviation2 !== null);
+        const thStatus1 = document.getElementById('thStatus1');
+        const thStatus2 = document.getElementById('thStatus2');
+
+        if (!isDeviationAvailable) {
+            thStatus1.innerHTML = 'Status (Deviation N/A)';
+            thStatus2.innerHTML = 'Status (Deviation N/A)';
+        } else {
+            thStatus1.innerHTML = `Status (Y1 Dev)`;
+            thStatus2.innerHTML = `Status (Y2 Dev)`;
+        }
+    }
+
+    // --- Search Functionality ---
+    function filterComparisonTable() {
+        const input = document.getElementById('searchTable');
+        const filter = input.value.toUpperCase();
+        const tableBody = document.getElementById('comparisonTableBody');
+        const tr = tableBody.getElementsByTagName('tr');
+
+        for (let i = 0; i < tr.length; i++) {
+            const td = tr[i].getElementsByTagName('td')[0]; 
+            if (td) {
+                const txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = '';
+                } else {
+                    tr[i].style.display = 'none';
+                }
+            }       
+        }
+    }
+    
+    // Initialize Dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        updateComparison();
+    });
+
+</script>
+</body>
+</html>
