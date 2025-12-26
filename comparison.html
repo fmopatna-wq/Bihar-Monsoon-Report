@@ -42,19 +42,49 @@
         .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .dark .card { border: 1px solid rgba(255,255,255,0.1); }
         
+             /* --- Navbar Style --- */
         .navbar {
             background-color: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            position: sticky; 
+            position: fixed !important; 
             top: 0;
-            z-index: 50;
-        }
-        .dark .navbar {
-            background-color: rgba(30, 41, 59, 0.9);
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000 !important;
         }
 
+  /* बॉडी को और नीचे धकेला गया है (Tiro Font के लिए) */
+body {
+    padding-top: 150px !important; /* कंप्यूटर के लिए गैप बढ़ाया गया */
+}
+
+@media (max-width: 1023px) {
+    body {
+        padding-top: 220px !important; /* मोबाइल के लिए गैप बढ़ाया गया */
+    }
+}
+
+/* हेडर का एडजस्टमेंट */
+#overview {
+    padding-top: 0 !important;
+    margin-top: -20px !important;
+}
+
+/* फ़ॉन्ट की ऊंचाई को संतुलित करने के लिए */
+h2, .gradient-text {
+    line-height: 1.5 !important;
+    padding-top: 5px;
+}
+
+.dark .navbar {
+    background-color: rgba(30, 41, 59, 0.9) !important;
+}       
+
+
+       
         .gradient-text {
             background: linear-gradient(to right, #2563eb, #0d9488);
             -webkit-background-clip: text;
