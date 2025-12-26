@@ -156,4 +156,27 @@ body {
             filter: drop-shadow(0 0 4px rgba(50, 205, 50, 0.8)); 
         }
 
-        
+ /* इसे अपनी <style> में अपडेट करें */
+.navbar {
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    position: fixed; /* sticky की जगह fixed बेहतर काम करेगा */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+/* मुख्य कंटेंट को नीचे धकेलने के लिए */
+main {
+    padding-top: 100px !important; /* नेविगेशन बार की ऊंचाई के बराबर जगह */
+}
+
+@media (max-width: 1023px) {
+    main {
+        padding-top: 140px !important; /* मोबाइल पर navbar बड़ा होता है इसलिए ज्यादा जगह */
+    }
+}       
+
+
