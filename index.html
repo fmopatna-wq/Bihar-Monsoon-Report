@@ -352,8 +352,8 @@ h2, .gradient-text {
 
 <header id="overview" class="text-center py-6 space-y-4">
     <h2 class="text-3xl md:text-4xl font-bold">
-        <span class="gradient-text lang-hi">बिहार मानसून सीजन वर्षा विश्लेषण <span id="yearDisplay">2025</span></span>
-        <span class="gradient-text lang-en">Bihar Monsoon Season Rainfall Analysis <span id="yearDisplay">2025</span></span>
+        <span class="gradient-text lang-hi">बिहार मानसून सीजन वर्षा विश्लेषण <span class="yearDisplay">2025</span></span>
+        <span class="gradient-text lang-en">Bihar Monsoon Season Rainfall Analysis <span class="yearDisplay">2025</span></span>
     </h2>
     
     
@@ -486,8 +486,8 @@ h2, .gradient-text {
         <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-chart-area text-blue-600"></i> 
-                <span class="gradient-text lang-hi">मानसून मौसम के लिए वर्षा प्रवृत्ति की समय श्रृंखला <span id="monthDisplay" class="dynamic-month-label lang-hi">मानसून (जून-सितंबर)</span></span>
-                <span class="gradient-text lang-en">Time Series of Rainfall Trend for Monsoon Season <span id="monthDisplay" class="dynamic-month-label lang-en">Monsoon (June-September)</span></span>
+                <span class="gradient-text lang-hi">मानसून मौसम के लिए वर्षा प्रवृत्ति की समय श्रृंखला वर्ष : <span class="yearDisplay">2025</span></span>
+                <span class="gradient-text lang-en">Time Series of Rainfall Trend for Monsoon Season Year : <span class="yearDisplay">2025</span></span>
             </h3>
             <div class="plotly-container">
                 <div id="lineChart" class="w-full h-[400px]">
@@ -930,7 +930,10 @@ h2, .gradient-text {
         const fullLabel = `${monthLabel} - ${year}`;
         
         // UI लेबल अपडेट करें
-        document.getElementById('yearDisplay').innerText = year;
+        const yearElements = document.querySelectorAll('.yearDisplay');
+yearElements.forEach(el => {
+    el.innerText = year;
+});
         document.getElementById('monthDisplay').innerText = fullLabel;
         document.getElementById('tableMonthLabel').innerText = fullLabel;
         document.querySelectorAll('.dynamic-month-label').forEach(el => el.innerText = fullLabel);
