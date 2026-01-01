@@ -37,12 +37,13 @@
         .card { 
             transition: all 0.3s ease;
             border: 1px solid rgba(0,0,0,0.05);
-            border-radius: 0.75rem; /* Added rounded corners */
+            border-radius: 0.75rem;
+            position: relative;
         }
         .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .dark .card { border: 1px solid rgba(255,255,255,0.1); }
         
-             /* --- Navbar Style --- */
+        /* --- Navbar Style --- */
         .navbar {
             background-color: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
@@ -56,35 +57,157 @@
             z-index: 1000 !important;
         }
 
-  /* बॉडी को और नीचे धकेला गया है (Tiro Font के लिए) */
-body {
-    padding-top: 150px !important; /* कंप्यूटर के लिए गैप बढ़ाया गया */
-}
+        /* Mobile-specific adjustments */
+        @media (max-width: 767px) {
+            .navbar {
+                padding: 0.5rem 0.75rem !important;
+            }
+            .nav-logo h1 {
+                font-size: 1.1rem !important;
+            }
+            .nav-links-container {
+                font-size: 0.75rem !important;
+                gap: 0.25rem !important;
+            }
+            .nav-box {
+                padding: 0.25rem 0.5rem !important;
+                font-size: 0.75rem !important;
+            }
+        }
 
-@media (max-width: 1023px) {
-    body {
-        padding-top: 220px !important; /* मोबाइल के लिए गैप बढ़ाया गया */
-    }
-}
+        /* Reduced gap between navbar and content */
+        body {
+            padding-top: 100px !important;
+        }
 
-/* हेडर का एडजस्टमेंट */
-#overview {
-    padding-top: 0 !important;
-    margin-top: -20px !important;
-}
+        @media (max-width: 1023px) {
+            body {
+                padding-top: 140px !important;
+            }
+        }
 
-/* फ़ॉन्ट की ऊंचाई को संतुलित करने के लिए */
-h2, .gradient-text {
-    line-height: 1.5 !important;
-    padding-top: 5px;
-}
+        @media (max-width: 767px) {
+            body {
+                padding-top: 120px !important;
+            }
+        }
 
-.dark .navbar {
-    background-color: rgba(30, 41, 59, 0.9) !important;
-}       
+        /* Header adjustments for reduced gap */
+        #overview {
+            padding-top: 0 !important;
+            margin-top: -10px !important;
+        }
 
+        /* Font height adjustment */
+        h2, .gradient-text {
+            line-height: 1.3 !important;
+            padding-top: 2px;
+        }
 
-       
+        .dark .navbar {
+            background-color: rgba(30, 41, 59, 0.9) !important;
+        }
+
+        /* --- Hover-based Toolbar Styles --- */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .plotly-toolbar {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 6px 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+            gap: 4px;
+            align-items: center;
+            transition: all 0.2s ease;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .chart-container:hover .plotly-toolbar {
+            display: flex !important;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dark .plotly-toolbar {
+            background: rgba(30, 41, 59, 0.95);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .toolbar-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #4b5563;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+        }
+
+        .dark .toolbar-btn {
+            color: #d1d5db;
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .dark .toolbar-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .toolbar-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Mobile adjustments for toolbar */
+        @media (max-width: 767px) {
+            .plotly-toolbar {
+                top: 10px;
+                right: 10px;
+                padding: 4px 6px;
+                gap: 3px;
+            }
+            
+            .toolbar-btn {
+                min-width: 24px;
+                height: 24px;
+                padding: 4px 6px;
+                font-size: 11px;
+            }
+        }
+
+        /* Compact toolbar for better mobile experience */
+        .toolbar-compact {
+            flex-wrap: wrap;
+            max-width: 120px;
+        }
+
+        @media (max-width: 767px) {
+            .toolbar-compact {
+                max-width: 100px;
+            }
+        }
+
         .gradient-text {
             background: linear-gradient(to right, #2563eb, #0d9488);
             -webkit-background-clip: text;
@@ -92,6 +215,7 @@ h2, .gradient-text {
             background-clip: text;
             display: inline-block;
         }
+        
         .dark .gradient-text {
             background: linear-gradient(to right, #60a5fa, #2dd4bf);
             -webkit-background-clip: text;
@@ -148,6 +272,52 @@ h2, .gradient-text {
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
         .dark ::-webkit-scrollbar-track { background: #2d3748; }
+
+        /* Chart hover area tracking */
+        .plotly-graph-div {
+            position: relative;
+        }
+
+        /* Reduce space between header and content */
+        main {
+            padding-top: 1rem !important;
+        }
+
+        header {
+            margin-bottom: 1rem !important;
+        }
+
+        /* Language Switcher Styles */
+        .lang-switcher {
+            position: relative;
+            display: inline-block;
+        }
+
+        .lang-switcher button {
+            background: linear-gradient(to right, #2563eb, #0d9488);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lang-switcher button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Language specific elements - Default to Hindi */
+        .lang-en { display: none; }
+        .lang-hi { display: block; }
+        
+        body.english .lang-en { display: block; }
+        body.english .lang-hi { display: none; }
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
@@ -165,23 +335,40 @@ h2, .gradient-text {
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
         
         <div class="flex items-center gap-3 nav-logo shrink-0">
-            <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">IMD</div> 
+            <img src="assets/logo.png" alt="IMD Logo" class="h-8 w-8 object-contain dark:invert"/> 
             <div>
-                <h1 class="text-xl font-bold leading-tight gradient-text">बिहार मानसून तुलना</h1>
-                <div class="text-xs text-gray-500 dark:text-gray-400">IMD MC Patna — वर्ष-दर-वर्ष तुलना</div>
+                <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">बिहार मानसून तुलना</h1>
+                <h1 class="text-xl font-bold leading-tight gradient-text lang-en">Bihar Monsoon Comparison</h1>
+                <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">IMD MC Patna — वर्ष-दर-वर्ष तुलना</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">IMD MC Patna — Year-over-Year Comparison</div>
             </div>
         </div>
         
         <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
-            <a href="index.html" class="nav-box" onclick="setActive(this)">होम</a>
-            <a href="#analysis" class="nav-box" onclick="smoothScrollToAnalysis(event)">डैशबोर्ड</a>    
-            <a href="district.html" class="nav-box" onclick="setActive(this)">जिलावार</a> 
-            <a href="maps.html" class="nav-box" onclick="setActive(this)">मानचित्र</a>
-            <a href="history.html" class="nav-box" onclick="setActive(this)">ऐतिहासिक</a>
-            <a href="comparison.html" class="nav-box active-nav" onclick="setActive(this)">तुलना</a>
+            <a href="index.html" class="nav-box lang-hi" onclick="setActive(this)">होम</a>
+            <a href="index.html" class="nav-box lang-en" onclick="setActive(this)">Home</a>
+            <a href="#analysis" class="nav-box lang-hi" onclick="smoothScrollToAnalysis(event)">डैशबोर्ड</a>    
+            <a href="#analysis" class="nav-box lang-en" onclick="smoothScrollToAnalysis(event)">Dashboard</a>    
+            <a href="district.html" class="nav-box lang-hi" onclick="setActive(this)">जिलावार</a> 
+            <a href="district.html" class="nav-box lang-en" onclick="setActive(this)">District-wise</a> 
+            <a href="maps.html" class="nav-box lang-hi" onclick="setActive(this)">मानचित्र</a>
+            <a href="maps.html" class="nav-box lang-en" onclick="setActive(this)">Maps</a>
+            <a href="history.html" class="nav-box lang-hi" onclick="setActive(this)">ऐतिहासिक</a>
+            <a href="history.html" class="nav-box lang-en" onclick="setActive(this)">Historical</a>
+            <a href="comparison.html" class="nav-box active-nav lang-hi" onclick="setActive(this)">तुलना</a>
+            <a href="comparison.html" class="nav-box active-nav lang-en" onclick="setActive(this)">Comparison</a>
         </div>
 
         <div class="flex items-center gap-4 shrink-0">
+            <!-- Language Switcher -->
+            <div class="lang-switcher">
+                <button id="langSwitchBtn" onclick="toggleLanguage()" title="Switch Language / भाषा बदलें">
+                    <i class="fas fa-language"></i>
+                    <span class="lang-hi">English</span>
+                    <span class="lang-en">हिन्दी</span>
+                </button>
+            </div>
+            
             <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                 <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
                 <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
@@ -190,18 +377,20 @@ h2, .gradient-text {
     </div>
 </nav>
 
-<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
+<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
 
-<header class="text-center py-6 space-y-4">
+<header class="text-center py-4 space-y-4">
     <h2 class="text-3xl md:text-4xl font-extrabold pb-2">
-        <span class="gradient-text">वास्तविक वर्षा (Actual Rainfall) तुलना</span>
+        <span class="gradient-text lang-hi">वास्तविक वर्षा तुलना</span>
+        <span class="gradient-text lang-en">Actual Rainfall Comparison</span>
     </h2>
     
     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl inline-flex flex-col md:flex-row justify-center gap-6 md:gap-10 mx-auto border-2 border-blue-100 dark:border-gray-700 w-full max-w-4xl">
         
         <div class="flex flex-col items-center">
-            <label for="year1Select" class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-1">पहला वर्ष (Year 1)</label>
-            <select id="year1Select" onchange="updateComparison()" class="bg-blue-50 dark:bg-gray-700 border-2 border-blue-400 dark:border-blue-600 rounded-lg px-4 py-2 text-xl font-extrabold text-blue-800 dark:text-blue-300 focus:ring-4 focus:ring-blue-300 w-36 transition duration-150 shadow-md">
+            <label for="year1Select" class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-1 lang-hi">पहला वर्ष (वर्ष 1)</label>
+            <label for="year1Select" class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-1 lang-en">First Year (Year 1)</label>
+            <select id="year1Select" onchange="updateComparison()" class="bg-blue-50 dark:bg-gray-700 border-2 border-blue-400 dark:border-blue-600 rounded-lg px-4 py-2 text-xl font-extrabold text-blue-800 dark:text-blue-300 focus:ring-4 focus:ring-blue-300 w-48 transition duration-150 shadow-md">
                 <option value="2025" selected>2025</option>
                 <option value="2024">2024</option>
                 <option value="2023">2023</option>
@@ -217,8 +406,9 @@ h2, .gradient-text {
         </div>
         
         <div class="flex flex-col items-center">
-            <label for="year2Select" class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-1">दूसरा वर्ष (Year 2)</label>
-            <select id="year2Select" onchange="updateComparison()" class="bg-teal-50 dark:bg-gray-700 border-2 border-teal-400 dark:border-teal-600 rounded-lg px-4 py-2 text-xl font-extrabold text-teal-800 dark:text-teal-300 focus:ring-4 focus:ring-teal-300 w-36 transition duration-150 shadow-md">
+            <label for="year2Select" class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-1 lang-hi">दूसरा वर्ष (वर्ष 2)</label>
+            <label for="year2Select" class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-1 lang-en">Second Year (Year 2)</label>
+            <select id="year2Select" onchange="updateComparison()" class="bg-teal-50 dark:bg-gray-700 border-2 border-teal-400 dark:border-teal-600 rounded-lg px-4 py-2 text-xl font-extrabold text-teal-800 dark:text-teal-300 focus:ring-4 focus:ring-teal-300 w-48 transition duration-150 shadow-md">
                 <option value="2025">2025</option>
                 <option value="2024">2024</option>
                 <option value="2023">2023</option>
@@ -234,15 +424,23 @@ h2, .gradient-text {
         </div>
         
         <div class="flex flex-col items-center">
-            <label for="periodSelect" class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-1">अवधि चयन (Table/Bar Chart)</label>
-            <select id="periodSelect" onchange="updateComparison()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 font-semibold focus:ring-2 focus:ring-purple-500 w-48 shadow-md">
-                <option value="overall_monsoon" selected>मानसून (जून-सितंबर)</option>
-                <option value="june">जून</option>
-                <option value="july">जुलाई</option>
-                <option value="august">अगस्त</option>
-                <option value="september">सितंबर</option>
+            <label for="periodSelect" class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-1 lang-hi">अवधि चयन (Table/Bar Chart)</label>
+            <label for="periodSelect" class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-1 lang-en">Period Selection (Table/Bar Chart)</label>
+            <select id="periodSelect" onchange="updateComparison()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 font-semibold focus:ring-2 focus:ring-purple-500 w-72
+             shadow-md">
+                <option value="overall_monsoon" selected class="lang-hi">मानसून (जून-सितंबर)</option>
+                <option value="overall_monsoon" selected class="lang-en">Monsoon (June-September)</option>
+                <option value="june" class="lang-hi">जून</option>
+                <option value="june" class="lang-en">June</option>
+                <option value="july" class="lang-hi">जुलाई</option>
+                <option value="july" class="lang-en">July</option>
+                <option value="august" class="lang-hi">अगस्त</option>
+                <option value="august" class="lang-en">August</option>
+                <option value="september" class="lang-hi">सितंबर</option>
+                <option value="september" class="lang-en">September</option>
             </select>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">मासिक प्रवृत्ति हमेशा जून-सितंबर की होती है।</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 lang-hi">मासिक प्रवृत्ति हमेशा जून-सितंबर की होती है।</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 lang-en">Monthly trend is always for June-September.</p>
         </div>
     </div>
 
@@ -251,7 +449,8 @@ h2, .gradient-text {
             <button id="districtDropdownBtn" onclick="toggleDistrictDropdown()" 
                     class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-150 flex items-center gap-2">
                 <i class="fa-solid fa-filter"></i> 
-                <span id="dropdownBtnText">सभी जिले</span>
+                <span id="dropdownBtnText" class="lang-hi">सभी जिले</span>
+                <span id="dropdownBtnText" class="lang-en">All Districts</span>
                 <i class="fa-solid fa-caret-down ml-1"></i>
             </button>
             <div id="districtCheckboxContent" class="district-checkbox-content text-left">
@@ -261,41 +460,112 @@ h2, .gradient-text {
 </header>
 
 <section class="grid grid-cols-1 gap-6">
-<div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg">
-        <h3 class="text-xl font-bold flex items-center gap-2 mb-4 border-b pb-2 border-gray-100 dark:border-gray-700">
-            <i class="fa-solid fa-chart-bar text-blue-600"></i> 
-            <span class="gradient-text" id="districtComparisonTitle">जिलेवार Actual Rainfall तुलना</span>
-        </h3>
-        <div id="actualComparisonChart" class="w-full h-[400px]"></div>
+    <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg">
+        <div class="chart-container">
+            <h3 class="text-xl font-bold flex items-center gap-2 mb-4 border-b pb-2 border-gray-100 dark:border-gray-700">
+                <i class="fa-solid fa-chart-bar text-blue-600"></i> 
+                <span class="gradient-text lang-hi" id="districtComparisonTitle">जिलेवार वास्तविक वर्षा तुलना</span>
+                <span class="gradient-text lang-en" id="districtComparisonTitle">District-wise Actual Rainfall Comparison</span>
+            </h3>
+            <div class="plotly-toolbar toolbar-compact">
+                <button class="toolbar-btn" onclick="downloadChart('actualComparisonChart', 'actual-comparison.png')" title="Download">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <button class="toolbar-btn" onclick="resetZoom('actualComparisonChart')" title="Reset Zoom">
+                    <i class="fa-solid fa-expand-arrows-alt"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleAutoscale('actualComparisonChart')" title="Autoscale">
+                    <i class="fa-solid fa-arrows-alt-v"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleSpikelines('actualComparisonChart')" title="Spikelines">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </button>
+                <button class="toolbar-btn" onclick="togglePanMode('actualComparisonChart')" title="Pan">
+                    <i class="fa-solid fa-hand-paper"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleZoomMode('actualComparisonChart')" title="Zoom">
+                    <i class="fa-solid fa-search-plus"></i>
+                </button>
+            </div>
+            <div id="actualComparisonChart" class="w-full h-[400px]"></div>
+        </div>
     </div>
 
     <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg">
-        <h3 class="text-xl font-bold flex items-center gap-2 mb-4 border-b pb-2 border-gray-100 dark:border-gray-700">
-            <i class="fa-solid fa-arrow-right-arrow-left text-teal-600"></i> 
-            <span class="gradient-text" id="differenceChartTitle">जिलेवार वास्तविक वर्षा अंतर</span>
-        </h3>
-        <div id="differenceBarChart" class="w-full h-[400px]"></div>
+        <div class="chart-container">
+            <h3 class="text-xl font-bold flex items-center gap-2 mb-4 border-b pb-2 border-gray-100 dark:border-gray-700">
+                <i class="fa-solid fa-arrow-right-arrow-left text-teal-600"></i> 
+                <span class="gradient-text lang-hi" id="differenceChartTitle">जिलेवार वास्तविक वर्षा अंतर</span>
+                <span class="gradient-text lang-en" id="differenceChartTitle">District-wise Actual Rainfall Difference</span>
+            </h3>
+            <div class="plotly-toolbar toolbar-compact">
+                <button class="toolbar-btn" onclick="downloadChart('differenceBarChart', 'difference-chart.png')" title="Download">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <button class="toolbar-btn" onclick="resetZoom('differenceBarChart')" title="Reset Zoom">
+                    <i class="fa-solid fa-expand-arrows-alt"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleAutoscale('differenceBarChart')" title="Autoscale">
+                    <i class="fa-solid fa-arrows-alt-v"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleSpikelines('differenceBarChart')" title="Spikelines">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </button>
+                <button class="toolbar-btn" onclick="togglePanMode('differenceBarChart')" title="Pan">
+                    <i class="fa-solid fa-hand-paper"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleZoomMode('differenceBarChart')" title="Zoom">
+                    <i class="fa-solid fa-search-plus"></i>
+                </button>
+            </div>
+            <div id="differenceBarChart" class="w-full h-[400px]"></div>
+        </div>
     </div>
 </section>
 
 <section class="grid grid-cols-1 gap-6">
     <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg">
-        <h3 class="text-xl font-bold flex items-center gap-2 mb-4 border-b pb-2 border-gray-100 dark:border-gray-700">
-            <i class="fa-solid fa-arrow-trend-up text-purple-600"></i> 
-            <span class="gradient-text" id="trendChartTitle">मासिक वास्तविक वर्षा प्रवृत्ति तुलना: 2025 vs 2020 (चयनित जिलों का औसत)</span>
-        </h3>
-        <div id="trendChartDataMessage" class="hidden text-center py-10 text-red-500 font-semibold">
-            मासिक प्रवृत्ति डेटा उपलब्ध नहीं है, या जिले चयनित नहीं हैं। (No monthly trend data available or districts are not selected.)
+        <div class="chart-container">
+            <h3 class="text-xl font-bold flex items-center gap-2 mb-4 border-b pb-2 border-gray-100 dark:border-gray-700">
+                <i class="fa-solid fa-arrow-trend-up text-purple-600"></i> 
+                <span class="gradient-text lang-hi" id="trendChartTitle">मासिक वास्तविक वर्षा प्रवृत्ति तुलना: 2025 vs 2020 (चयनित जिलों का औसत)</span>
+                <span class="gradient-text lang-en" id="trendChartTitle">Monthly Actual Rainfall Trend Comparison: 2025 vs 2020 (Average of Selected Districts)</span>
+            </h3>
+            <div class="plotly-toolbar toolbar-compact">
+                <button class="toolbar-btn" onclick="downloadChart('trendChart', 'trend-chart.png')" title="Download">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <button class="toolbar-btn" onclick="resetZoom('trendChart')" title="Reset Zoom">
+                    <i class="fa-solid fa-expand-arrows-alt"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleAutoscale('trendChart')" title="Autoscale">
+                    <i class="fa-solid fa-arrows-alt-v"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleSpikelines('trendChart')" title="Spikelines">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </button>
+                <button class="toolbar-btn" onclick="togglePanMode('trendChart')" title="Pan">
+                    <i class="fa-solid fa-hand-paper"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleZoomMode('trendChart')" title="Zoom">
+                    <i class="fa-solid fa-search-plus"></i>
+                </button>
+            </div>
+            <div id="trendChartDataMessage" class="hidden text-center py-10 text-red-500 font-semibold">
+                <span class="lang-hi">मासिक प्रवृत्ति डेटा उपलब्ध नहीं है, या जिले चयनित नहीं हैं।</span>
+                <span class="lang-en">No monthly trend data available or districts are not selected.</span>
+            </div>
+            <div id="trendChart" class="w-full h-[450px]"></div>
         </div>
-        <div id="trendChart" class="w-full h-[450px]"></div>
     </div>
 </section>
-
 
 <section id="comparison-table" class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg">
     <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
         <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2 md:mb-0">
-            Detailed Comparison: <span class="text-blue-600" id="compTablePeriod">--</span>
+            <span class="lang-hi">विस्तृत तुलना:</span>
+            <span class="lang-en">Detailed Comparison:</span>
+            <span class="text-blue-600" id="compTablePeriod">--</span>
         </h3>
         
         <div class="relative w-full md:w-64">
@@ -304,7 +574,10 @@ h2, .gradient-text {
             </div>
             <input type="text" id="searchTable" onkeyup="filterAndSortData()" 
                     placeholder="जिला खोजें..."
-                    class="w-full pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm" />
+                    class="lang-hi w-full pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm" />
+            <input type="text" id="searchTable" onkeyup="filterAndSortData()" 
+                    placeholder="Search District..."
+                    class="lang-en w-full pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm" />
         </div>
     </div>
     
@@ -313,23 +586,40 @@ h2, .gradient-text {
             <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0 z-10">
                 <tr>
                     <th class="px-6 py-3 cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800" data-sort="district">
-                        District <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
+                        <span class="lang-hi">जिला</span>
+                        <span class="lang-en">District</span>
+                        <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
                     </th>
                     <th class="px-6 py-3 text-right cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800" data-sort="actual1">
-                        Actual (mm) <span id="thYear1">Y1</span> <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
+                        <span class="lang-hi">वास्तविक (मि.मि.)</span>
+                        <span class="lang-en">Actual (mm)</span>
+                        <span id="thYear1">Y1</span>
+                        <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
                     </th>
                     <th class="px-6 py-3 text-right cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800" data-sort="actual2">
-                        Actual (mm) <span id="thYear2">Y2</span> <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
+                        <span class="lang-hi">वास्तविक (मि.मि.)</span>
+                        <span class="lang-en">Actual (mm)</span>
+                        <span id="thYear2">Y2</span>
+                        <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
                     </th>
                     <th class="px-6 py-3 text-right cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800" data-sort="diff">
-                        Difference (Y1 - Y2) <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
+                        <span class="lang-hi">अंतर (Y1 - Y2)</span>
+                        <span class="lang-en">Difference (Y1 - Y2)</span>
+                        <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
                     </th>
-                    <th class="px-6 py-3 text-center" id="thStatus1">Status (Y1 Dev)</th>
-                    <th class="px-6 py-3 text-center" id="thStatus2">Status (Y2 Dev)</th>
+                    <th class="px-6 py-3 text-center" id="thStatus1">
+                        <span class="lang-hi">स्थिति (Y1 विचलन)</span>
+                        <span class="lang-en">Status (Y1 Dev)</span>
+                    </th>
+                    <th class="px-6 py-3 text-center" id="thStatus2">
+                        <span class="lang-hi">स्थिति (Y2 विचलन)</span>
+                        <span class="lang-en">Status (Y2 Dev)</span>
+                    </th>
                 </tr>
             </thead>
             <tbody id="comparisonTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
-                <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">डेटा लोड हो रहा है...</td></tr>
+                <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500 lang-hi">डेटा लोड हो रहा है...</td>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500 lang-en">Loading data...</td></tr>
             </tbody>
         </table>
     </div>
@@ -341,15 +631,17 @@ h2, .gradient-text {
     // --- Global Config ---
     const PLOTLY_CONFIG = {
         responsive: true,
-        displayModeBar: true,
+        displayModeBar: false, // Hide default modebar
         displaylogo: false, 
         modebar: { orientation: 'h' }
     };
 
     const monthDisplayNames = {
-        'overall_monsoon': 'मानसून (जून-सितंबर)',
-        'september': 'सितंबर', 'august': 'अगस्त',
-        'july': 'जुलाई', 'june': 'जून'
+        'overall_monsoon': { en: 'Monsoon (June-September)', hi: 'मानसून (जून-सितंबर)' },
+        'september': { en: 'September', hi: 'सितंबर' },
+        'august': { en: 'August', hi: 'अगस्त' },
+        'july': { en: 'July', hi: 'जुलाई' },
+        'june': { en: 'June', hi: 'जून' }
     };
     
     // The list of months for the monthly trend chart
@@ -362,12 +654,85 @@ h2, .gradient-text {
     let currentSort = { column: 'district', order: 'asc' };
     let availableDistricts = [];
     let selectedDistricts = [];
+    let currentMode = {}; // Track current mode for each chart
+    let currentLanguage = 'hi'; // Default to Hindi
 
     // --- Utility ---
     function toggleDarkMode() {
         document.documentElement.classList.toggle('dark');
         // Re-render all charts to update colors
         filterAndSortData(); 
+    }
+    
+    function toggleLanguage() {
+        document.body.classList.toggle('english');
+        currentLanguage = document.body.classList.contains('english') ? 'en' : 'hi';
+        
+        // Update language switcher button
+        document.getElementById('langSwitchBtn').innerHTML = `
+            <i class="fas fa-language"></i>
+            ${currentLanguage === 'en' ? 'हिन्दी' : 'English'}
+        `;
+        
+        updateLanguageContent();
+        filterAndSortData();
+    }
+
+    function updateLanguageContent() {
+        const year1 = document.getElementById('year1Select').value;
+        const year2 = document.getElementById('year2Select').value;
+        const periodKey = document.getElementById('periodSelect').value;
+        const monthLabel = monthDisplayNames[periodKey][currentLanguage];
+        
+        // Update static content
+        document.querySelectorAll('.lang-hi').forEach(el => {
+            el.style.display = currentLanguage === 'en' ? 'none' : 'block';
+        });
+        document.querySelectorAll('.lang-en').forEach(el => {
+            el.style.display = currentLanguage === 'en' ? 'block' : 'none';
+        });
+        
+        // Update dynamic titles
+        document.getElementById('districtComparisonTitle').textContent = 
+            currentLanguage === 'en' 
+                ? `District-wise Actual Rainfall Comparison: ${monthLabel} (${year1} vs ${year2})`
+                : `जिलेवार वास्तविक वर्षा तुलना: ${monthLabel} (${year1} vs ${year2})`;
+                
+        document.getElementById('differenceChartTitle').textContent = 
+            currentLanguage === 'en'
+                ? `District-wise Actual Rainfall Difference: ${monthLabel} (${year1} - ${year2})`
+                : `जिलेवार वास्तविक वर्षा अंतर: ${monthLabel} (${year1} - ${year2})`;
+                
+        document.getElementById('trendChartTitle').textContent = 
+            currentLanguage === 'en'
+                ? `Monthly Actual Rainfall Trend Comparison: ${year1} vs ${year2} (Average of Selected Districts)`
+                : `मासिक वास्तविक वर्षा प्रवृत्ति तुलना: ${year1} vs ${year2} (चयनित जिलों का औसत)`;
+                
+        document.getElementById('compTablePeriod').textContent = `${monthLabel} (${year1} vs ${year2})`;
+        
+        // Update search placeholder
+        const searchInput = document.getElementById('searchTable');
+        searchInput.placeholder = currentLanguage === 'en' ? 'Search District...' : 'जिला खोजें...';
+        
+        // Update dropdown button text
+        updateDropdownText();
+    }
+    
+    function setActive(element) {
+        document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('active-nav'));
+        element.classList.add('active-nav');
+    }
+    
+    function smoothScrollToAnalysis(event) {
+        event.preventDefault(); 
+        setActive(event.currentTarget);
+        const targetElement = document.getElementById('analysis');
+        if (targetElement) {
+            targetElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start'
+            });
+        }
     }
     
     /**
@@ -382,6 +747,133 @@ h2, .gradient-text {
         return parseFloat(cleaned) || 0;
     };
 
+    // --- Enhanced Toolbar Functions ---
+    function downloadChart(chartId, filename) {
+        try {
+            Plotly.downloadImage(chartId, {
+                format: 'png', 
+                width: 1200, 
+                height: 700, 
+                filename: filename,
+                scale: 2 // Higher quality
+            });
+        } catch (error) {
+            console.error('Download failed:', error);
+            alert(currentLanguage === 'en' ? 'Download error. Please try again.' : 'डाउनलोड में त्रुटि आई है। कृपया पुनः प्रयास करें।');
+        }
+    }
+
+    function resetZoom(chartId) {
+        try {
+            Plotly.relayout(chartId, {
+                'xaxis.autorange': true,
+                'yaxis.autorange': true,
+                'xaxis.fixedrange': false,
+                'yaxis.fixedrange': false
+            });
+        } catch (error) {
+            console.error('Reset zoom failed:', error);
+        }
+    }
+
+    function toggleAutoscale(chartId) {
+        try {
+            const plotDiv = document.getElementById(chartId);
+            const currentLayout = plotDiv._fullLayout;
+            
+            const newFixedRange = !currentLayout.yaxis.fixedrange;
+            
+            Plotly.relayout(chartId, {
+                'yaxis.fixedrange': newFixedRange,
+                'xaxis.fixedrange': false
+            });
+
+            // Visual feedback
+            const button = event.target.closest('.toolbar-btn');
+            button.style.background = newFixedRange ? 'rgba(59, 130, 246, 0.2)' : 'transparent';
+        } catch (error) {
+            console.error('Autoscale toggle failed:', error);
+        }
+    }
+
+    function toggleSpikelines(chartId) {
+        try {
+            const plotDiv = document.getElementById(chartId);
+            const currentSpikes = plotDiv._fullLayout.xaxis.showspikes || false;
+            const newSpikeState = !currentSpikes;
+            
+            Plotly.relayout(chartId, {
+                'xaxis.showspikes': newSpikeState,
+                'yaxis.showspikes': newSpikeState,
+                'xaxis.spikemode': 'across',
+                'yaxis.spikemode': 'across',
+                'xaxis.spikesnap': 'cursor',
+                'yaxis.spikesnap': 'cursor'
+            });
+
+            // Visual feedback
+            const button = event.target.closest('.toolbar-btn');
+            button.style.background = newSpikeState ? 'rgba(59, 130, 246, 0.2)' : 'transparent';
+        } catch (error) {
+            console.error('Spikelines toggle failed:', error);
+        }
+    }
+
+    function togglePanMode(chartId) {
+        try {
+            const plotDiv = document.getElementById(chartId);
+            
+            if (!currentMode[chartId]) currentMode[chartId] = 'zoom';
+            
+            const newMode = currentMode[chartId] === 'pan' ? 'zoom' : 'pan';
+            currentMode[chartId] = newMode;
+            
+            Plotly.relayout(chartId, {
+                'dragmode': newMode
+            });
+
+            // Update button states
+            const buttons = plotDiv.parentElement.querySelectorAll('.toolbar-btn');
+            buttons.forEach(btn => {
+                if (btn.onclick.toString().includes('PanMode')) {
+                    btn.style.background = newMode === 'pan' ? 'rgba(59, 130, 246, 0.2)' : 'transparent';
+                }
+                if (btn.onclick.toString().includes('ZoomMode')) {
+                    btn.style.background = newMode === 'zoom' ? 'rgba(59, 130, 246, 0.2)' : 'transparent';
+                }
+            });
+        } catch (error) {
+            console.error('Pan mode toggle failed:', error);
+        }
+    }
+
+    function toggleZoomMode(chartId) {
+        try {
+            const plotDiv = document.getElementById(chartId);
+            
+            if (!currentMode[chartId]) currentMode[chartId] = 'zoom';
+            
+            const newMode = currentMode[chartId] === 'zoom' ? 'pan' : 'zoom';
+            currentMode[chartId] = newMode;
+            
+            Plotly.relayout(chartId, {
+                'dragmode': newMode
+            });
+
+            // Update button states
+            const buttons = plotDiv.parentElement.querySelectorAll('.toolbar-btn');
+            buttons.forEach(btn => {
+                if (btn.onclick.toString().includes('PanMode')) {
+                    btn.style.background = newMode === 'pan' ? 'rgba(59, 130, 246, 0.2)' : 'transparent';
+                }
+                if (btn.onclick.toString().includes('ZoomMode')) {
+                    btn.style.background = newMode === 'zoom' ? 'rgba(59, 130, 246, 0.2)' : 'transparent';
+                }
+            });
+        } catch (error) {
+            console.error('Zoom mode toggle failed:', error);
+        }
+    }
 
     // --- Data Loading ---
     
@@ -489,16 +981,22 @@ h2, .gradient-text {
         const year2 = document.getElementById('year2Select').value;
         // Keep periodSelect for bar/table charts
         const periodKey = document.getElementById('periodSelect').value; 
-        const monthLabel = monthDisplayNames[periodKey] || periodKey;
+        const monthLabel = monthDisplayNames[periodKey][currentLanguage];
 
         // UI Text Updates
-        document.getElementById('trendChartTitle').innerText = `मासिक वास्तविक वर्षा प्रवृत्ति तुलना: ${year1} vs ${year2} (चयनित जिलों का औसत)`;
-        document.getElementById('districtComparisonTitle').innerText = `जिलेवार Actual Rainfall तुलना: ${monthLabel} (${year1} vs ${year2})`;
-        document.getElementById('differenceChartTitle').innerText = `जिलेवार वास्तविक वर्षा अंतर: ${monthLabel} (${year1} - ${year2})`;
+        document.getElementById('trendChartTitle').innerText = currentLanguage === 'en'
+            ? `Monthly Actual Rainfall Trend Comparison: ${year1} vs ${year2} (Average of Selected Districts)`
+            : `मासिक वास्तविक वर्षा प्रवृत्ति तुलना: ${year1} vs ${year2} (चयनित जिलों का औसत)`;
+        
+        document.getElementById('districtComparisonTitle').innerText = currentLanguage === 'en'
+            ? `District-wise Actual Rainfall Comparison: ${monthLabel} (${year1} vs ${year2})`
+            : `जिलेवार वास्तविक वर्षा तुलना: ${monthLabel} (${year1} vs ${year2})`;
+            
+        document.getElementById('differenceChartTitle').innerText = currentLanguage === 'en'
+            ? `District-wise Actual Rainfall Difference: ${monthLabel} (${year1} - ${year2})`
+            : `जिलेवार वास्तविक वर्षा अंतर: ${monthLabel} (${year1} - ${year2})`;
         
         document.getElementById('compTablePeriod').innerText = `${monthLabel} (${year1} vs ${year2})`;
-        document.getElementById('thYear1').innerText = year1;
-        document.getElementById('thYear2').innerText = year2;
 
         // 1. Load Period Data (For Bar Charts & Table) - Uses period file (e.g., overall_monsoon.csv)
         const periodFile = `${periodKey}.csv`;
@@ -663,10 +1161,12 @@ h2, .gradient-text {
             barmode: 'group',
             paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
-            margin: { t: 10, b: 100, l: 50, r: 10 },
+            margin: { t: 40, b: 100, l: 50, r: 50 }, // Increased top margin for toolbar
             xaxis: { tickangle: -45, automargin: true },
-            yaxis: { title: 'Actual R/F (mm)', gridcolor: isDark ? '#374151' : '#e2e8f0' },
-            legend: { orientation: 'h', y: 1.1 }
+            yaxis: { title: currentLanguage === 'en' ? 'Actual R/F (mm)' : 'वास्तविक वर्षा (मि.मि.)', gridcolor: isDark ? '#374151' : '#e2e8f0' },
+            legend: { orientation: 'h', y: 1.1 },
+            dragmode: 'zoom', // Default mode
+            hovermode: 'x unified' // Better hover experience
         }, PLOTLY_CONFIG);
 
         // 2. Difference Chart (Difference in Actual R/F for selected period)
@@ -674,16 +1174,24 @@ h2, .gradient-text {
             x: data.map(d => d.district), y: data.map(d => d.diff),
             type: 'bar',
             marker: { color: data.map(d => d.diff >= 0 ? '#4caf50' : '#e53935') }, // Green/Red
-            hovertemplate: `<b>%{x}</b><br>Diff: %{y:.1f} mm<extra></extra>`
+            hovertemplate: currentLanguage === 'en' 
+                ? '<b>%{x}</b><br>Diff: %{y:.1f} mm<extra></extra>'
+                : '<b>%{x}</b><br>अंतर: %{y:.1f} मि.मि.<extra></extra>'
         };
 
         Plotly.newPlot('differenceBarChart', [traceDiff], {
             paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
-            margin: { t: 10, b: 100, l: 50, r: 10 },
+            margin: { t: 40, b: 100, l: 50, r: 50 }, // Increased top margin for toolbar
             xaxis: { tickangle: -45, automargin: true },
-            yaxis: { title: 'Difference (mm)', gridcolor: isDark ? '#374151' : '#e2e8f0' }
+            yaxis: { title: currentLanguage === 'en' ? 'Difference (mm)' : 'अंतर (मि.मि.)', gridcolor: isDark ? '#374151' : '#e2e8f0' },
+            dragmode: 'zoom', // Default mode
+            hovermode: 'x unified' // Better hover experience
         }, PLOTLY_CONFIG);
+
+        // Initialize mode tracking
+        currentMode['actualComparisonChart'] = 'zoom';
+        currentMode['differenceBarChart'] = 'zoom';
     }
 
     function renderTrendChart(trendData) {
@@ -737,32 +1245,38 @@ h2, .gradient-text {
 
         const trace1 = {
             x: ALL_MONTHS, y: y1Avgs,
-            mode: 'lines+markers', name: `${trendData.y1Label} (Actual Avg)`,
+            mode: 'lines+markers', name: `${trendData.y1Label} (${currentLanguage === 'en' ? 'Actual Avg' : 'वास्तविक औसत'})`,
             line: { color: isDark ? '#34d399' : '#0d9488', width: 3 }, marker: { size: 8 }
         };
         const trace2 = {
             x: ALL_MONTHS, y: y2Avgs,
-            mode: 'lines+markers', name: `${trendData.y2Label} (Actual Avg)`,
+            mode: 'lines+markers', name: `${trendData.y2Label} (${currentLanguage === 'en' ? 'Actual Avg' : 'वास्तविक औसत'})`,
             line: { color: isDark ? '#7f9cf5' : '#2563eb', width: 3, dash: 'dash' }, marker: { size: 8 }
         };
         
         Plotly.newPlot('trendChart', [trace1, trace2], {
             paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
-            margin: { t: 20, b: 50, l: 50, r: 20 },
-            xaxis: { title: 'Month' },
-            yaxis: { title: 'Avg Rainfall (mm)', gridcolor: isDark ? '#374151' : '#e2e8f0', zeroline: true, zerolinecolor: isDark ? '#4b5563' : '#a0aec0' },
+            margin: { t: 40, b: 50, l: 50, r: 50 }, // Increased top margin for toolbar
+            xaxis: { title: currentLanguage === 'en' ? 'Month' : 'महीना' },
+            yaxis: { title: currentLanguage === 'en' ? 'Avg Rainfall (mm)' : 'औसत वर्षा (मि.मि.)', gridcolor: isDark ? '#374151' : '#e2e8f0', zeroline: true, zerolinecolor: isDark ? '#4b5563' : '#a0aec0' },
             legend: { orientation: 'h', y: 1.1 },
+            dragmode: 'zoom', // Default mode
+            hovermode: 'x unified' // Better hover experience
         }, PLOTLY_CONFIG);
-    }
 
-    // --- Table ---
+        // Initialize mode tracking
+        currentMode['trendChart'] = 'zoom';
+    }
 
     function renderTable(data) {
         const tbody = document.getElementById('comparisonTableBody');
         tbody.innerHTML = '';
         if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">कोई डेटा नहीं मिला। (No data found)</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">
+                <span class="lang-hi">कोई डेटा नहीं मिला।</span>
+                <span class="lang-en">No data found.</span>
+            </td></tr>`;
             return;
         }
 
@@ -771,11 +1285,11 @@ h2, .gradient-text {
         const thStatus2 = document.getElementById('thStatus2');
 
         if (!isDeviationAvailable) {
-            thStatus1.innerHTML = 'Status (Deviation N/A)';
-            thStatus2.innerHTML = 'Status (Deviation N/A)';
+            thStatus1.innerHTML = currentLanguage === 'en' ? 'Status (Deviation N/A)' : 'स्थिति (विचलन अनुपलब्ध)';
+            thStatus2.innerHTML = currentLanguage === 'en' ? 'Status (Deviation N/A)' : 'स्थिति (विचलन अनुपलब्ध)';
         } else {
-            thStatus1.innerHTML = `Status (Y1 Dev)`;
-            thStatus2.innerHTML = `Status (Y2 Dev)`;
+            thStatus1.innerHTML = currentLanguage === 'en' ? 'Status (Y1 Dev)' : 'स्थिति (Y1 विचलन)';
+            thStatus2.innerHTML = currentLanguage === 'en' ? 'Status (Y2 Dev)' : 'स्थिति (Y2 विचलन)';
         }
 
 
@@ -802,13 +1316,30 @@ h2, .gradient-text {
                 <td class="px-6 py-4 text-right">${d.actual1.toFixed(1)}</td>
                 <td class="px-6 py-4 text-right">${d.actual2.toFixed(1)}</td>
                 <td class="px-6 py-4 text-right ${diffClass}">${diffSign}${d.diff.toFixed(1)}</td>
-                <td class="px-6 py-4 text-center"><span style="background-color: ${s1Color}; color: ${s1Text};" class="px-2 py-1 rounded text-xs font-bold">${status1}</span></td>
-                <td class="px-6 py-4 text-center"><span style="background-color: ${s2Color}; color: ${s2Text};" class="px-2 py-1 rounded text-xs font-bold">${status2}</span></td>
+                <td class="px-6 py-4 text-center"><span style="background-color: ${s1Color}; color: ${s1Text};" class="px-2 py-1 rounded text-xs font-bold">
+                    ${currentLanguage === 'en' ? status1 : getHindiStatus(status1)}
+                </span></td>
+                <td class="px-6 py-4 text-center"><span style="background-color: ${s2Color}; color: ${s2Text};" class="px-2 py-1 rounded text-xs font-bold">
+                    ${currentLanguage === 'en' ? status2 : getHindiStatus(status2)}
+                </span></td>
             `;
             tbody.appendChild(tr);
         });
         
         updateSortIcons();
+    }
+
+    function getHindiStatus(status) {
+        const statusMap = {
+            'LARGE EXCESS': 'अत्यधिक अधिक',
+            'EXCESS': 'अधिक',
+            'NORMAL': 'सामान्य',
+            'DEFICIENT': 'कम',
+            'LARGE DEFICIENT': 'अत्यधिक कम',
+            'NO RAIN': 'बिना वर्षा',
+            'N/A': 'अनुपलब्ध'
+        };
+        return statusMap[status] || status;
     }
 
     // --- UI Helpers ---
@@ -819,7 +1350,10 @@ h2, .gradient-text {
         
         const selectAllDiv = document.createElement('div');
         selectAllDiv.className = 'district-checkbox-item border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800 font-bold';
-        selectAllDiv.innerHTML = `<input type="checkbox" id="selectAll" class="mr-2"><label for="selectAll">सभी चुनें</label>`;
+        selectAllDiv.innerHTML = `<input type="checkbox" id="selectAll" class="mr-2"><label for="selectAll">
+            <span class="lang-hi">सभी चुनें</span>
+            <span class="lang-en">Select All</span>
+        </label>`;
         container.appendChild(selectAllDiv);
         
         document.getElementById('selectAll').addEventListener('change', function() {
@@ -860,15 +1394,6 @@ h2, .gradient-text {
                 if (this.checked) selectedDistricts.push(this.value);
                 else selectedDistricts = selectedDistricts.filter(d => d !== this.value);
                 
-                // Keep the filter functional even if a district is deselected.
-                // Re-enabling the check to prevent empty selection logic.
-                // if (selectedDistricts.length === 0 && availableDistricts.length > 0) {
-                //      alert("कृपया कम से कम एक जिले का चयन करें।"); 
-                //      this.checked = true;
-                //      selectedDistricts.push(this.value);
-                //      return;
-                // }
-                
                 document.getElementById('selectAll').checked = selectedDistricts.length === availableDistricts.length;
                 updateDropdownText();
                 filterAndSortData();
@@ -879,12 +1404,23 @@ h2, .gradient-text {
 
     function updateDropdownText() {
         const btn = document.getElementById('dropdownBtnText');
-        btn.innerText = selectedDistricts.length === availableDistricts.length ? "सभी जिले" : `${selectedDistricts.length} जिले चयनित`;
+        if (currentLanguage === 'en') {
+            btn.innerHTML = `<span class="lang-en">${selectedDistricts.length === availableDistricts.length ? "All Districts" : `${selectedDistricts.length} Districts Selected`}</span>`;
+        } else {
+            btn.innerHTML = `<span class="lang-hi">${selectedDistricts.length === availableDistricts.length ? "सभी जिले" : `${selectedDistricts.length} जिले चयनित`}</span>`;
+        }
     }
     
-    function toggleDistrictDropdown() { document.getElementById('districtCheckboxContent').classList.toggle('show'); }
+    function toggleDistrictDropdown() { 
+        document.getElementById('districtCheckboxContent').classList.toggle('show'); 
+    }
+    
     // Close dropdown if clicked outside
-    window.onclick = function(e) { if (!e.target.closest('.district-checkbox-dropdown')) document.getElementById('districtCheckboxContent')?.classList.remove('show'); }
+    window.onclick = function(e) { 
+        if (!e.target.closest('.district-checkbox-dropdown')) {
+            document.getElementById('districtCheckboxContent')?.classList.remove('show'); 
+        }
+    }
 
     // Event Listeners for Sorting
     document.querySelectorAll('.sort-header').forEach(h => {
@@ -909,6 +1445,16 @@ h2, .gradient-text {
 
     // Init
     document.addEventListener('DOMContentLoaded', () => {
+        // Set default language to Hindi
+        document.body.classList.add('hindi');
+        currentLanguage = 'hi';
+        
+        // Set up language switcher
+        document.getElementById('langSwitchBtn').innerHTML = `
+            <i class="fas fa-language"></i>
+            English
+        `;
+        
         // Initial setup to ensure both trend and comparison data are loaded
         updateComparison();
     });
