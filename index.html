@@ -1096,7 +1096,7 @@ yearElements.forEach(el => {
         document.getElementById('statMaxVal').innerText = `${maxDist.actual} ${currentLanguage === 'en' ? 'mm' : 'मिमी'}`;
     }
 
-    function renderMainCharts(data) {
+ function renderMainCharts(data) {
         if (data.length === 0) {
             Plotly.purge('deviationChart'); 
             Plotly.purge('comparisonChart'); 
@@ -1118,17 +1118,8 @@ yearElements.forEach(el => {
         };
 
         const gradientId = isDark ? 'gradient-dark' : 'gradient';
-        const axisTitleConfig = {
-            xref: 'paper', yref: 'paper',
-            showarrow: false,
-            font: { 
-                family: 'Poppins', 
-                size: 14,
-                color: 'transparent',
-            },
-        };
         
-        // --- COMPARISON CHART: Single line title ---
+        // --- COMPARISON CHART ---
         const traceActual = {
             x: data.map(d => d.district),
             y: data.map(d => d.actual),
@@ -1159,15 +1150,10 @@ yearElements.forEach(el => {
             hovertemplate: currentLanguage === 'en' ? '<b>%{x}</b><br>Departure: %{y}%<extra></extra>' : '<b>%{x}</b><br>विचलन: %{y}%<extra></extra>'
         };
 
-        // Single line title for comparison chart
-        const comparisonTitle = currentLanguage === 'en' 
-            ? `District-wise Rainfall Analysis - ${document.getElementById('monthDisplay').textContent}`
-            : `जिलेवार वर्षा विश्लेषण - ${document.getElementById('monthDisplay').textContent}`;
-
+        // Title removed from Comparison Chart
         Plotly.newPlot('comparisonChart', [traceActual, traceNormal, traceDeparture], {
             ...layoutConfig,
             margin: { t: 30, b: 150, l: 80, r: 80 },
-            title: { text: comparisonTitle, font: { size: 16 } }, // Single line title
             yaxis: { 
                 title: currentLanguage === 'en' ? 'Rainfall (mm)' : 'वर्षा (मिमी)', 
                 titlefont: { color: 'transparent' },
@@ -1192,7 +1178,7 @@ yearElements.forEach(el => {
             hovermode: 'x unified'
         }, PLOTLY_CONFIG); 
 
-        // --- Deviation Chart: Single line title ---
+        // --- Deviation Chart ---
         const deviationColors = data.map(d => {
              if(d.deviation >= 60) return RAINFALL_COLORS_HEX['LARGE EXCESS'];         
              if(d.deviation > 19) return RAINFALL_COLORS_HEX['EXCESS'];          
@@ -1202,10 +1188,7 @@ yearElements.forEach(el => {
              return RAINFALL_COLORS_HEX['LARGE DEFICIENT'];
         });
         
-        const deviationTitle = currentLanguage === 'en'
-            ? `District-wise Rainfall Departure - ${document.getElementById('monthDisplay').textContent}`
-            : `जिलेवार वर्षा विचलन - ${document.getElementById('monthDisplay').textContent}`;
-
+        // Title removed from Deviation Chart
         Plotly.newPlot('deviationChart', [{
             x: data.map(d => d.district),
             y: data.map(d => d.deviation),
@@ -1215,7 +1198,6 @@ yearElements.forEach(el => {
         }], { 
             ...layoutConfig, 
             margin: { t: 30, b: 150, l: 80, r: 10 },
-            title: { text: deviationTitle, font: { size: 16 } }, // Single line title
             yaxis: { 
                 title: currentLanguage === 'en' ? 'Departure (%)' : 'विचलन (%)',
                 titlefont: { color: 'transparent' }
@@ -1252,7 +1234,7 @@ yearElements.forEach(el => {
             hovertemplate: currentLanguage === 'en' ? '<b>%{y}</b>: %{x} mm<extra>Bottom 5</extra>' : '<b>%{y}</b>: %{x} मि.मि.<extra>बॉटम 5</extra>'
         }], barLayout, PLOTLY_CONFIG); 
 
-        // --- Pie Chart - USING NEW COLORS ---
+        // --- Pie Chart ---
         const counts = calculateLegendCounts(data);
         
         const pieData = [
@@ -1290,7 +1272,7 @@ yearElements.forEach(el => {
     }
     
     // --- Line Chart ---
-    function renderLineChart(data) {
+function renderLineChart(data) {
         const monthlyAverages = {};
         const monthOrder = ['June', 'July', 'August', 'September'];
         
@@ -1311,6 +1293,7 @@ yearElements.forEach(el => {
         const fontColor = isDark ? '#cbd5e1' : '#334155';
         const gradientId = isDark ? 'gradient-dark' : 'gradient';
 
+        // Title removed from Line Chart
         Plotly.newPlot('lineChart', [
             {
                 x: plotMonths, y: avgActuals,
@@ -1331,7 +1314,6 @@ yearElements.forEach(el => {
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: { family: 'Poppins', color: fontColor },
             margin: { t: 30, b: 60, l: 80, r: 10 },
-            title: { text: currentLanguage === 'en' ? 'Monthly Rainfall Trend (Regional Avg)' : 'मासिक वर्षा प्रवृत्ति (क्षेत्रीय औसत)', font: { size: 16 } },
             xaxis: { title: currentLanguage === 'en' ? 'Month' : 'महीना', showgrid: false },
             yaxis: { 
                 title: currentLanguage === 'en' ? 'Rainfall (mm)' : 'वर्षा (मिमी)', 
