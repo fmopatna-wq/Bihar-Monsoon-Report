@@ -518,6 +518,7 @@
     let availableDistricts = [];
     let selectedDistricts = [];
     let currentLanguage = 'hi'; // Default to hindi
+    let traceVisibility = { actual: true, normal: true, deviation: true }; // Track trace visibility
     
     const DEFAULT_TOP_DISTRICTS = ['Patna', 'Gaya', 'Bhagalpur', 'Purnea', 'West Champaran']; 
     
@@ -602,13 +603,13 @@
         currentLanguage = currentLanguage === 'en' ? 'hi' : 'en';
         document.body.classList.toggle('hindi', currentLanguage === 'hi');
         
-                // Update language switcher button text
+        // Update language switcher button text
         document.getElementById('langSwitchBtn').innerHTML = `
             <i class="fas fa-language"></i>
             ${currentLanguage === 'hi' ? 'English' : 'हिन्दी'}
         `;
         
-        // Update all text elements
+        // Update all text elements but preserve month selection
         updateLanguageText();
         
         // Re-render everything with new language
@@ -648,24 +649,50 @@
         document.getElementById('dropdownBtnText').textContent = translations[currentLanguage].allDistricts;
     }
 
-    function updateDynamicTitles() {
-        const year = document.getElementById('yearSelect').value;
-        const month = currentSelectedMonth;
-        
-        const monthNames = {
-            'Overall': { en: 'Monsoon (June-September)', hi: 'मानसून (जून-सितंबर)' },
-            'June': { en: 'June', hi: 'जून' },
-            'July': { en: 'July', hi: 'जुलाई' },
-            'August': { en: 'August', hi: 'अगस्त' },
-            'September': { en: 'September', hi: 'सितंबर' }
-        };
-        
-        const monthText = monthNames[month][currentLanguage];
-        const dynamicTitle = `${monthText} - ${year}`;
-        
-        document.getElementById('dynamicGraphTitle').textContent = dynamicTitle;
-        document.getElementById('compTablePeriod').textContent = dynamicTitle;
+function updateDynamicTitles() {
+    const year = document.getElementById('yearSelect').value;
+    const month = currentSelectedMonth;
+    
+    const monthNames = {
+        'Overall': { en: 'Monsoon (June-September)', hi: 'मानसून (जून-सितंबर)' },
+        'June': { en: 'June', hi: 'जून' },
+        'July': { en: 'July', hi: 'जुलाई' },
+        'August': { en: 'August', hi: 'अगस्त' },
+        'September': { en: 'September', hi: 'सितंबर' }
+    };
+    
+    const monthText = monthNames[month][currentLanguage];
+    
+    // Update graph title - handle both language versions
+    const graphTitleEn = `${translations['en'].graphTitle} - ${monthNames[month]['en']} - ${year}`;
+    const graphTitleHi = `${translations['hi'].graphTitle} - ${monthNames[month]['hi']} - ${year}`;
+    
+    // Update English title element
+    const graphTitleEnElement = document.querySelector('#dynamicGraphTitle.lang-en');
+    if (graphTitleEnElement) {
+        graphTitleEnElement.textContent = graphTitleEn;
     }
+    
+    // Update Hindi title element  
+    const graphTitleHiElement = document.querySelector('#dynamicGraphTitle.lang-hi');
+    if (graphTitleHiElement) {
+        graphTitleHiElement.textContent = graphTitleHi;
+    }
+    
+    // Update table period
+    const tablePeriodEn = `${monthNames[month]['en']} - ${year}`;
+    const tablePeriodHi = `${monthNames[month]['hi']} - ${year}`;
+    
+    const tablePeriodElement = document.getElementById('compTablePeriod');
+    if (tablePeriodElement) {
+        tablePeriodElement.textContent = currentLanguage === 'en' ? tablePeriodEn : tablePeriodHi;
+    }
+    
+    // Also update the graph itself if it exists
+    if (currentData.length > 0) {
+        renderGraph();
+    }
+}
 
     // --- Rain Status Categorization Logic ---
     function getRainStatus(deviation) {
@@ -819,179 +846,176 @@
         }
     }
 
-    // --- Graph Rendering Function (Auto-sync with table sort) ---
-    function renderGraph() {
-        const graphData = currentData.filter(d => selectedDistricts.includes(d.district));
-        
-        // Auto-sync with table sort settings
-        const sortedData = sortData([...graphData], currentSort.column, currentSort.order);
+// --- Graph Rendering Function (Auto-sync with table sort) ---
+function renderGraph() {
+    const graphData = currentData.filter(d => selectedDistricts.includes(d.district));
+    
+    // Auto-sync with table sort settings
+    const sortedData = sortData([...graphData], currentSort.column, currentSort.order);
 
-        const isDark = document.documentElement.classList.contains('dark');
-        const fontColor = isDark ? '#cbd5e1' : '#334155';
+    const isDark = document.documentElement.classList.contains('dark');
+    const fontColor = isDark ? '#cbd5e1' : '#334155';
 
-        if (sortedData.length === 0) {
-            Plotly.purge('districtGraph');
-            return;
-        }
+    if (sortedData.length === 0) {
+        Plotly.purge('districtGraph');
+        return;
+    }
 
-        // Bar trace for Actual R/F with departure-based colors
-        const barTrace = {
-            x: sortedData.map(d => d.district),
-            y: sortedData.map(d => d.actual),
-            type: 'bar',
-            name: translations[currentLanguage].actualRF,
-            marker: {
-                color: sortedData.map(d => getDepartureColor(d.deviation)),
-                line: {
-                    color: sortedData.map(d => getDepartureColor(d.deviation)),
-                    width: 1
-                }
-            },
-            hovertemplate: `<b>%{x}</b><br>${translations[currentLanguage].actualRain}: %{y} mm<br>${translations[currentLanguage].departure}: ` + sortedData.map(d => d.deviation + '%') + '<extra></extra>'
-        };
+    // Get current month name based on language
+    const monthNames = {
+        'Overall': { en: 'Monsoon (June-September)', hi: 'मानसून (जून-सितंबर)' },
+        'June': { en: 'June', hi: 'जून' },
+        'July': { en: 'July', hi: 'जुलाई' },
+        'August': { en: 'August', hi: 'अगस्त' },
+        'September': { en: 'September', hi: 'सितंबर' }
+    };
 
-        // Line trace for Normal R/F with glowing gray effect
-        const lineTrace = {
-            x: sortedData.map(d => d.district),
-            y: sortedData.map(d => d.normal),
-            type: 'scatter',
-            mode: 'lines+markers',
-            name: translations[currentLanguage].normalRF,
+    const year = document.getElementById('yearSelect').value;
+    const monthText = monthNames[currentSelectedMonth][currentLanguage];
+
+    // Bar trace for Actual R/F with departure-based colors
+    const barTrace = {
+        x: sortedData.map(d => d.district),
+        y: sortedData.map(d => d.actual),
+        type: 'bar',
+        name: translations[currentLanguage].actualRF,
+        marker: {
+            color: sortedData.map(d => getDepartureColor(d.deviation)),
             line: {
-                color: isDark ? '#9ca3af' : '#6b7280',
-                width: 4,
-                shape: 'spline',
-                smoothing: 1.3
-            },
-            marker: {
-                color: isDark ? '#9ca3af' : '#6b7280',
-                size: 10,
-                line: {
-                    color: isDark ? '#ffffff' : '#ffffff',
-                    width: 2
-                }
-            },
-            yaxis: 'y2',
-            hovertemplate: `<b>%{x}</b><br>${translations[currentLanguage].normalRain}: %{y} mm<extra></extra>`,
-            className: 'glowing-line'
-        };
+                color: sortedData.map(d => getDepartureColor(d.deviation)),
+                width: 1
+            }
+        },
+        hovertemplate: `<b>%{x}</b><br>${translations[currentLanguage].actualRain}: %{y} mm<br>${translations[currentLanguage].departure}: ` + sortedData.map(d => d.deviation + '%') + '<extra></extra>'
+    };
 
-        const layout = {
-            title: {
-                text: `District-wise Rainfall Analysis - ${document.getElementById('dynamicGraphTitle').textContent}`,
-                font: { family: 'Poppins', color: fontColor }
-            },
-            xaxis: {
-                title: translations[currentLanguage].district,
-                tickangle: -45,
-                automargin: true,
-                gridcolor: isDark ? '#374151' : '#e2e8f0'
-            },
-            yaxis: {
-                title: translations[currentLanguage].actualRain + ' (mm)',
-                side: 'left',
-                gridcolor: isDark ? '#374151' : '#e2e8f0'
-            },
-            yaxis2: {
-                title: translations[currentLanguage].normalRain + ' (mm)',
-                overlaying: 'y',
-                side: 'right',
-                gridcolor: isDark ? '#374151' : '#e2e8f0'
-            },
-            paper_bgcolor: 'rgba(0,0,0,0)',
-            plot_bgcolor: 'rgba(0,0,0,0)',
-            font: { family: 'Poppins', color: fontColor },
-            margin: { t: 50, b: 150, l: 50, r: 50 },
-            showlegend: true,
-            legend: {
-                orientation: 'h',
-                y: -0.2,
-                font: { size: 12 },
-                itemclick: false,
-                itemdoubleclick: false
-            },
-            barmode: 'group'
-        };
+    // Line trace for Normal R/F with glowing gray effect
+    const lineTrace = {
+        x: sortedData.map(d => d.district),
+        y: sortedData.map(d => d.normal),
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: translations[currentLanguage].normalRF,
+        line: {
+            color: isDark ? '#9ca3af' : '#6b7280',
+            width: 4,
+            shape: 'spline',
+            smoothing: 1.3
+        },
+        marker: {
+            color: isDark ? '#9ca3af' : '#6b7280',
+            size: 10,
+            line: {
+                color: isDark ? '#ffffff' : '#ffffff',
+                width: 2
+            }
+        },
+        yaxis: 'y2',
+        hovertemplate: `<b>%{x}</b><br>${translations[currentLanguage].normalRain}: %{y} mm<extra></extra>`,
+        className: 'glowing-line'
+    };
 
-        Plotly.newPlot('districtGraph', [barTrace, lineTrace], layout, {
-            responsive: true,
-            displayModeBar: true,
-            displaylogo: false,
-            modebar: { orientation: 'h' }
-        });
+    const layout = {
+        // Remove title completely
+        xaxis: {
+            title: translations[currentLanguage].district,
+            tickangle: -45,
+            automargin: true,
+            gridcolor: isDark ? '#374151' : '#e2e8f0'
+        },
+        yaxis: {
+            title: translations[currentLanguage].actualRain + ' (mm)',
+            side: 'left',
+            gridcolor: isDark ? '#374151' : '#e2e8f0'
+        },
+        yaxis2: {
+            title: translations[currentLanguage].normalRain + ' (mm)',
+            overlaying: 'y',
+            side: 'right',
+            gridcolor: isDark ? '#374151' : '#e2e8f0'
+        },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { family: 'Poppins', color: fontColor },
+        margin: { t: 30, b: 150, l: 50, r: 50 }, // Reduced top margin since no title
+        showlegend: true,
+        legend: {
+            orientation: 'h',
+            y: -0.2,
+            font: { size: 12 },
+            itemclick: 'toggleothers', // Enable click to toggle
+            itemdoubleclick: false
+        },
+        barmode: 'group'
+    };
+
+    Plotly.newPlot('districtGraph', [barTrace, lineTrace], layout, {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modebar: { orientation: 'h' }
+    });
+}
+
+// --- Main Fetch Function ---
+async function updateDashboard() {
+    
+    const year = document.getElementById('yearSelect').value;
+    const month = currentSelectedMonth;
+    
+    let filename = '';
+    if (month === 'Overall') {
+        filename = 'overall_monsoon.csv';
+    } else {
+        filename = `${month.toLowerCase()}.csv`;
     }
 
-    // --- Main Fetch Function ---
-    async function updateDashboard() {
+    const filePath = `data/${year}/${filename}`;
+
+    // Update dynamic titles immediately when year/month changes
+    updateDynamicTitles();
+
+    const tableBody = document.getElementById('dataTableBody');
+    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500"></i><br>${translations[currentLanguage].loading}</td></tr>`;
+    document.getElementById('errorContainer').classList.add('hidden');
+    document.getElementById('dataCard').classList.remove('hidden');
+
+    try {
+        const response = await fetch(filePath);
         
-        const year = document.getElementById('yearSelect').value;
-        const month = currentSelectedMonth;
-        
-        let filename = '';
-        if (month === 'Overall') {
-            filename = 'overall_monsoon.csv';
-        } else {
-            filename = `${month.toLowerCase()}.csv`;
+        if (!response.ok) {
+            throw new Error("File not found");
         }
 
-        const filePath = `data/${year}/${filename}`;
-
-        // Update dynamic titles with year and month
-        const monthNames = {
-            'Overall': { en: 'Monsoon (June-September)', hi: 'मानसून (जून-सितंबर)' },
-            'June': { en: 'June', hi: 'जून' },
-            'July': { en: 'July', hi: 'जुलाई' },
-            'August': { en: 'August', hi: 'अगस्त' },
-            'September': { en: 'September', hi: 'सितंबर' }
-        };
+        const csvText = await response.text();
+        const parsedData = parseCSV(csvText);
         
-        const monthText = monthNames[month][currentLanguage];
-        const dynamicTitle = `${monthText} - ${year}`;
+        if(parsedData.length === 0) throw new Error("Empty Data");
+
+        currentData = parsedData;
         
-        document.getElementById('dynamicGraphTitle').textContent = dynamicTitle;
-        document.getElementById('compTablePeriod').textContent = dynamicTitle;
-
-        const tableBody = document.getElementById('dataTableBody');
-        tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500"></i><br>${translations[currentLanguage].loading}</td></tr>`;
-        document.getElementById('errorContainer').classList.add('hidden');
-        document.getElementById('dataCard').classList.remove('hidden');
-
-        try {
-            const response = await fetch(filePath);
-            
-            if (!response.ok) {
-                throw new Error("File not found");
-            }
-
-            const csvText = await response.text();
-            const parsedData = parseCSV(csvText);
-            
-            if(parsedData.length === 0) throw new Error("Empty Data");
-
-            currentData = parsedData;
-            
-            const newAvailableDistricts = [...new Set(currentData.map(d => d.district))];
-            
-            const needToResetSelection = selectedDistricts.length === 0 || !selectedDistricts.every(d => newAvailableDistricts.includes(d));
-            
-            if (needToResetSelection) {
-                 selectedDistricts = newAvailableDistricts; 
-            }
-
-            generateDistrictCheckboxes();
-            renderData();
-            renderGraph();
-
-        } catch (error) {
-            console.error("Error loading data:", error);
-            document.getElementById('dataCard').classList.add('hidden');
-            document.getElementById('errorContainer').classList.remove('hidden');
-            availableDistricts = [];
-            selectedDistricts = [];
-            generateDistrictCheckboxes();
-            Plotly.purge('districtGraph');
+        const newAvailableDistricts = [...new Set(currentData.map(d => d.district))];
+        
+        const needToResetSelection = selectedDistricts.length === 0 || !selectedDistricts.every(d => newAvailableDistricts.includes(d));
+        
+        if (needToResetSelection) {
+             selectedDistricts = newAvailableDistricts; 
         }
+
+        generateDistrictCheckboxes();
+        renderData();
+        renderGraph();
+
+    } catch (error) {
+        console.error("Error loading data:", error);
+        document.getElementById('dataCard').classList.add('hidden');
+        document.getElementById('errorContainer').classList.remove('hidden');
+        availableDistricts = [];
+        selectedDistricts = [];
+        generateDistrictCheckboxes();
+        Plotly.purge('districtGraph');
     }
+}
 
     // --- CSV Parser Helper ---
     function parseCSV(csv) {
@@ -1117,6 +1141,9 @@
     function selectMonth(month) {
         currentSelectedMonth = month;
         
+        // Save month selection to localStorage
+        localStorage.setItem('selectedMonth', month);
+        
         document.querySelectorAll('.month-tab').forEach(btn => {
             if(btn.getAttribute('data-month') === month) {
                 btn.classList.add('active-tab');
@@ -1161,12 +1188,26 @@
     document.addEventListener('DOMContentLoaded', () => {
         // Set Hindi as default language
         document.body.classList.add('hindi');
+        currentLanguage = 'hi';
         
         // Set up language switcher
         document.getElementById('langSwitchBtn').innerHTML = `
             <i class="fas fa-language"></i>
             English
         `;
+        
+        // Preserve month selection on language change
+        const savedMonth = localStorage.getItem('selectedMonth') || 'Overall';
+        currentSelectedMonth = savedMonth;
+        
+        // Update month tabs to reflect saved selection
+        document.querySelectorAll('.month-tab').forEach(btn => {
+            if(btn.getAttribute('data-month') === savedMonth) {
+                btn.classList.add('active-tab');
+            } else {
+                btn.classList.remove('active-tab');
+            }
+        });
         
         updateDashboard();
     });

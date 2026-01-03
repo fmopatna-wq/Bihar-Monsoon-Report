@@ -1,0 +1,9 @@
+git status
+
+git add .
+
+git status
+
+git commit -m "Fixed Hindi title bug and overall tab translation"
+
+git push origin main
