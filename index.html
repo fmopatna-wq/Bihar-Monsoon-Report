@@ -374,6 +374,21 @@ h2, .gradient-text {
         <option value="2017">2017</option>
         <option value="2016">2016</option>
         <option value="2015">2015</option>
+        <option value="2014">2014</option>
+        <option value="2013">2013</option>
+        <option value="2012">2012</option>
+        <option value="2011">2011</option>
+        <option value="2010">2010</option>
+        <option value="2009">2009</option>
+        <option value="2008">2008</option>
+        <option value="2007">2007</option>
+        <option value="2006">2006</option>
+        <option value="2005">2005</option>
+        <option value="2004">2004</option>
+        <option value="2003">2003</option>
+        <option value="2002">2002</option>
+        <option value="2001">2001</option>
+        <option value="2000">2000</option>
     </select>
 </div>
         
@@ -400,6 +415,19 @@ h2, .gradient-text {
         <span class="gradient-text lang-hi"><i class="fa-solid fa-map-location-dot"></i> कुल जिले: 38</span>
         <span class="gradient-text lang-en"><i class="fa-solid fa-map-location-dot"></i> Total Districts: 38</span>
     </div>
+
+<div class="bg-white dark:bg-carddark p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8 mt-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b border-gray-100 dark:border-gray-700 pb-4">
+        <h2 class="text-2xl font-bold gradient-text flex items-center gap-2">
+            <i class="fas fa-calendar-alt"></i>
+            <span class="lang-hi">बिहार मानसून आगमन एवं वापसी समयरेखा</span>
+            <span class="lang-en">Bihar Monsoon Onset & Withdrawal Timeline</span>
+        </h2>
+    </div>
+    <div id="monsoonDetails" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        </div>
+</div>
+
 </header>
 
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -923,50 +951,56 @@ h2, .gradient-text {
 
     // --- Dashboard Control ---
 
-    async function updateDashboard() {
-        const year = document.getElementById('yearSelect').value;
-        const periodKey = document.getElementById('periodSelect').value;
-        const monthLabel = monthDisplayNames[periodKey][currentLanguage];
-        const fullLabel = `${monthLabel} - ${year}`;
+async function updateDashboard() {
+    const year = document.getElementById('yearSelect').value;
+    const periodKey = document.getElementById('periodSelect').value;
+    const monthLabel = monthDisplayNames[periodKey][currentLanguage];
+    const fullLabel = `${monthLabel} - ${year}`;
+    
+    // UI लेबल अपडेट करें
+    const yearElements = document.querySelectorAll('.yearDisplay');
+    yearElements.forEach(el => {
+        el.innerText = year;
+    });
+    document.getElementById('monthDisplay').innerText = fullLabel;
+    document.getElementById('tableMonthLabel').innerText = fullLabel;
+    document.querySelectorAll('.dynamic-month-label').forEach(el => el.innerText = fullLabel);
+    
+    // 1. सिंगल CSV डेटा लोड करें
+    try {
+        const rawData = await loadCSVData(year, periodKey);
+        window.globalData = rawData; 
+        updateDashboardUI(rawData);
+    } catch (error) {
+        console.error("सिंगल डैशबोर्ड अपडेट में त्रुटि:", error);
+        const errorMsg = currentLanguage === 'en' 
+            ? `Data could not be loaded. Please ensure the file data/${year}/${periodKey}.csv exists.` 
+            : `डेटा लोड नहीं हो सका। कृपया सुनिश्चित करें कि फ़ाइल data/${year}/${periodKey}.csv मौजूद है।`;
         
-        // UI लेबल अपडेट करें
-        const yearElements = document.querySelectorAll('.yearDisplay');
-yearElements.forEach(el => {
-    el.innerText = year;
-});
-        document.getElementById('monthDisplay').innerText = fullLabel;
-        document.getElementById('tableMonthLabel').innerText = fullLabel;
-        document.querySelectorAll('.dynamic-month-label').forEach(el => el.innerText = fullLabel);
+        document.getElementById('dataTableBody').innerHTML = 
+            `<tr><td colspan="5" class="px-6 py-4 text-center text-red-500 font-semibold">${errorMsg}</td></tr>`;
         
-        // 1. सिंगल CSV डेटा लोड करें
-        try {
-            const rawData = await loadCSVData(year, periodKey);
-            window.globalData = rawData; 
-            updateDashboardUI(rawData);
-        } catch (error) {
-            console.error("सिंगल डैशबोर्ड अपडेट में त्रुटि:", error);
-            const errorMsg = currentLanguage === 'en' 
-                ? `Data could not be loaded. Please ensure the file data/${year}/${periodKey}.csv exists.` 
-                : `डेटा लोड नहीं हो सका। कृपया सुनिश्चित करें कि फ़ाइल data/${year}/${periodKey}.csv मौजूद है।`;
-            
-            document.getElementById('dataTableBody').innerHTML = 
-                `<tr><td colspan="5" class="px-6 py-4 text-center text-red-500 font-semibold">${errorMsg}</td></tr>`;
-            
-            // Clear all chart areas
-            renderStats([]); 
-            renderLegendTable(calculateLegendCounts([])); 
-            Plotly.purge('deviationChart'); 
-            Plotly.purge('comparisonChart'); 
-            Plotly.purge('pieChart'); 
-            Plotly.purge('topDistChart'); 
-            Plotly.purge('botDistChart'); 
-            Plotly.purge('lineChart');
-            Plotly.purge('heatmapChart');
-        }
-
-        // 2. मासिक संयुक्त डेटा लोड करें
-        loadAndRenderMonthlyCharts(year, periodKey); 
+        // Clear all chart areas
+        renderStats([]); 
+        renderLegendTable(calculateLegendCounts([])); 
+        Plotly.purge('deviationChart'); 
+        Plotly.purge('comparisonChart'); 
+        Plotly.purge('pieChart'); 
+        Plotly.purge('topDistChart'); 
+        Plotly.purge('botDistChart'); 
+        Plotly.purge('lineChart');
+        Plotly.purge('heatmapChart');
     }
+
+    // 2. मासिक संयुक्त डेटा लोड करें
+    loadAndRenderMonthlyCharts(year, periodKey);
+
+    // --- यहाँ नया बदलाव जोड़ा गया है ---
+    // यह मानसून आगमन और वापसी वाले ब्लॉक को अपडेट करेगा
+    if (typeof updateMonsoonUI === "function") {
+        updateMonsoonUI(year);
+    }
+}
     
     async function loadAndRenderMonthlyCharts(year, selectedPeriodKey) { 
         try {
@@ -1502,6 +1536,8 @@ function renderLineChart(data) {
     }
     
     // --- Initialize Dashboard ---
+
+    
     document.addEventListener('DOMContentLoaded', () => {
         // Set default language to Hindi
         document.body.classList.add('hindi');
@@ -1517,5 +1553,6 @@ function renderLineChart(data) {
     });
 
 </script>
+<script src="monsoon-arrival.js"></script>
 </body>
 </html>
