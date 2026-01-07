@@ -363,33 +363,7 @@ h2, .gradient-text {
     <label for="yearSelect" class="text-3xl font-bold gradient-text mb-1 lang-hi">वर्ष:</label>
     <label for="yearSelect" class="text-3xl font-bold gradient-text mb-1 lang-en">Year:</label>
     <select id="yearSelect" onchange="updateDashboard()" class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-32">
-        <option value="2025" selected>2025</option>
-        <option value="2024">2024</option>
-        <option value="2023">2023</option>
-        <option value="2022">2022</option>
-        <option value="2021">2021</option>
-        <option value="2020">2020</option>
-        <option value="2019">2019</option>
-        <option value="2018">2018</option>
-        <option value="2017">2017</option>
-        <option value="2016">2016</option>
-        <option value="2015">2015</option>
-        <option value="2014">2014</option>
-        <option value="2013">2013</option>
-        <option value="2012">2012</option>
-        <option value="2011">2011</option>
-        <option value="2010">2010</option>
-        <option value="2009">2009</option>
-        <option value="2008">2008</option>
-        <option value="2007">2007</option>
-        <option value="2006">2006</option>
-        <option value="2005">2005</option>
-        <option value="2004">2004</option>
-        <option value="2003">2003</option>
-        <option value="2002">2002</option>
-        <option value="2001">2001</option>
-        <option value="2000">2000</option>
-    </select>
+        </select>
 </div>
         
         <div class="flex flex-col items-center">
@@ -1538,19 +1512,67 @@ function renderLineChart(data) {
     // --- Initialize Dashboard ---
 
     
-    document.addEventListener('DOMContentLoaded', () => {
-        // Set default language to Hindi
-        document.body.classList.add('hindi');
-        currentLanguage = 'hi';
-        
-        // Set up language switcher
-        document.getElementById('langSwitchBtn').innerHTML = `
-            <i class="fas fa-language"></i>
-            English
-        `;
-        
+// --- Initialize Dashboard ---
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. सबसे पहले साल की लिस्ट (Dropdown) तैयार करें
+    setupYearDropdown();
+
+    // 2. डिफ़ॉल्ट भाषा हिंदी सेट करें
+    document.body.classList.add('hindi');
+    currentLanguage = 'hi';
+    
+    // 3. भाषा बदलने वाले बटन का टेक्स्ट सेट करें
+    const langBtn = document.getElementById('langSwitchBtn');
+    if (langBtn) {
+        langBtn.innerHTML = `<i class="fas fa-language"></i> English`;
+    }
+
+    // 4. मानसून आगमन की CSV फाइल लोड करें
+    // नोट: सुनिश्चित करें कि PapaParse लाइब्रेरी लोड है
+    if (typeof Papa !== 'undefined') {
+        Papa.parse('Onset and Withdrawal of SW monsoon over Bihar.csv', {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                // ग्लोबल वेरिएबल में डेटा स्टोर करें
+                monsoonArrivalData = results.data;
+                
+                // 5. मुख्य डैशबोर्ड अपडेट करें (यह ग्राफ और मानसून ब्लॉक दोनों चलाएगा)
+                updateDashboard();
+            },
+            error: function(err) {
+                console.error("Monsoon CSV लोड करने में त्रुटि:", err);
+                // अगर मानसून फाइल न भी मिले, तब भी ग्राफ्स लोड होने चाहिए
+                updateDashboard();
+            }
+        });
+    } else {
+        // अगर पापा पार्स नहीं है तो सीधे अपडेट करें
         updateDashboard();
-    });
+    }
+
+    // भाषा बदलने के बटन पर इवेंट लिसनर (अगर पहले से नहीं है)
+    langBtn?.addEventListener('click', toggleLanguage);
+});
+
+// --- साल को ऑटोमैटिक भरने वाला फंक्शन (Dynamic Year Logic) ---
+function setupYearDropdown() {
+    const yearSelect = document.getElementById('yearSelect');
+    if (!yearSelect) return;
+
+    const startYear = 2000; 
+    const currentYear = new Date().getFullYear(); 
+    const endYear = 2025; // भविष्य के लिए बफर
+
+    let yearOptions = "";
+    for (let y = endYear; y >= startYear; y--) {
+        // जो साल आप पहले दिखाना चाहते हैं (जैसे 2025)
+        const selected = (y === 2025) ? 'selected' : ''; 
+        yearOptions += `<option value="${y}" ${selected}>${y}</option>`;
+    }
+    yearSelect.innerHTML = yearOptions;
+}
 
 </script>
 <script src="monsoon-arrival.js"></script>
