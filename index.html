@@ -1514,21 +1514,33 @@ function renderLineChart(data) {
     
 // --- Initialize Dashboard ---
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. सबसे पहले साल की लिस्ट (Dropdown) तैयार करें
-    setupYearDropdown();
+    // 1. साल की लिस्ट (Dropdown) तैयार करें
+    if (typeof setupYearDropdown === "function") {
+        setupYearDropdown();
+    }
 
     // 2. डिफ़ॉल्ट भाषा हिंदी सेट करें
     document.body.classList.add('hindi');
     currentLanguage = 'hi';
     
-    // 3. भाषा बदलने वाले बटन का टेक्स्ट सेट करें
+    // 3. भाषा बदलने वाले बटन को सेट करें
     const langBtn = document.getElementById('langSwitchBtn');
     if (langBtn) {
+        // बटन का टेक्स्ट सेट करें
         langBtn.innerHTML = `<i class="fas fa-language"></i> English`;
+        
+        // बटन पर क्लिक करने का पक्का इंतजाम (Event Listener)
+        langBtn.onclick = function(e) {
+            e.preventDefault();
+            if (typeof toggleLanguage === "function") {
+                toggleLanguage();
+            } else {
+                console.error("toggleLanguage function missing!");
+            }
+        };
     }
 
     // 4. मानसून आगमन की CSV फाइल लोड करें
-    // नोट: सुनिश्चित करें कि PapaParse लाइब्रेरी लोड है
     if (typeof Papa !== 'undefined') {
         Papa.parse('Onset and Withdrawal of SW monsoon over Bihar.csv', {
             download: true,
@@ -1536,24 +1548,18 @@ document.addEventListener('DOMContentLoaded', () => {
             skipEmptyLines: true,
             complete: function(results) {
                 // ग्लोबल वेरिएबल में डेटा स्टोर करें
-                monsoonArrivalData = results.data;
-                
-                // 5. मुख्य डैशबोर्ड अपडेट करें (यह ग्राफ और मानसून ब्लॉक दोनों चलाएगा)
+                window.monsoonArrivalData = results.data;
+                // मुख्य डैशबोर्ड अपडेट करें
                 updateDashboard();
             },
             error: function(err) {
-                console.error("Monsoon CSV लोड करने में त्रुटि:", err);
-                // अगर मानसून फाइल न भी मिले, तब भी ग्राफ्स लोड होने चाहिए
+                console.error("Monsoon CSV error:", err);
                 updateDashboard();
             }
         });
     } else {
-        // अगर पापा पार्स नहीं है तो सीधे अपडेट करें
         updateDashboard();
     }
-
-    // भाषा बदलने के बटन पर इवेंट लिसनर (अगर पहले से नहीं है)
-    langBtn?.addEventListener('click', toggleLanguage);
 });
 
 // --- साल को ऑटोमैटिक भरने वाला फंक्शन (Dynamic Year Logic) ---
