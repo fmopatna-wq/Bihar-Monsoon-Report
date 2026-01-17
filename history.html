@@ -207,7 +207,7 @@
     </style>
   </head>
   <body
-    class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen"
+    class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col"
   >
     <svg height="0" width="0" style="position: absolute">
       <defs>
@@ -346,7 +346,9 @@
       </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
+    <main
+      class="max-w-7xl mx-auto p-4 md:p-6 space-y-8 flex-grow flex flex-col w-full"
+    >
       <section class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
         <div class="border-b border-gray-100 dark:border-gray-700 pb-4 mb-6">
           <h3 class="text-2xl font-bold flex items-center gap-2">
@@ -445,6 +447,28 @@
           <div id="legendContainer" class="flex flex-wrap gap-4 text-xs"></div>
         </div>
       </section>
+
+      <footer
+        class="bg-slate-800 text-white p-8 rounded-xl mt-auto text-center space-y-4 !mt-auto"
+      >
+        <h4 class="text-xl font-bold gradient-text lang-hi">
+          डेटा स्रोत और क्रेडिट
+        </h4>
+        <h4 class="text-xl font-bold gradient-text lang-en">
+          Data Source and Credits
+        </h4>
+        <p class="text-gray-300 lang-hi">
+          India Meteorological Department: Meteorological Centre Patna
+        </p>
+        <p class="text-gray-300 lang-en">
+          India Meteorological Department: Meteorological Centre Patna
+        </p>
+        <div class="pt-4 border-t border-slate-700">
+          <p class="text-sm text-gray-400 lang-hi">विश्लेषण तैयार किया गया:</p>
+          <p class="text-sm text-gray-400 lang-en">Analysis Prepared by:</p>
+          <p class="text-lg font-semibold">© Lal Kamal</p>
+        </div>
+      </footer>
     </main>
 
     <script>
