@@ -1,458 +1,669 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="hi" class="light">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>
-        <span class="lang-hi">बिहार वर्षा मानचित्र विश्लेषण</span>
-        <span class="lang-en">Bihar Rainfall Map Analysis</span>
+      <span class="lang-hi">बिहार वर्षा मानचित्र विश्लेषण</span> <span
+      class="lang-en">Bihar Rainfall Map Analysis</span>
     </title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2E8B57',
-                        secondary: '#E6F4EA',
-                        darkbg: '#1a202c',
-                        carddark: '#2d3748',
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2E8B57",
+              secondary: "#E6F4EA",
+              darkbg: "#1a202c",
+              carddark: "#2d3748",
+            },
+          },
+        },
+      };
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap');
-        
-        body { font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif; scroll-behavior: smooth; }
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap");
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-        .dark ::-webkit-scrollbar-track { background: #2d3748; }
+      body {
+        font-family: "Poppins", "Tiro Devanagari Hindi", sans-serif;
+        scroll-behavior: smooth;
+      }
 
-        /* Language specific elements - Default to Hindi */
-        .lang-en { display: none !important; }
-        .lang-hi { display: block !important; }
-        
-        body.english .lang-en { display: block !important; }
-        body.english .lang-hi { display: none !important; }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      .dark ::-webkit-scrollbar-track {
+        background: #2d3748;
+      }
 
-        /* --- Navbar Style --- */
-        .navbar {
-            background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            position: fixed !important; 
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            z-index: 1000 !important;
-        }
+      /* Language specific elements - Default to Hindi */
+      .lang-en {
+        display: none !important;
+      }
+      .lang-hi {
+        display: block !important;
+      }
 
-        /* बॉडी को और नीचे धकेला गया है (Tiro Font के लिए) */
+      body.english .lang-en {
+        display: block !important;
+      }
+      body.english .lang-hi {
+        display: none !important;
+      }
+
+      /* --- Navbar Style --- */
+      .navbar {
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 1000 !important;
+      }
+
+      /* बॉडी को और नीचे धकेला गया है (Tiro Font के लिए) */
+      body {
+        padding-top: 150px !important; /* कंप्यूटर के लिए गैप बढ़ाया गया */
+      }
+
+      @media (max-width: 1023px) {
         body {
-            padding-top: 150px !important; /* कंप्यूटर के लिए गैप बढ़ाया गया */
+          padding-top: 220px !important; /* मोबाइल के लिए गैप बढ़ाया गया */
         }
+      }
 
-        @media (max-width: 1023px) {
-            body {
-                padding-top: 220px !important; /* मोबाइल के लिए गैप बढ़ाया गया */
-            }
-        }
+      /* हेडर का एडजस्टमेंट */
+      #overview {
+        padding-top: 0 !important;
+        margin-top: -20px !important;
+      }
 
-        /* हेडर का एडजस्टमेंट */
-        #overview {
-            padding-top: 0 !important;
-            margin-top: -20px !important;
-        }
+      /* फ़ॉन्ट की ऊंचाई को संतुलित करने के लिए */
+      h2,
+      .gradient-text {
+        line-height: 1.5 !important;
+        padding-top: 5px;
+      }
 
-        /* फ़ॉन्ट की ऊंचाई को संतुलित करने के लिए */
-        h2, .gradient-text {
-            line-height: 1.5 !important;
-            padding-top: 5px;
-        }
+      .dark .navbar {
+        background-color: rgba(30, 41, 59, 0.9) !important;
+      }
 
-        .dark .navbar {
-            background-color: rgba(30, 41, 59, 0.9) !important;
-        }       
+      /* --- Gradient Text --- */
+      .gradient-text {
+        background: linear-gradient(
+          to right,
+          #2563eb,
+          #0d9488
+        ); /* Blue to Teal */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: inline-block;
+      }
+      .dark .gradient-text {
+        background: linear-gradient(to right, #60a5fa, #2dd4bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
 
-        /* --- Gradient Text --- */
-        .gradient-text {
-            background: linear-gradient(to right, #2563eb, #0d9488); /* Blue to Teal */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: inline-block;
-        }
-        .dark .gradient-text {
-            background: linear-gradient(to right, #60a5fa, #2dd4bf);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+      /* --- Nav Box Style --- */
+      .nav-box {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid transparent;
+        color: #4b5563;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .dark .nav-box {
+        color: #d1d5db;
+      }
 
-        /* --- Nav Box Style --- */
-        .nav-box {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid transparent;
-            color: #4b5563;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .dark .nav-box { color: #d1d5db; }
-        
-        .nav-box:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-            background-color: white;
-        }
-        .dark .nav-box:hover { background-color: #374151; }
+      .nav-box:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        background-color: white;
+      }
+      .dark .nav-box:hover {
+        background-color: #374151;
+      }
 
-        .nav-box.active-nav {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            color: white !important;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-            border: none;
-        }
+      .nav-box.active-nav {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white !important;
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        border: none;
+      }
 
-        /* --- Month Tabs Style --- */
-        .month-tab {
-            padding: 0.5rem 1.2rem;
-            border-radius: 9999px; /* Pill shape */
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            border: 1px solid #e5e7eb;
-            background-color: white;
-            color: #4b5563;
-            cursor: pointer;
-        }
-        .dark .month-tab {
-            background-color: #1f2937;
-            border-color: #374151;
-            color: #d1d5db;
-        }
-        .month-tab:hover {
-            background-color: #f3f4f6;
-            transform: translateY(-1px);
-        }
-        .dark .month-tab:hover { background-color: #374151; }
+      /* --- Month Tabs Style --- */
+      .month-tab {
+        padding: 0.5rem 1.2rem;
+        border-radius: 9999px; /* Pill shape */
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: 1px solid #e5e7eb;
+        background-color: white;
+        color: #4b5563;
+        cursor: pointer;
+      }
+      .dark .month-tab {
+        background-color: #1f2937;
+        border-color: #374151;
+        color: #d1d5db;
+      }
+      .month-tab:hover {
+        background-color: #f3f4f6;
+        transform: translateY(-1px);
+      }
+      .dark .month-tab:hover {
+        background-color: #374151;
+      }
 
-        .month-tab.active-tab {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+      .month-tab.active-tab {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
 
-        /* Language Switcher Styles */
-        .lang-switcher {
-            position: relative;
-            display: inline-block;
-        }
+      /* Language Switcher Styles */
+      .lang-switcher {
+        position: relative;
+        display: inline-block;
+      }
 
-        .lang-switcher button {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+      .lang-switcher button {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
 
-        .lang-switcher button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+      .lang-switcher button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
 
-        /* Responsive Navigation */
+      /* Responsive Navigation */
+      .nav-links-container {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+      @media (max-width: 1023px) {
         .nav-links-container {
-            display: flex; gap: 1rem; align-items: center;
+          gap: 0.5rem;
+          overflow-x: auto;
+          white-space: nowrap;
+          padding-bottom: 4px;
+          flex-grow: 1;
+          justify-content: flex-start;
         }
-        @media (max-width: 1023px) {
-            .nav-links-container {
-                gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; flex-grow: 1; justify-content: flex-start;
-            }
-        }
+      }
     </style>
-</head>
-<body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
-
-<nav id="navbar" class="navbar">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
-        
+  </head>
+  <body
+    class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen"
+  >
+    <nav id="navbar" class="navbar">
+      <div
+        class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between"
+      >
         <div class="flex items-center gap-3 nav-logo shrink-0">
-            <img src="assets/logo.png" alt="IMD Logo" class="h-8 w-8 object-contain dark:invert hidden sm:block"/> 
-            
-            <div class="text-3xl text-blue-600 dark:text-blue-400"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
-            <div>
-                <div class="lang-hi">
-                    <h1 class="text-xl font-bold leading-tight gradient-text">बिहार मानसून डैशबोर्ड</h1>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">IMD MC Patna — व्यापक विश्लेषण</div>
-                </div>
-                <div class="lang-en">
-                    <h1 class="text-xl font-bold leading-tight gradient-text">Bihar Monsoon Dashboard</h1>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">IMD MC Patna — Comprehensive Analysis</div>
-                </div>
-            </div>
-        </div>
-        
+          <img
+            src="assets/logo.png"
+            alt="IMD Logo"
+            class="h-8 w-8 object-contain dark:invert hidden sm:block"
+          />
 
-        <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
-            <!-- Hindi Navigation -->
+          <div class="text-3xl text-blue-600 dark:text-blue-400">
+            <i class="fa-solid fa-cloud-showers-heavy"></i>
+          </div>
+          <div>
             <div class="lang-hi">
-                <a href="index.html" class="nav-box" onclick="setActive(this)">होम</a>
-                <a href="index.html#analysis" class="nav-box" onclick="setActive(this)">डैशबोर्ड</a>    
-                <a href="district.html" class="nav-box" onclick="setActive(this)">जिलावार</a> 
-                <a href="maps.html" class="nav-box active-nav" onclick="setActive(this)">मानचित्र</a>
-                <a href="history.html" class="nav-box" onclick="setActive(this)">ऐतिहासिक</a>
-                <a href="comparison.html" class="nav-box" onclick="setActive(this)">तुलना</a>
+              <h1 class="text-xl font-bold leading-tight gradient-text">
+                बिहार मानसून डैशबोर्ड
+              </h1>
+              <div class="text-xs text-gray-500 dark:text-gray-400">
+                IMD MC Patna — व्यापक विश्लेषण
+              </div>
             </div>
-            
-            <!-- English Navigation -->
             <div class="lang-en">
-                <a href="index.html" class="nav-box" onclick="setActive(this)">Home</a>
-                <a href="index.html#analysis" class="nav-box" onclick="setActive(this)">Dashboard</a>    
-                <a href="district.html" class="nav-box" onclick="setActive(this)">District-wise</a> 
-                <a href="maps.html" class="nav-box active-nav" onclick="setActive(this)">Maps</a>
-                <a href="history.html" class="nav-box" onclick="setActive(this)">Historical</a>
-                <a href="comparison.html" class="nav-box" onclick="setActive(this)">Comparison</a>
+              <h1 class="text-xl font-bold leading-tight gradient-text">
+                Bihar Monsoon Dashboard
+              </h1>
+              <div class="text-xs text-gray-500 dark:text-gray-400">
+                IMD MC Patna — Comprehensive Analysis
+              </div>
             </div>
+          </div>
+        </div>
+
+        <div
+          class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0"
+        >
+          <!-- Hindi Navigation -->
+          <div class="lang-hi">
+            <a href="index.html" class="nav-box" onclick="setActive(this)"
+              >होम</a
+            >
+            <a
+              href="index.html#analysis"
+              class="nav-box"
+              onclick="setActive(this)"
+              >डैशबोर्ड</a
+            >
+            <a href="district.html" class="nav-box" onclick="setActive(this)"
+              >जिलावार</a
+            >
+            <a href="intensity.html" class="nav-box" onclick="setActive(this)"
+              >तीव्रता</a
+            >
+            <a
+              href="maps.html"
+              class="nav-box active-nav"
+              onclick="setActive(this)"
+              >मानचित्र</a
+            >
+            <a href="history.html" class="nav-box" onclick="setActive(this)"
+              >ऐतिहासिक</a
+            >
+            <a href="comparison.html" class="nav-box" onclick="setActive(this)"
+              >तुलना</a
+            >
+          </div>
+
+          <!-- English Navigation -->
+          <div class="lang-en">
+            <a href="index.html" class="nav-box" onclick="setActive(this)"
+              >Home</a
+            >
+            <a
+              href="index.html#analysis"
+              class="nav-box"
+              onclick="setActive(this)"
+              >Dashboard</a
+            >
+            <a href="district.html" class="nav-box" onclick="setActive(this)"
+              >District-wise</a
+            >
+            <a href="intensity.html" class="nav-box" onclick="setActive(this)"
+              >Intensity</a
+            >
+            <a
+              href="maps.html"
+              class="nav-box active-nav"
+              onclick="setActive(this)"
+              >Maps</a
+            >
+            <a href="history.html" class="nav-box" onclick="setActive(this)"
+              >Historical</a
+            >
+            <a href="comparison.html" class="nav-box" onclick="setActive(this)"
+              >Comparison</a
+            >
+          </div>
         </div>
 
         <div class="flex items-center gap-4 shrink-0">
-            <!-- Language Switcher -->
-            <div class="lang-switcher">
-                <button id="langSwitchBtn" onclick="toggleLanguage()" title="Switch Language / भाषा बदलें">
-                    <i class="fas fa-language"></i>
-                    <span class="lang-hi">English</span>
-                    <span class="lang-en">हिन्दी</span>
-                </button>
-            </div>
-            
-            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
-                <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+          <!-- Language Switcher -->
+          <div class="lang-switcher">
+            <button
+              id="langSwitchBtn"
+              onclick="toggleLanguage()"
+              title="Switch Language / भाषा बदलें"
+            >
+              <i class="fas fa-language"></i>
+              <span class="lang-hi">English</span>
+              <span class="lang-en">हिन्दी</span>
             </button>
-        </div>
-    </div>
-</nav>
+          </div>
 
-<main class="max-w-7xl mx-auto p-6">
-    
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 mb-8">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-                <div class="lang-hi">
-                    <h2 class="text-2xl font-bold flex items-center gap-2 mb-1">
-                        <i class="fa-solid fa-map-location-dot text-blue-600"></i> 
-                        <span class="gradient-text">वर्षा मानचित्र विश्लेषण</span>
-                    </h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">विभिन्न वर्षों और महीनों के लिए स्थानिक वितरण देखें।</p>
-                </div>
-                <div class="lang-en">
-                    <h2 class="text-2xl font-bold flex items-center gap-2 mb-1">
-                        <i class="fa-solid fa-map-location-dot text-blue-600"></i> 
-                        <span class="gradient-text">Rainfall Map Analysis</span>
-                    </h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">View spatial distribution for different years and months.</p>
-                </div>
+          <button
+            onclick="toggleDarkMode()"
+            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          >
+            <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+            <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-6">
+      <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 mb-8"
+      >
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
+        >
+          <div>
+            <div class="lang-hi">
+              <h2 class="text-2xl font-bold flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-map-location-dot text-blue-600"></i>
+                <span class="gradient-text">वर्षा मानचित्र विश्लेषण</span>
+              </h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                विभिन्न वर्षों और महीनों के लिए स्थानिक वितरण देखें।
+              </p>
             </div>
-            
-            <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
-                <div class="lang-hi">
-                    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2">वर्ष:</label>
-                </div>
-                <div class="lang-en">
-                    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2">Year:</label>
-                </div>
-                <select id="mapYear" onchange="updateMap()" class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer min-w-[100px]">
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                    <option value="2020">2020</option>
-                    <option value="2019">2019</option>
-                    <option value="2018">2018</option>
-                    <option value="2017">2017</option>
-                    <option value="2016">2016</option>
-                    <option value="2015">2015</option>
-                </select>
+            <div class="lang-en">
+              <h2 class="text-2xl font-bold flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-map-location-dot text-blue-600"></i>
+                <span class="gradient-text">Rainfall Map Analysis</span>
+              </h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                View spatial distribution for different years and months.
+              </p>
             </div>
+          </div>
+
+          <div
+            class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600"
+          >
+            <div class="lang-hi">
+              <label
+                class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2"
+                >वर्ष:</label
+              >
+            </div>
+            <div class="lang-en">
+              <label
+                class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2"
+                >Year:</label
+              >
+            </div>
+            <select
+              id="mapYear"
+              onchange="updateMap()"
+              class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer min-w-[100px]"
+            >
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+              <option value="2020">2020</option>
+              <option value="2019">2019</option>
+              <option value="2018">2018</option>
+              <option value="2017">2017</option>
+              <option value="2016">2016</option>
+              <option value="2015">2015</option>
+            </select>
+          </div>
         </div>
 
-        <hr class="my-4 border-gray-100 dark:border-gray-700">
+        <hr class="my-4 border-gray-100 dark:border-gray-700" />
 
         <div class="flex flex-wrap gap-3" id="monthTabsContainer">
-            <!-- Hindi Month Tabs -->
-            <div class="lang-hi">
-                <button onclick="selectMonth('Overall')" class="month-tab active-tab" data-month="Overall">मानसून (जून-सितंबर)</button>
-                <button onclick="selectMonth('June')" class="month-tab" data-month="June">जून</button>
-                <button onclick="selectMonth('July')" class="month-tab" data-month="July">जुलाई</button>
-                <button onclick="selectMonth('August')" class="month-tab" data-month="August">अगस्त</button>
-                <button onclick="selectMonth('September')" class="month-tab" data-month="September">सितंबर</button>
-            </div>
-            
-            <!-- English Month Tabs -->
-            <div class="lang-en">
-                <button onclick="selectMonth('Overall')" class="month-tab" data-month="Overall">Monsoon (June-September)</button>
-                <button onclick="selectMonth('June')" class="month-tab" data-month="June">June</button>
-                <button onclick="selectMonth('July')" class="month-tab" data-month="July">July</button>
-                <button onclick="selectMonth('August')" class="month-tab" data-month="August">August</button>
-                <button onclick="selectMonth('September')" class="month-tab" data-month="September">September</button>
-            </div>
+          <!-- Hindi Month Tabs -->
+          <div class="lang-hi">
+            <button
+              onclick="selectMonth('Overall')"
+              class="month-tab active-tab"
+              data-month="Overall"
+            >
+              मानसून (जून-सितंबर)
+            </button>
+            <button
+              onclick="selectMonth('June')"
+              class="month-tab"
+              data-month="June"
+            >
+              जून
+            </button>
+            <button
+              onclick="selectMonth('July')"
+              class="month-tab"
+              data-month="July"
+            >
+              जुलाई
+            </button>
+            <button
+              onclick="selectMonth('August')"
+              class="month-tab"
+              data-month="August"
+            >
+              अगस्त
+            </button>
+            <button
+              onclick="selectMonth('September')"
+              class="month-tab"
+              data-month="September"
+            >
+              सितंबर
+            </button>
+          </div>
+
+          <!-- English Month Tabs -->
+          <div class="lang-en">
+            <button
+              onclick="selectMonth('Overall')"
+              class="month-tab"
+              data-month="Overall"
+            >
+              Monsoon (June-September)
+            </button>
+            <button
+              onclick="selectMonth('June')"
+              class="month-tab"
+              data-month="June"
+            >
+              June
+            </button>
+            <button
+              onclick="selectMonth('July')"
+              class="month-tab"
+              data-month="July"
+            >
+              July
+            </button>
+            <button
+              onclick="selectMonth('August')"
+              class="month-tab"
+              data-month="August"
+            >
+              August
+            </button>
+            <button
+              onclick="selectMonth('September')"
+              class="month-tab"
+              data-month="September"
+            >
+              September
+            </button>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <div id="mapContainer" class="card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg min-h-[600px] flex items-center justify-center border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
-        
-        <div id="mapNotice" class="text-center text-gray-500 dark:text-gray-400 py-10 font-medium">
-            <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-blue-500"></i><br>
-            <span class="lang-hi">मानचित्र लोड किया जा रहा है...</span>
-            <span class="lang-en">Loading map...</span>
+      <div
+        id="mapContainer"
+        class="card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg min-h-[600px] flex items-center justify-center border border-gray-100 dark:border-gray-700 relative overflow-hidden group"
+      >
+        <div
+          id="mapNotice"
+          class="text-center text-gray-500 dark:text-gray-400 py-10 font-medium"
+        >
+          <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-blue-500"></i
+          ><br />
+          <span class="lang-hi">मानचित्र लोड किया जा रहा है...</span>
+          <span class="lang-en">Loading map...</span>
         </div>
 
-        <img id="mapView" 
-             class="mx-auto max-w-full max-h-[80vh] h-auto hidden rounded-lg shadow-sm transition-transform duration-500 group-hover:scale-[1.01]" 
-             alt="वर्षा मानचित्र छवि"
-             onload="onImageLoad()"
-             onerror="onImageError()" />
-             
-        <div class="absolute bottom-6 right-6 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-4 py-2 rounded-lg shadow text-sm font-bold border border-gray-200 dark:border-gray-600">
-            <div class="lang-hi">
-                <span id="labelYear">2025</span> - <span id="labelMonth" class="text-blue-600">Overall</span>
-            </div>
-            <div class="lang-en">
-                <span id="labelYear">2025</span> - <span id="labelMonth" class="text-blue-600">Total</span>
-            </div>
+        <img
+          id="mapView"
+          class="mx-auto max-w-full max-h-[80vh] h-auto hidden rounded-lg shadow-sm transition-transform duration-500 group-hover:scale-[1.01]"
+          alt="वर्षा मानचित्र छवि"
+          onload="onImageLoad()"
+          onerror="onImageError()"
+        />
+
+        <div
+          class="absolute bottom-6 right-6 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-4 py-2 rounded-lg shadow text-sm font-bold border border-gray-200 dark:border-gray-600"
+        >
+          <div class="lang-hi">
+            <span id="labelYear">2025</span> -
+            <span id="labelMonth" class="text-blue-600">Overall</span>
+          </div>
+          <div class="lang-en">
+            <span id="labelYear">2025</span> -
+            <span id="labelMonth" class="text-blue-600">Total</span>
+          </div>
         </div>
-    </div>
+      </div>
+    </main>
 
-</main>
+    <script>
+      // --- Configuration based on file structure ---
+      const mapFiles = {
+        Overall: "monsoon_overall_map.png",
+        June: "june_map.png",
+        July: "july_map.png",
+        August: "aug_map.png",
+        September: "sep_map.png",
+      };
 
-<script>
-    // --- Configuration based on file structure ---
-    const mapFiles = {
-        'Overall': 'monsoon_overall_map.png',
-        'June': 'june_map.png',
-        'July': 'july_map.png',
-        'August': 'aug_map.png',
-        'September': 'sep_map.png'
-    };
+      let currentYear = "2025";
+      let currentMonth = "Overall";
+      let currentLanguage = "hi"; // Default to Hindi
 
-    let currentYear = '2025';
-    let currentMonth = 'Overall';
-    let currentLanguage = 'hi'; // Default to Hindi
+      // --- Language Switching ---
+      function toggleLanguage() {
+        document.body.classList.toggle("english");
+        currentLanguage = document.body.classList.contains("english")
+          ? "en"
+          : "hi";
 
-    // --- Language Switching ---
-    function toggleLanguage() {
-        document.body.classList.toggle('english');
-        currentLanguage = document.body.classList.contains('english') ? 'en' : 'hi';
-        
         // Update language switcher button
-        document.getElementById('langSwitchBtn').innerHTML = `
+        document.getElementById("langSwitchBtn").innerHTML = `
             <i class="fas fa-language"></i>
-            ${currentLanguage === 'en' ? 'हिन्दी' : 'English'}
+            ${currentLanguage === "en" ? "हिन्दी" : "English"}
         `;
-        
-        updateLanguageContent();
-    }
 
-    function updateLanguageContent() {
-        const isEnglish = currentLanguage === 'en';
-        
+        updateLanguageContent();
+      }
+
+      function updateLanguageContent() {
+        const isEnglish = currentLanguage === "en";
+
         // Update page title
-        document.title = isEnglish ? 'Bihar Rainfall Map Analysis' : 'बिहार वर्षा मानचित्र विश्लेषण';
-        
+        document.title = isEnglish
+          ? "Bihar Rainfall Map Analysis"
+          : "बिहार वर्षा मानचित्र विश्लेषण";
+
         // Update dynamic content
         updateMonthLabel();
-        
+
         // Fix the active tab display issue
         updateActiveTabDisplay();
-    }
+      }
 
-    function updateActiveTabDisplay() {
+      function updateActiveTabDisplay() {
         // Get all month tabs
-        const allTabs = document.querySelectorAll('.month-tab');
-        
+        const allTabs = document.querySelectorAll(".month-tab");
+
         // First, remove active-tab class from all tabs
-        allTabs.forEach(tab => {
-            tab.classList.remove('active-tab');
+        allTabs.forEach((tab) => {
+          tab.classList.remove("active-tab");
         });
-        
+
         // Then, add active-tab class only to the tabs matching current month and language
-        const activeTabs = document.querySelectorAll(`[data-month="${currentMonth}"]`);
-        activeTabs.forEach(tab => {
-            if ((currentLanguage === 'hi' && tab.parentElement.classList.contains('lang-hi')) ||
-                (currentLanguage === 'en' && tab.parentElement.classList.contains('lang-en'))) {
-                tab.classList.add('active-tab');
-            }
+        const activeTabs = document.querySelectorAll(
+          `[data-month="${currentMonth}"]`,
+        );
+        activeTabs.forEach((tab) => {
+          if (
+            (currentLanguage === "hi" &&
+              tab.parentElement.classList.contains("lang-hi")) ||
+            (currentLanguage === "en" &&
+              tab.parentElement.classList.contains("lang-en"))
+          ) {
+            tab.classList.add("active-tab");
+          }
         });
-    }
+      }
 
-    function updateMonthLabel() {
+      function updateMonthLabel() {
         const monthMap = {
-            'Overall': { hi: 'कुल', en: 'Total' },
-            'June': { hi: 'जून', en: 'June' },
-            'July': { hi: 'जुलाई', en: 'July' },
-            'August': { hi: 'अगस्त', en: 'August' },
-            'September': { hi: 'सितंबर', en: 'September' }
+          Overall: { hi: "कुल", en: "Total" },
+          June: { hi: "जून", en: "June" },
+          July: { hi: "जुलाई", en: "July" },
+          August: { hi: "अगस्त", en: "August" },
+          September: { hi: "सितंबर", en: "September" },
         };
-        
-        const labelElement = document.getElementById('labelMonth');
+
+        const labelElement = document.getElementById("labelMonth");
         if (labelElement) {
-            labelElement.textContent = monthMap[currentMonth][currentLanguage];
+          labelElement.textContent = monthMap[currentMonth][currentLanguage];
         }
-    }
+      }
 
-    // --- Core Functions ---
+      // --- Core Functions ---
 
-    function selectMonth(month) {
+      function selectMonth(month) {
         currentMonth = month;
-        
+
         // Update Tab UI - fix for language switching
         updateActiveTabDisplay();
-        
+
         // Update Labels
         updateMonthLabel();
-        
+
         // Load Map
         updateMap();
-    }
+      }
 
-    function updateMap() {
-        const yearSelect = document.getElementById('mapYear');
+      function updateMap() {
+        const yearSelect = document.getElementById("mapYear");
         currentYear = yearSelect.value;
-        document.getElementById('labelYear').innerText = currentYear;
+        document.getElementById("labelYear").innerText = currentYear;
 
-        const img = document.getElementById('mapView');
-        const notice = document.getElementById('mapNotice');
-        
+        const img = document.getElementById("mapView");
+        const notice = document.getElementById("mapNotice");
+
         // Reset State
-        img.classList.add('hidden');
-        notice.classList.remove('hidden');
-        
-        const loadingText = currentLanguage === 'en' ? 'Loading map...' : 'मानचित्र लोड किया जा रहा है...';
+        img.classList.add("hidden");
+        notice.classList.remove("hidden");
+
+        const loadingText =
+          currentLanguage === "en"
+            ? "Loading map..."
+            : "मानचित्र लोड किया जा रहा है...";
         notice.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-blue-500"></i><br>${loadingText}`;
 
         // Construct Path: maps/{year}/{filename}
@@ -461,31 +672,35 @@
 
         // Set Source
         img.src = imagePath;
-    }
+      }
 
-    // --- Image Event Handlers ---
+      // --- Image Event Handlers ---
 
-    function onImageLoad() {
-        const img = document.getElementById('mapView');
-        const notice = document.getElementById('mapNotice');
-        
-        notice.classList.add('hidden');
-        img.classList.remove('hidden');
+      function onImageLoad() {
+        const img = document.getElementById("mapView");
+        const notice = document.getElementById("mapNotice");
+
+        notice.classList.add("hidden");
+        img.classList.remove("hidden");
         // Simple fade-in animation
         img.style.opacity = 0;
-        setTimeout(() => img.style.opacity = 1, 50);
-    }
+        setTimeout(() => (img.style.opacity = 1), 50);
+      }
 
-    function onImageError() {
-        const img = document.getElementById('mapView');
-        const notice = document.getElementById('mapNotice');
-        
-        img.classList.add('hidden');
-        notice.classList.remove('hidden');
-        
-        const errorText = currentLanguage === 'en' ? 'Map not available.' : 'मानचित्र उपलब्ध नहीं है।';
-        const monthText = currentLanguage === 'en' ? currentMonth : getHindiMonth(currentMonth);
-        
+      function onImageError() {
+        const img = document.getElementById("mapView");
+        const notice = document.getElementById("mapNotice");
+
+        img.classList.add("hidden");
+        notice.classList.remove("hidden");
+
+        const errorText =
+          currentLanguage === "en"
+            ? "Map not available."
+            : "मानचित्र उपलब्ध नहीं है।";
+        const monthText =
+          currentLanguage === "en" ? currentMonth : getHindiMonth(currentMonth);
+
         notice.innerHTML = `
             <div class="text-red-500">
                 <i class="fa-solid fa-triangle-exclamation text-4xl mb-2"></i><br>
@@ -493,51 +708,52 @@
                 <span class="text-xs text-gray-400 mt-2 block">(${monthText} ${currentYear})</span>
             </div>
         `;
-    }
+      }
 
-    function getHindiMonth(month) {
+      function getHindiMonth(month) {
         const monthMap = {
-            'Overall': 'कुल',
-            'June': 'जून',
-            'July': 'जुलाई',
-            'August': 'अगस्त',
-            'September': 'सितंबर'
+          Overall: "कुल",
+          June: "जून",
+          July: "जुलाई",
+          August: "अगस्त",
+          September: "सितंबर",
         };
         return monthMap[month] || month;
-    }
+      }
 
-    // --- General Logic ---
+      // --- General Logic ---
 
-    function toggleDarkMode() {
-        document.documentElement.classList.toggle('dark');
-    }
+      function toggleDarkMode() {
+        document.documentElement.classList.toggle("dark");
+      }
 
-    function setActive(element) {
-        document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('active-nav'));
-        element.classList.add('active-nav');
-    }
+      function setActive(element) {
+        document
+          .querySelectorAll(".nav-box")
+          .forEach((el) => el.classList.remove("active-nav"));
+        element.classList.add("active-nav");
+      }
 
-    // Init
-    document.addEventListener('DOMContentLoaded', () => {
+      // Init
+      document.addEventListener("DOMContentLoaded", () => {
         // Set default language to Hindi
-        document.body.classList.add('hindi');
-        currentLanguage = 'hi';
-        
+        document.body.classList.add("hindi");
+        currentLanguage = "hi";
+
         // Set up language switcher
-        document.getElementById('langSwitchBtn').innerHTML = `
+        document.getElementById("langSwitchBtn").innerHTML = `
             <i class="fas fa-language"></i>
             English
         `;
-        
+
         // Ensure default year 2025 is selected
-        const yearSelect = document.getElementById('mapYear');
-        if (!yearSelect.value) yearSelect.value = '2025';
-        
+        const yearSelect = document.getElementById("mapYear");
+        if (!yearSelect.value) yearSelect.value = "2025";
+
         // Initialize with proper language display
         updateLanguageContent();
         updateMap();
-    });
-
-</script>
-</body>
+      });
+    </script>
+  </body>
 </html>

@@ -1,0 +1,1565 @@
+<!doctype html>
+<html lang="hi" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      <span class="lang-hi">वर्षा तीव्रता विश्लेषण</span> <span
+      class="lang-en">Rainfall Intensity Analysis</span>
+    </title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2E8B57",
+              secondary: "#E6F4EA",
+              darkbg: "#1a202c",
+              carddark: "#2d3748",
+            },
+          },
+        },
+      };
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap");
+
+      body {
+        font-family: "Poppins", "Tiro Devanagari Hindi", sans-serif;
+        scroll-behavior: smooth;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      .dark ::-webkit-scrollbar-track {
+        background: #2d3748;
+      }
+
+      /* Navbar Style */
+      .navbar {
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 1000 !important;
+      }
+
+      body {
+        padding-top: 150px !important;
+      }
+      @media (max-width: 1023px) {
+        body {
+          padding-top: 220px !important;
+        }
+      }
+
+      .dark .navbar {
+        background-color: rgba(30, 41, 59, 0.9) !important;
+      }
+
+      /* Gradient Text */
+      .gradient-text {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: inline-block;
+      }
+      .dark .gradient-text {
+        background: linear-gradient(to right, #60a5fa, #2dd4bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: inline-block;
+      }
+
+      /* Nav Box */
+      .nav-box {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid transparent;
+        color: #4b5563;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .dark .nav-box {
+        color: #d1d5db;
+      }
+      .nav-box:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        background-color: white;
+      }
+      .dark .nav-box:hover {
+        background-color: #374151;
+      }
+      .nav-box.active-nav {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white !important;
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        border: none;
+      }
+
+      .nav-links-container {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+      @media (max-width: 1023px) {
+        .nav-links-container {
+          gap: 0.5rem;
+          overflow-x: auto;
+          white-space: nowrap;
+          padding-bottom: 4px;
+          flex-grow: 1;
+          justify-content: flex-start;
+        }
+      }
+
+      /* Language Switcher */
+      .lang-switcher button {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .lang-en {
+        display: none;
+      }
+      .lang-hi {
+        display: block;
+      }
+      body.english .lang-en {
+        display: block;
+      }
+      body.english .lang-hi {
+        display: none;
+      }
+
+      /* Card & Checkbox */
+      .card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 0.75rem;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      .dark .card {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .intensity-checkbox {
+        accent-color: #2563eb;
+        width: 1.2rem;
+        height: 1.2rem;
+        cursor: pointer;
+      }
+
+      /* Custom Dropdown/Checkbox Box */
+      .district-checkbox-dropdown,
+      .month-checkbox-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+      .district-checkbox-content,
+      .month-checkbox-content {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 280px;
+        max-height: 350px;
+        overflow-y: auto;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 50;
+        border-radius: 0.5rem;
+        margin-top: 0.5rem;
+        right: 0;
+        border: 1px solid #e5e7eb;
+      }
+      .dark .district-checkbox-content,
+      .dark .month-checkbox-content {
+        background-color: #1f2937;
+        border: 1px solid #374151;
+      }
+      .district-checkbox-content.show,
+      .month-checkbox-content.show {
+        display: block;
+      }
+      .district-checkbox-item,
+      .month-checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .district-checkbox-item:hover,
+      .month-checkbox-item:hover {
+        background-color: #f3f4f6;
+      }
+      .dark .district-checkbox-item:hover,
+      .dark .month-checkbox-item:hover {
+        background-color: #374151;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen"
+  >
+    <nav id="navbar" class="navbar">
+      <div
+        class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between"
+      >
+        <div class="flex items-center gap-3 nav-logo shrink-0">
+          <img
+            src="assets/logo.png"
+            alt="IMD Logo"
+            class="h-8 w-8 object-contain dark:invert hidden sm:block"
+          />
+          <div class="text-3xl text-blue-600 dark:text-blue-400">
+            <i class="fa-solid fa-cloud-bolt"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">
+              बिहार मानसून डैशबोर्ड
+            </h1>
+            <h1 class="text-xl font-bold leading-tight gradient-text lang-en">
+              Bihar Monsoon Dashboard
+            </h1>
+            <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">
+              IMD MC Patna — तीव्रता विश्लेषण
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">
+              IMD MC Patna — Intensity Analysis
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0"
+        >
+          <a href="index.html" class="nav-box lang-hi" onclick="setActive(this)"
+            >होम</a
+          >
+          <a href="index.html" class="nav-box lang-en" onclick="setActive(this)"
+            >Home</a
+          >
+          <a
+            href="index.html#analysis"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >डैशबोर्ड</a
+          >
+          <a
+            href="index.html#analysis"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Dashboard</a
+          >
+          <a
+            href="district.html"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >जिलावार</a
+          >
+          <a
+            href="district.html"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >District-wise</a
+          >
+          <a
+            href="intensity.html"
+            class="nav-box active-nav lang-hi"
+            onclick="setActive(this)"
+            >तीव्रता</a
+          >
+          <a
+            href="intensity.html"
+            class="nav-box active-nav lang-en"
+            onclick="setActive(this)"
+            >Intensity</a
+          >
+          <a href="maps.html" class="nav-box lang-hi" onclick="setActive(this)"
+            >मानचित्र</a
+          >
+          <a href="maps.html" class="nav-box lang-en" onclick="setActive(this)"
+            >Maps</a
+          >
+          <a
+            href="history.html"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >ऐतिहासिक</a
+          >
+          <a
+            href="history.html"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Historical</a
+          >
+          <a
+            href="comparison.html"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >तुलना</a
+          >
+          <a
+            href="comparison.html"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Comparison</a
+          >
+        </div>
+
+        <div class="flex items-center gap-4 shrink-0">
+          <div class="lang-switcher">
+            <button id="langSwitchBtn" onclick="toggleLanguage()">
+              <i class="fas fa-language"></i>
+              <span class="lang-hi">English</span>
+              <span class="lang-en">हिन्दी</span>
+            </button>
+          </div>
+          <button
+            onclick="toggleDarkMode()"
+            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          >
+            <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+            <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+      <!-- Controls Section -->
+      <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6"
+        >
+          <div>
+            <h2 class="text-2xl font-bold flex items-center gap-2">
+              <i class="fa-solid fa-filter text-blue-600"></i>
+              <span class="gradient-text lang-hi">वर्षा तीव्रता चयन</span>
+              <span class="gradient-text lang-en"
+                >Rainfall Intensity Selection</span
+              >
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 lang-hi">
+              IMD मानकों के अनुसार श्रेणियों का चयन करें
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 lang-en">
+              Select categories as per IMD standards
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- View Level Select -->
+            <div
+              class="flex items-center gap-3 bg-blue-50 dark:bg-gray-700 p-2 rounded-lg border border-blue-200 dark:border-gray-600"
+            >
+              <label
+                class="text-sm font-bold text-gray-600 dark:text-gray-300 px-1 lang-hi"
+                >स्तर:</label
+              >
+              <label
+                class="text-sm font-bold text-gray-600 dark:text-gray-300 px-1 lang-en"
+                >Level:</label
+              >
+              <select
+                id="viewLevelSelect"
+                onchange="processAndRender()"
+                class="bg-white dark:bg-gray-800 border-none rounded-md px-2 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer"
+              >
+                <option value="block">Block Wise (Raw)</option>
+                <option value="district" selected>District Wise (Avg)</option>
+              </select>
+            </div>
+
+            <!-- Month Select (Checkbox Dropdown) -->
+            <div class="month-checkbox-dropdown">
+              <button
+                id="monthDropdownBtn"
+                onclick="toggleMonthDropdown()"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 flex items-center gap-2"
+              >
+                <i class="fa-solid fa-calendar-days"></i>
+                <span id="monthDropdownBtnText">Monsoon (Jun-Sep)</span>
+                <i class="fa-solid fa-caret-down ml-1"></i>
+              </button>
+              <div
+                id="monthCheckboxContent"
+                class="month-checkbox-content"
+              ></div>
+            </div>
+
+            <!-- District Dropdown -->
+            <div class="district-checkbox-dropdown">
+              <button
+                id="districtDropdownBtn"
+                onclick="toggleDistrictDropdown()"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 flex items-center gap-2"
+              >
+                <i class="fa-solid fa-list-check"></i>
+                <span id="dropdownBtnText">सभी जिले</span>
+                <i class="fa-solid fa-caret-down ml-1"></i>
+              </button>
+              <div
+                id="districtCheckboxContent"
+                class="district-checkbox-content"
+              ></div>
+            </div>
+
+            <!-- Year Select -->
+            <div
+              class="flex items-center gap-3 bg-blue-50 dark:bg-gray-700 p-2 rounded-lg border border-blue-200 dark:border-gray-600"
+            >
+              <label
+                class="text-lg font-bold text-gray-600 dark:text-gray-300 px-2 lang-hi"
+                >वर्ष:</label
+              >
+              <label
+                class="text-lg font-bold text-gray-600 dark:text-gray-300 px-2 lang-en"
+                >Year:</label
+              >
+              <select
+                id="yearSelect"
+                onchange="loadData()"
+                class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-lg font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer"
+              >
+                <option value="2025" selected>2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-100 dark:border-gray-700 pt-4">
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            id="categoryContainer"
+          >
+            <!-- Checkboxes will be generated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Card -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          class="card bg-gradient-to-br from-blue-600 to-teal-500 text-white p-6 rounded-xl shadow-lg"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-blue-100 text-sm font-medium uppercase lang-hi">
+                कुल वर्षा दिवस (चयनित श्रेणियाँ)
+              </p>
+              <p class="text-blue-100 text-sm font-medium uppercase lang-en">
+                Total Rainy Days (Selected Categories)
+              </p>
+              <h3 class="text-4xl font-bold mt-2" id="totalDaysCount">0</h3>
+            </div>
+            <div class="bg-white/20 p-3 rounded-lg">
+              <i class="fa-solid fa-cloud-showers-water text-3xl"></i>
+            </div>
+          </div>
+          <p class="text-sm text-blue-100 mt-4 lang-hi">
+            सभी चयनित जिलों और ब्लॉकों में कुल गणना
+          </p>
+          <p class="text-sm text-blue-100 mt-4 lang-en">
+            Total count across all selected districts and blocks
+          </p>
+        </div>
+
+        <div
+          class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col justify-center items-center text-center"
+        >
+          <p class="text-gray-500 dark:text-gray-400 mb-2 lang-hi">
+            चयनित वर्ष
+          </p>
+          <p class="text-gray-500 dark:text-gray-400 mb-2 lang-en">
+            Selected Year
+          </p>
+          <h2 class="text-4xl font-bold gradient-text" id="displayYear">
+            2025
+          </h2>
+        </div>
+      </div>
+
+      <!-- Heatmap Section -->
+      <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg mb-6">
+        <div
+          class="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-700 pb-4"
+        >
+          <h3 class="text-xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-chart-gantt text-purple-600"></i>
+            <span class="gradient-text lang-hi">सप्ताह-वार तीव्रता हीटमैप</span>
+            <span class="gradient-text lang-en"
+              >Week-wise Intensity Heatmap</span
+            >
+          </h3>
+        </div>
+        <div id="heatmapChart" class="w-full h-[800px]"></div>
+        <div id="loadingMessage" class="hidden text-center py-10 text-gray-500">
+          <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+          <span class="lang-hi">डेटा लोड हो रहा है...</span>
+          <span class="lang-en">Loading data...</span>
+        </div>
+        <div
+          id="errorMessage"
+          class="hidden text-center py-10 text-red-500 font-bold"
+        ></div>
+      </div>
+
+      <!-- Bar Chart Section -->
+      <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg mb-6">
+        <div
+          class="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-700 pb-4"
+        >
+          <h3 class="text-xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-chart-simple text-teal-600"></i>
+            <span class="gradient-text lang-hi"
+              >कुल वर्षा दिवस (चयनित तीव्रता)</span
+            >
+            <span class="gradient-text lang-en"
+              >Total Rainy Days (Selected Intensity)</span
+            >
+          </h3>
+        </div>
+        <div id="barChart" class="w-full h-[500px]"></div>
+      </div>
+
+      <!-- Data Table Section -->
+      <div
+        class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg"
+      >
+        <div
+          class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row justify-between items-center gap-4"
+        >
+          <h3
+            class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2"
+          >
+            <i class="fa-solid fa-table text-blue-600"></i>
+            <span class="lang-hi">विस्तृत डेटा तालिका</span>
+            <span class="lang-en">Detailed Data Table</span>
+          </h3>
+          <div class="relative w-full md:w-64">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+            </div>
+            <input
+              type="text"
+              id="tableSearchInput"
+              onkeyup="renderTableUI()"
+              placeholder="जिला खोजें"
+              class="w-full pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm transition-all"
+            />
+          </div>
+        </div>
+        <div class="overflow-x-auto max-h-[500px]">
+          <table
+            class="w-full text-sm text-left text-gray-600 dark:text-gray-300"
+          >
+            <thead
+              class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0"
+            >
+              <tr>
+                <th
+                  class="px-6 py-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+                  onclick="sortTable('district')"
+                >
+                  <div class="flex items-center">
+                    <span class="lang-hi">जिला</span>
+                    <span class="lang-en">District</span>
+                    <i
+                      id="sort-icon-district"
+                      class="fa-solid fa-sort ml-1 text-gray-400"
+                    ></i>
+                  </div>
+                </th>
+                <th
+                  class="px-6 py-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+                  onclick="sortTable('block')"
+                >
+                  <div class="flex items-center">
+                    <span class="lang-hi">ब्लॉक / स्तर</span>
+                    <span class="lang-en">Block / Level</span>
+                    <i
+                      id="sort-icon-block"
+                      class="fa-solid fa-sort ml-1 text-gray-400"
+                    ></i>
+                  </div>
+                </th>
+                <th
+                  class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+                  onclick="sortTable('count')"
+                >
+                  <div class="flex items-center justify-end">
+                    <span class="lang-hi">कुल वर्षा दिवस</span>
+                    <span class="lang-en">Total Rainy Days</span>
+                    <i
+                      id="sort-icon-count"
+                      class="fa-solid fa-sort ml-1 text-gray-400"
+                    ></i>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              id="dataTableBody"
+              class="divide-y divide-gray-100 dark:divide-gray-700"
+            ></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // --- Configuration ---
+      const INTENSITY_CATEGORIES = [
+        {
+          id: "very_light",
+          name_en: "Very Light Rain",
+          name_hi: "बहुत हल्की वर्षा",
+          min: 0.1,
+          max: 2.4,
+          color: "#a5d6a7",
+          range: "0.1 to 2.4 mm",
+        },
+        {
+          id: "light",
+          name_en: "Light Rain",
+          name_hi: "हल्की वर्षा",
+          min: 2.5,
+          max: 7.5,
+          color: "#66bb6a",
+          range: "2.5 to 7.5 mm",
+        },
+        {
+          id: "moderate",
+          name_en: "Moderate Rain",
+          name_hi: "मध्यम वर्षा",
+          min: 7.6,
+          max: 35.5,
+          color: "#43a047",
+          range: "7.6 to 35.5 mm",
+        },
+        {
+          id: "rather_heavy",
+          name_en: "Rather Heavy Rain",
+          name_hi: "काफी भारी वर्षा",
+          min: 35.6,
+          max: 64.4,
+          color: "#fdd835",
+          range: "35.6 to 64.4 mm",
+        },
+        {
+          id: "heavy",
+          name_en: "Heavy Rain",
+          name_hi: "भारी वर्षा",
+          min: 64.5,
+          max: 124.4,
+          color: "#fb8c00",
+          range: "64.5 to 124.4 mm",
+        },
+        {
+          id: "very_heavy",
+          name_en: "Very Heavy Rain",
+          name_hi: "बहुत भारी वर्षा",
+          min: 124.5,
+          max: 244.4,
+          color: "#e53935",
+          range: "124.5 to 244.4 mm",
+        },
+        {
+          id: "ext_heavy",
+          name_en: "Extremely Heavy Rain",
+          name_hi: "अत्यधिक भारी वर्षा",
+          min: 244.5,
+          max: 99999,
+          color: "#b71c1c",
+          range: "244.5 mm & above",
+        },
+      ];
+
+      const MONTH_CONFIG = {
+        periods: [
+          {
+            name: "All Months",
+            months: [
+              "January",
+              "February",
+              "March",
+              "April",
+              "May",
+              "June",
+              "July",
+              "August",
+              "September",
+              "October",
+              "November",
+              "December",
+            ],
+            label_hi: "सभी महीने (जन-दिसं)",
+            label_en: "All Months (Jan-Dec)",
+          },
+          {
+            name: "Winter",
+            months: ["January", "February"],
+            label_hi: "शीतकालीन (जन-फर)",
+            label_en: "Winter (Jan-Feb)",
+          },
+          {
+            name: "Pre-Monsoon",
+            months: ["March", "April", "May"],
+            label_hi: "प्री-मानसून (मार्च-मई)",
+            label_en: "Pre-Monsoon (Mar-May)",
+          },
+          {
+            name: "Monsoon",
+            months: ["June", "July", "August", "September"],
+            label_hi: "मानसून (जून-सितंबर) ⭐",
+            label_en: "Monsoon (Jun-Sep) ⭐",
+          },
+          {
+            name: "Post-Monsoon",
+            months: ["October", "November", "December"],
+            label_hi: "पोस्ट-मानसून (अक्टू-दिसं)",
+            label_en: "Post-Monsoon (Oct-Dec)",
+          },
+        ],
+        months: [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ],
+      };
+
+      const uiTranslations = {
+        en: {
+          allDistricts: "All Districts",
+          selected: "Selected",
+          noDistrict: "No District",
+          selectAll: "Select All",
+        },
+        hi: {
+          allDistricts: "सभी जिले",
+          selected: "चयनित",
+          noDistrict: "कोई जिला नहीं",
+          selectAll: "सभी चुनें",
+        },
+      };
+
+      // --- State ---
+      let rawData = [];
+      let currentLanguage = "hi";
+      let availableDistricts = [];
+      let selectedDistricts = [];
+      let selectedMonths = ["June", "July", "August", "September"]; // Default Monsoon
+      let tableData = [];
+      let currentTableSort = { column: "count", order: "desc" };
+
+      // --- Initialization ---
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("hindi");
+        generateCheckboxes();
+        generateMonthCheckboxes();
+        loadData();
+      });
+
+      function toggleLanguage() {
+        document.body.classList.toggle("english");
+        currentLanguage = document.body.classList.contains("english")
+          ? "en"
+          : "hi";
+        document.getElementById("langSwitchBtn").innerHTML =
+          `<i class="fas fa-language"></i> ${currentLanguage === "en" ? "हिन्दी" : "English"}`;
+
+        const searchInput = document.getElementById("tableSearchInput");
+        if (searchInput)
+          searchInput.placeholder =
+            currentLanguage === "en" ? "Search District" : "जिला खोजें";
+
+        generateCheckboxes();
+        generateMonthCheckboxes();
+        updateDropdownButtonText();
+        updateMonthDropdownText();
+        processAndRender();
+      }
+
+      function toggleDarkMode() {
+        document.documentElement.classList.toggle("dark");
+        processAndRender();
+      }
+
+      function setActive(el) {
+        /* Handled by page load */
+      }
+
+      // --- UI Generation ---
+      function generateCheckboxes() {
+        const container = document.getElementById("categoryContainer");
+        const checkedState = {};
+        document
+          .querySelectorAll(
+            ".intensity-checkbox:not(.district-chk):not(.month-chk):not(.period-chk)",
+          )
+          .forEach((cb) => {
+            checkedState[cb.value] = cb.checked;
+          });
+
+        container.innerHTML = INTENSITY_CATEGORIES.map((cat) => {
+          const isChecked =
+            checkedState[cat.id] !== undefined ? checkedState[cat.id] : true;
+          const label = currentLanguage === "en" ? cat.name_en : cat.name_hi;
+          return `
+                <div class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 hover:bg-blue-50 dark:hover:bg-gray-600 transition cursor-pointer" onclick="document.getElementById('${cat.id}').click()">
+                    <input type="checkbox" id="${cat.id}" value="${cat.id}" class="intensity-checkbox mr-3" ${isChecked ? "checked" : ""} onclick="event.stopPropagation(); processAndRender()">
+                    <div class="flex-1">
+                        <div class="font-bold text-gray-800 dark:text-gray-200">${label}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 font-mono">${cat.range}</div>
+                    </div>
+                    <div class="w-4 h-4 rounded-full border border-gray-300 shadow-sm" style="background-color: ${cat.color};"></div>
+                </div>
+            `;
+        }).join("");
+      }
+
+      // --- Month Dropdown ---
+      function generateMonthCheckboxes() {
+        const container = document.getElementById("monthCheckboxContent");
+        if (!container) return;
+        container.innerHTML = "";
+
+        // Periods
+        const periodHeader = document.createElement("div");
+        periodHeader.className =
+          "px-4 py-2 text-xs font-bold text-gray-500 uppercase bg-gray-100 dark:bg-gray-800";
+        periodHeader.textContent =
+          currentLanguage === "en" ? "Periods" : "अवधि";
+        container.appendChild(periodHeader);
+
+        MONTH_CONFIG.periods.forEach((period) => {
+          const isChecked = period.months.every((m) =>
+            selectedMonths.includes(m),
+          );
+          const div = document.createElement("div");
+          div.className = "month-checkbox-item";
+          div.innerHTML = `
+                <input type="checkbox" value="${period.name}" ${isChecked ? "checked" : ""} class="mr-2 period-chk intensity-checkbox" onchange="handlePeriodSelection(this, '${period.months.join(",")}')">
+                <label class="cursor-pointer flex-1 font-semibold">${currentLanguage === "en" ? period.label_en : period.label_hi}</label>
+            `;
+          container.appendChild(div);
+        });
+
+        // Months
+        const monthHeader = document.createElement("div");
+        monthHeader.className =
+          "px-4 py-2 text-xs font-bold text-gray-500 uppercase bg-gray-100 dark:bg-gray-800 border-t dark:border-gray-700";
+        monthHeader.textContent = currentLanguage === "en" ? "Months" : "महीने";
+        container.appendChild(monthHeader);
+
+        MONTH_CONFIG.months.forEach((month) => {
+          const isChecked = selectedMonths.includes(month);
+          const div = document.createElement("div");
+          div.className = "month-checkbox-item";
+          div.innerHTML = `
+                <input type="checkbox" value="${month}" ${isChecked ? "checked" : ""} class="mr-2 month-chk intensity-checkbox" onchange="handleMonthSelection(this)">
+                <label class="cursor-pointer flex-1">${month}</label>
+            `;
+          container.appendChild(div);
+        });
+        updateMonthDropdownText();
+      }
+
+      function handlePeriodSelection(checkbox, monthsStr) {
+        const months = monthsStr.split(",");
+        if (checkbox.checked) {
+          months.forEach((m) => {
+            if (!selectedMonths.includes(m)) selectedMonths.push(m);
+          });
+        } else {
+          selectedMonths = selectedMonths.filter((m) => !months.includes(m));
+        }
+        generateMonthCheckboxes();
+        processAndRender();
+      }
+
+      function handleMonthSelection(checkbox) {
+        const month = checkbox.value;
+        if (checkbox.checked) {
+          if (!selectedMonths.includes(month)) selectedMonths.push(month);
+        } else {
+          selectedMonths = selectedMonths.filter((m) => m !== month);
+        }
+        generateMonthCheckboxes();
+        processAndRender();
+      }
+
+      function updateMonthDropdownText() {
+        const btnText = document.getElementById("monthDropdownBtnText");
+        if (selectedMonths.length === 0) {
+          btnText.textContent =
+            currentLanguage === "en" ? "Select Month" : "माह चुनें";
+        } else if (selectedMonths.length === 12) {
+          btnText.textContent =
+            currentLanguage === "en" ? "All Months" : "सभी महीने";
+        } else {
+          const matchedPeriod = MONTH_CONFIG.periods.find(
+            (p) =>
+              p.months.length === selectedMonths.length &&
+              p.months.every((m) => selectedMonths.includes(m)),
+          );
+          if (matchedPeriod) {
+            btnText.textContent =
+              currentLanguage === "en"
+                ? matchedPeriod.label_en.split("(")[0].trim()
+                : matchedPeriod.label_hi.split("(")[0].trim();
+          } else {
+            btnText.textContent = `${selectedMonths.length} ${currentLanguage === "en" ? "Months" : "महीने"}`;
+          }
+        }
+      }
+
+      // --- District Dropdown ---
+      function generateDistrictCheckboxes() {
+        const container = document.getElementById("districtCheckboxContent");
+        container.innerHTML = "";
+
+        const selectAllDiv = document.createElement("div");
+        selectAllDiv.className =
+          "district-checkbox-item border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800 font-bold";
+        selectAllDiv.innerHTML = `
+            <input type="checkbox" id="selectAll" class="mr-2 intensity-checkbox" onchange="toggleSelectAll(this.checked)">
+            <label for="selectAll" class="cursor-pointer flex-1">${uiTranslations[currentLanguage].selectAll}</label>
+        `;
+        container.appendChild(selectAllDiv);
+
+        availableDistricts.forEach((dist) => {
+          const isSelected = selectedDistricts.includes(dist);
+          const div = document.createElement("div");
+          div.className = "district-checkbox-item";
+          div.innerHTML = `
+                <input type="checkbox" value="${dist}" ${isSelected ? "checked" : ""} class="mr-2 district-chk intensity-checkbox" onchange="handleDistrictSelection(this)">
+                <label class="cursor-pointer flex-1">${dist}</label>
+            `;
+          container.appendChild(div);
+        });
+
+        const selectAllCheckbox = document.getElementById("selectAll");
+        if (selectAllCheckbox) {
+          selectAllCheckbox.checked =
+            selectedDistricts.length === availableDistricts.length &&
+            availableDistricts.length > 0;
+        }
+        updateDropdownButtonText();
+      }
+
+      function toggleSelectAll(checked) {
+        const checkboxes = document.querySelectorAll(".district-chk");
+        checkboxes.forEach((cb) => (cb.checked = checked));
+        selectedDistricts = checked ? [...availableDistricts] : [];
+        updateDropdownButtonText();
+        processAndRender();
+      }
+
+      function handleDistrictSelection(checkbox) {
+        const dist = checkbox.value;
+        if (checkbox.checked) {
+          if (!selectedDistricts.includes(dist)) selectedDistricts.push(dist);
+        } else {
+          selectedDistricts = selectedDistricts.filter((d) => d !== dist);
+        }
+        const selectAllCheckbox = document.getElementById("selectAll");
+        if (selectAllCheckbox)
+          selectAllCheckbox.checked =
+            selectedDistricts.length === availableDistricts.length;
+        updateDropdownButtonText();
+        processAndRender();
+      }
+
+      function updateDropdownButtonText() {
+        const btnText = document.getElementById("dropdownBtnText");
+        if (selectedDistricts.length === 0) {
+          btnText.textContent = uiTranslations[currentLanguage].noDistrict;
+        } else if (
+          selectedDistricts.length === availableDistricts.length &&
+          availableDistricts.length > 0
+        ) {
+          btnText.textContent = uiTranslations[currentLanguage].allDistricts;
+        } else {
+          btnText.textContent = `${selectedDistricts.length} ${uiTranslations[currentLanguage].selected}`;
+        }
+      }
+
+      function toggleDistrictDropdown() {
+        document
+          .getElementById("districtCheckboxContent")
+          .classList.toggle("show");
+      }
+      function toggleMonthDropdown() {
+        document
+          .getElementById("monthCheckboxContent")
+          .classList.toggle("show");
+      }
+
+      window.onclick = function (event) {
+        if (!event.target.closest(".district-checkbox-dropdown")) {
+          document
+            .getElementById("districtCheckboxContent")
+            .classList.remove("show");
+        }
+        if (!event.target.closest(".month-checkbox-dropdown")) {
+          document
+            .getElementById("monthCheckboxContent")
+            .classList.remove("show");
+        }
+      };
+
+      // --- Data Loading ---
+      async function loadData() {
+        const year = document.getElementById("yearSelect").value;
+        document.getElementById("displayYear").innerText = year;
+        const filePath = `data/${year}/Day-wise_ Rainfall.csv`;
+
+        const loading = document.getElementById("loadingMessage");
+        const errorMsg = document.getElementById("errorMessage");
+        const chartDiv = document.getElementById("heatmapChart");
+
+        loading.classList.remove("hidden");
+        errorMsg.classList.add("hidden");
+        chartDiv.classList.add("opacity-50");
+
+        try {
+          const response = await fetch(filePath);
+          if (!response.ok) throw new Error("File not found");
+          const csvText = await response.text();
+
+          rawData = parseCustomCSV(csvText);
+
+          availableDistricts = [
+            ...new Set(rawData.map((d) => d.district)),
+          ].sort();
+          if (availableDistricts.length > 0)
+            selectedDistricts = [...availableDistricts];
+          generateDistrictCheckboxes();
+
+          processAndRender();
+        } catch (error) {
+          console.error(error);
+          errorMsg.innerText =
+            currentLanguage === "en"
+              ? "Data file not found."
+              : "डेटा फ़ाइल नहीं मिली।";
+          errorMsg.classList.remove("hidden");
+          rawData = [];
+          processAndRender();
+        } finally {
+          loading.classList.add("hidden");
+          chartDiv.classList.remove("opacity-50");
+        }
+      }
+
+      function parseCustomCSV(csvText) {
+        const rows = Papa.parse(csvText, { skipEmptyLines: "greedy" }).data;
+        if (rows.length < 2) return [];
+
+        const rawDates = rows[0].slice(1).map((d) => (d ? d.trim() : ""));
+        const defaultYear = document.getElementById("yearSelect").value;
+
+        const dates = rawDates.map((d) => {
+          const c = parseDateComponents(d, defaultYear);
+          return c ? c : null;
+        });
+
+        let parsed = [];
+        let currentDistrict = null;
+
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          const colA = row[0] ? row[0].toString().trim() : "";
+          if (!colA) continue;
+
+          const upperA = colA.toUpperCase();
+          if (upperA.includes("TOTAL") || upperA.includes("SUBDIVISION")) {
+            currentDistrict = null;
+            continue;
+          }
+
+          if (upperA.includes("DISTRICT")) {
+            const parts = colA.split(/[:\-]/);
+            if (parts.length > 1 && parts[1].trim()) {
+              currentDistrict = parts[1].trim();
+            } else {
+              const name = colA
+                .replace(/DISTRICT/i, "")
+                .replace(/[:\-\.]/g, "")
+                .trim();
+              if (name) currentDistrict = name;
+            }
+            continue;
+          }
+
+          if (currentDistrict) {
+            if (upperA === "AVG" || upperA.includes("STATION")) continue;
+            const blockName = colA;
+            for (let j = 1; j < row.length; j++) {
+              if (!dates[j - 1]) continue;
+              const val = parseFloat(row[j]);
+              if (!isNaN(val)) {
+                parsed.push({
+                  dateObj: dates[j - 1],
+                  dateStr: `${dates[j - 1].day}-${dates[j - 1].month}-${dates[j - 1].year}`,
+                  district: currentDistrict,
+                  block: blockName,
+                  value: val,
+                });
+              }
+            }
+          }
+        }
+        return parsed;
+      }
+
+      function parseDateComponents(dateStr, defaultYear) {
+        if (!dateStr) return null;
+        if (/^\d{5}$/.test(dateStr)) {
+          const date = new Date(
+            Math.round((parseInt(dateStr) - 25569) * 86400 * 1000),
+          );
+          return {
+            day: date.getDate(),
+            month: date.getMonth() + 1,
+            year: date.getFullYear(),
+          };
+        }
+        const cleanStr = dateStr
+          .split(" ")[0]
+          .replace(/[\/\.\s,]+/g, "-")
+          .trim();
+        const parts = cleanStr.split("-");
+        let day, month, year;
+
+        const getMonthIndex = (str) => {
+          if (!str) return NaN;
+          const mStr = str.toLowerCase().substring(0, 3);
+          const months = [
+            "jan",
+            "feb",
+            "mar",
+            "apr",
+            "may",
+            "jun",
+            "jul",
+            "aug",
+            "sep",
+            "oct",
+            "nov",
+            "dec",
+          ];
+          const idx = months.indexOf(mStr);
+          return idx !== -1 ? idx + 1 : parseInt(str);
+        };
+
+        if (parts.length === 3) {
+          const p0 = parseInt(parts[0]);
+          const p1 = getMonthIndex(parts[1]);
+          const p2 = parseInt(parts[2]);
+          if (p0 > 1900) {
+            year = p0;
+            month = p1;
+            day = p2;
+          } else {
+            day = p0;
+            month = p1;
+            year = p2;
+          }
+        } else if (parts.length === 2 && defaultYear) {
+          year = parseInt(defaultYear);
+          let p0 = parseInt(parts[0]);
+          let p1 = getMonthIndex(parts[1]);
+          if (!isNaN(p0) && !isNaN(p1)) {
+            day = p0;
+            month = p1;
+          } else {
+            p0 = getMonthIndex(parts[0]);
+            p1 = parseInt(parts[1]);
+            if (!isNaN(p0) && !isNaN(p1)) {
+              month = p0;
+              day = p1;
+            }
+          }
+        } else return null;
+
+        if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+        if (year < 100) year += 2000;
+        return { day, month, year };
+      }
+
+      // --- Processing ---
+      function processAndRender() {
+        if (rawData.length === 0) {
+          document.getElementById("totalDaysCount").innerText = "0";
+          Plotly.purge("heatmapChart");
+          Plotly.purge("barChart");
+          document.getElementById("dataTableBody").innerHTML =
+            '<tr><td colspan="3" class="px-6 py-4 text-center">No Data</td></tr>';
+          return;
+        }
+
+        // Filter by District
+        let filtered = rawData.filter((d) =>
+          selectedDistricts.includes(d.district),
+        );
+
+        // Filter by Month
+        const monthNames = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+        filtered = filtered.filter((d) => {
+          const mName = monthNames[d.dateObj.month - 1];
+          return selectedMonths.includes(mName);
+        });
+
+        // Filter by Intensity
+        const selectedCats = [];
+        document
+          .querySelectorAll(
+            ".intensity-checkbox:not(.district-chk):not(.month-chk):not(.period-chk):checked",
+          )
+          .forEach((cb) => {
+            const cat = INTENSITY_CATEGORIES.find((c) => c.id === cb.value);
+            if (cat) selectedCats.push(cat);
+          });
+
+        if (selectedCats.length === 0 || filtered.length === 0) {
+          document.getElementById("totalDaysCount").innerText = "0";
+          Plotly.purge("heatmapChart");
+          Plotly.purge("barChart");
+          document.getElementById("dataTableBody").innerHTML =
+            '<tr><td colspan="3" class="px-6 py-4 text-center">No Data</td></tr>';
+          return;
+        }
+
+        // View Level Aggregation
+        const viewLevel = document.getElementById("viewLevelSelect").value;
+        let processed = filtered;
+        if (viewLevel === "district") {
+          const grouped = {};
+          filtered.forEach((d) => {
+            const key = `${d.district}|${d.dateStr}`;
+            if (!grouped[key]) grouped[key] = { ...d, sum: 0, count: 0 };
+            grouped[key].sum += d.value;
+            grouped[key].count++;
+          });
+          processed = Object.values(grouped).map((g) => ({
+            ...g,
+            value: g.sum / g.count,
+            block: "District Avg",
+          }));
+        }
+
+        // Final Intensity Filter
+        const finalData = processed.filter((d) =>
+          selectedCats.some((cat) => d.value >= cat.min && d.value <= cat.max),
+        );
+
+        document.getElementById("totalDaysCount").innerText =
+          finalData.length.toLocaleString();
+
+        renderHeatmap(finalData, viewLevel);
+        renderBarChart(finalData, viewLevel);
+        renderTable(finalData, viewLevel);
+      }
+
+      // --- Visualizations ---
+      function renderHeatmap(data, viewLevel) {
+        const mapData = {};
+        const weeksSet = new Set();
+        const monthNames = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+
+        data.forEach((d) => {
+          // Calculate Week
+          const date = new Date(
+            d.dateObj.year,
+            d.dateObj.month - 1,
+            d.dateObj.day,
+          );
+          const start = new Date(date.getFullYear(), 0, 1);
+          const weekNo = Math.ceil(
+            ((date - start) / 86400000 + start.getDay() + 1) / 7,
+          );
+
+          // Label
+          const mName = monthNames[d.dateObj.month - 1];
+          const weekLabel = `${mName}-W${weekNo}`;
+          weeksSet.add(weekLabel);
+
+          const yKey =
+            viewLevel === "district"
+              ? d.district
+              : `${d.district} - ${d.block}`;
+          if (!mapData[yKey]) mapData[yKey] = {};
+          if (!mapData[yKey][weekLabel]) mapData[yKey][weekLabel] = 0;
+          mapData[yKey][weekLabel]++;
+        });
+
+        const yLabels = Object.keys(mapData).sort();
+        // Sort weeks: Extract month index and week number
+        const weeksLabels = Array.from(weeksSet).sort((a, b) => {
+          const [m1, w1] = a.split("-W");
+          const [m2, w2] = b.split("-W");
+          const mi1 = monthNames.indexOf(m1);
+          const mi2 = monthNames.indexOf(m2);
+          if (mi1 !== mi2) return mi1 - mi2;
+          return parseInt(w1) - parseInt(w2);
+        });
+
+        // If single month selected, rename to Week 1, 2, 3...
+        let displayWeeks = weeksLabels;
+        if (selectedMonths.length === 1) {
+          displayWeeks = weeksLabels.map((_, i) =>
+            currentLanguage === "en" ? `Week ${i + 1}` : `सप्ताह ${i + 1}`,
+          );
+        }
+
+        const zData = yLabels.map((y) =>
+          weeksLabels.map((w) => mapData[y][w] || 0),
+        );
+        const isDark = document.documentElement.classList.contains("dark");
+
+        const trace = {
+          z: zData,
+          x: displayWeeks,
+          y: yLabels,
+          type: "heatmap",
+          colorscale: [
+            [0, "rgb(200, 230, 255)"],
+            [0.2, "rgb(135, 206, 235)"],
+            [0.4, "rgb(144, 238, 144)"],
+            [0.6, "rgb(255, 215, 0)"],
+            [0.8, "rgb(255, 140, 0)"],
+            [1, "rgb(255, 0, 0)"],
+          ],
+          colorbar: {
+            title: currentLanguage === "en" ? "Count" : "संख्या",
+            titleside: "right",
+          },
+          hovertemplate:
+            currentLanguage === "en"
+              ? "<b>%{y}</b><br>%{x}<br>Count: %{z}<extra></extra>"
+              : "<b>%{y}</b><br>%{x}<br>संख्या: %{z}<extra></extra>",
+        };
+
+        Plotly.newPlot(
+          "heatmapChart",
+          [trace],
+          {
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            font: { family: "Poppins", color: isDark ? "#cbd5e1" : "#334155" },
+            margin: { t: 30, b: 80, l: 120, r: 20 },
+            xaxis: { side: "top" },
+            yaxis: { automargin: true },
+          },
+          { responsive: true, displayModeBar: false },
+        );
+      }
+
+      function renderBarChart(data, viewLevel) {
+        const counts = {};
+        data.forEach((d) => {
+          const key =
+            viewLevel === "district"
+              ? d.district
+              : `${d.district} - ${d.block}`;
+          counts[key] = (counts[key] || 0) + 1;
+        });
+        const sortedKeys = Object.keys(counts)
+          .sort((a, b) => counts[b] - counts[a])
+          .slice(0, 50);
+        const isDark = document.documentElement.classList.contains("dark");
+
+        Plotly.newPlot(
+          "barChart",
+          [
+            {
+              x: sortedKeys,
+              y: sortedKeys.map((k) => counts[k]),
+              type: "bar",
+              marker: { color: "#2E8B57" },
+            },
+          ],
+          {
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            font: { family: "Poppins", color: isDark ? "#cbd5e1" : "#334155" },
+            margin: { t: 30, b: 100, l: 50, r: 20 },
+            xaxis: { tickangle: -45 },
+          },
+          { responsive: true, displayModeBar: false },
+        );
+      }
+
+      function renderTable(data, viewLevel) {
+        const counts = {};
+        data.forEach((d) => {
+          const key =
+            viewLevel === "district" ? d.district : `${d.district}|${d.block}`;
+          counts[key] = (counts[key] || 0) + 1;
+        });
+
+        tableData = Object.keys(counts).map((k) => {
+          const [d, b] = k.split("|");
+          return {
+            district: d,
+            block:
+              b || (currentLanguage === "en" ? "District Avg" : "जिला औसत"),
+            count: counts[k],
+          };
+        });
+        renderTableUI();
+      }
+
+      function renderTableUI() {
+        const tbody = document.getElementById("dataTableBody");
+        tbody.innerHTML = "";
+        const search = document
+          .getElementById("tableSearchInput")
+          .value.toLowerCase();
+
+        let display = tableData.filter((d) =>
+          d.district.toLowerCase().includes(search),
+        );
+        display.sort((a, b) => {
+          let valA = a[currentTableSort.column];
+          let valB = b[currentTableSort.column];
+          if (typeof valA === "string") {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+          }
+          return (
+            (valA < valB ? -1 : 1) * (currentTableSort.order === "asc" ? 1 : -1)
+          );
+        });
+
+        if (display.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-4 text-center">No Data</td></tr>`;
+          return;
+        }
+
+        display.forEach((d) => {
+          const tr = document.createElement("tr");
+          tr.className =
+            "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700";
+          tr.innerHTML = `
+                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>
+                <td class="px-6 py-4 text-gray-600 dark:text-gray-300">${d.block}</td>
+                <td class="px-6 py-4 text-right font-bold text-blue-600 dark:text-blue-400">${d.count}</td>
+            `;
+          tbody.appendChild(tr);
+        });
+        updateSortIcons();
+      }
+
+      function sortTable(col) {
+        if (currentTableSort.column === col)
+          currentTableSort.order =
+            currentTableSort.order === "asc" ? "desc" : "asc";
+        else {
+          currentTableSort.column = col;
+          currentTableSort.order = "asc";
+        }
+        renderTableUI();
+      }
+
+      function updateSortIcons() {
+        ["district", "block", "count"].forEach((col) => {
+          const icon = document.getElementById(`sort-icon-${col}`);
+          if (icon) {
+            icon.className = "fa-solid fa-sort ml-1 text-gray-400";
+            if (currentTableSort.column === col)
+              icon.className = `fa-solid fa-sort-${currentTableSort.order === "asc" ? "up" : "down"} ml-1 text-blue-600`;
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

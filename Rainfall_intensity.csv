@@ -1,0 +1,8 @@
+Rainfall_(mm/day),IMD_Category _Intensity
+0.1 to 2.4,Very Light Rain
+2.5 to 7.5,Light Rain
+7.6 to 35.5,Moderate Rain
+35.6 to 64.4,Rather Heavy Rain
+64.5 to 124.4,Heavy Rain
+124.5 to 244.4,Very Heavy Rain
+244.5 to above,Extremely Heavy Rain

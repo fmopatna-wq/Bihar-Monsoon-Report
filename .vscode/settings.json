@@ -1,5 +1,6 @@
 {
-    // ... आपकी अन्य सेटिंग्स ...
+  // ... आपकी अन्य सेटिंग्स ...
 
-    "css.lint.unknownAtRules": "ignore" 
+  "css.lint.unknownAtRules": "ignore",
+  "liveServer.settings.port": 5502
 }

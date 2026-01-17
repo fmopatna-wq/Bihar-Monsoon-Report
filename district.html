@@ -1,1217 +1,1644 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="hi" class="light">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>
-        <span class="lang-hi">बिहार वर्षा मानचित्र विश्लेषण</span>
-        <span class="lang-en">Bihar Rainfall Map Analysis</span>
+      <span class="lang-hi">बिहार वर्षा मानचित्र विश्लेषण</span> <span
+      class="lang-en">Bihar Rainfall Map Analysis</span>
     </title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2E8B57',
-                        secondary: '#E6F4EA',
-                        darkbg: '#1a202c',
-                        carddark: '#2d3748',
-                        // Custom Status Colors based on departure categories
-                        'status-no-rain': '#ffffff',
-                        'status-large-def': '#ffd700',
-                        'status-def': '#e53935',
-                        'status-normal': '#4caf50',
-                        'status-excess': '#4fc3f7',
-                        'status-large-excess': '#1565c0',
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2E8B57",
+              secondary: "#E6F4EA",
+              darkbg: "#1a202c",
+              carddark: "#2d3748",
+              // Custom Status Colors based on departure categories
+              "status-no-rain": "#ffffff",
+              "status-large-def": "#ffd700",
+              "status-def": "#e53935",
+              "status-normal": "#4caf50",
+              "status-excess": "#4fc3f7",
+              "status-large-excess": "#1565c0",
+            },
+          },
+        },
+      };
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap');
-        
-        body { font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif; scroll-behavior: smooth; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-        .dark ::-webkit-scrollbar-track { background: #2d3748; }
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap");
 
-        /* --- Navbar Style --- */
-        .navbar {
-            background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            position: fixed !important; 
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            z-index: 1000 !important;
-        }
+      body {
+        font-family: "Poppins", "Tiro Devanagari Hindi", sans-serif;
+        scroll-behavior: smooth;
+      }
 
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      .dark ::-webkit-scrollbar-track {
+        background: #2d3748;
+      }
+
+      /* --- Navbar Style --- */
+      .navbar {
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 1000 !important;
+      }
+
+      body {
+        padding-top: 150px !important;
+      }
+
+      @media (max-width: 1023px) {
         body {
-            padding-top: 150px !important;
+          padding-top: 220px !important;
         }
+      }
 
-        @media (max-width: 1023px) {
-            body {
-                padding-top: 220px !important;
-            }
-        }
+      #overview {
+        padding-top: 0 !important;
+        margin-top: -20px !important;
+      }
 
-        #overview {
-            padding-top: 0 !important;
-            margin-top: -20px !important;
-        }
+      h2,
+      .gradient-text {
+        line-height: 1.5 !important;
+        padding-top: 5px;
+      }
 
-        h2, .gradient-text {
-            line-height: 1.5 !important;
-            padding-top: 5px;
-        }
+      .dark .navbar {
+        background-color: rgba(30, 41, 59, 0.9) !important;
+      }
 
-        .dark .navbar {
-            background-color: rgba(30, 41, 59, 0.9) !important;
-        }       
+      /* --- Gradient Text --- */
+      .gradient-text {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: inline-block;
+      }
+      .dark .gradient-text {
+        background: linear-gradient(to right, #60a5fa, #2dd4bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
 
-        /* --- Gradient Text --- */
-        .gradient-text {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: inline-block;
-        }
-        .dark .gradient-text {
-            background: linear-gradient(to right, #60a5fa, #2dd4bf);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+      /* --- Nav Box & Tabs --- */
+      .nav-box {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid transparent;
+        color: #4b5563;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .dark .nav-box {
+        color: #d1d5db;
+      }
+      .nav-box:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        background-color: white;
+      }
+      .dark .nav-box:hover {
+        background-color: #374151;
+      }
+      .nav-box.active-nav {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white !important;
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        border: none;
+      }
 
-        /* --- Nav Box & Tabs --- */
-        .nav-box {
-            padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease;
-            font-weight: 600; cursor: pointer; border: 1px solid transparent;
-            color: #4b5563; text-decoration: none; display: inline-block;
-        }
-        .dark .nav-box { color: #d1d5db; }
-        .nav-box:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transform: translateY(-2px); background-color: white; }
-        .dark .nav-box:hover { background-color: #374151; }
-        .nav-box.active-nav {
-            background: linear-gradient(to right, #2563eb, #0d9488); color: white !important;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); border: none;
-        }
+      .month-tab {
+        padding: 0.5rem 1.2rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: 1px solid #e5e7eb;
+        background-color: white;
+        color: #4b5563;
+        cursor: pointer;
+      }
+      .dark .month-tab {
+        background-color: #1f2937;
+        border-color: #374151;
+        color: #d1d5db;
+      }
+      .month-tab:hover {
+        background-color: #f3f4f6;
+        transform: translateY(-1px);
+      }
+      .dark .month-tab:hover {
+        background-color: #374151;
+      }
+      .month-tab.active-tab {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
 
-        .month-tab {
-            padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.875rem;
-            font-weight: 600; transition: all 0.2s ease; border: 1px solid #e5e7eb;
-            background-color: white; color: #4b5563; cursor: pointer;
+      .nav-links-container {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+      @media (max-width: 1023px) {
+        .nav-links-container {
+          gap: 0.5rem;
+          overflow-x: auto;
+          white-space: nowrap;
+          padding-bottom: 4px;
+          flex-grow: 1;
+          justify-content: flex-start;
         }
-        .dark .month-tab { background-color: #1f2937; border-color: #374151; color: #d1d5db; }
-        .month-tab:hover { background-color: #f3f4f6; transform: translateY(-1px); }
-        .dark .month-tab:hover { background-color: #374151; }
-        .month-tab.active-tab {
-            background: linear-gradient(to right, #2563eb, #0d9488); color: white;
-            border-color: transparent; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+      }
 
-        .nav-links-container { display: flex; gap: 1rem; align-items: center; }
-        @media (max-width: 1023px) {
-            .nav-links-container { gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; flex-grow: 1; justify-content: flex-start; }
-        }
+      /* Language Switcher */
+      .lang-switcher {
+        position: relative;
+        display: inline-block;
+      }
 
-        /* Language Switcher */
-        .lang-switcher {
-            position: relative;
-            display: inline-block;
-        }
+      .lang-switcher button {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
 
-        .lang-switcher button {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+      .lang-switcher button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
 
-        .lang-switcher button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+      /* Status cell styling */
+      .status-cell {
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-align: center;
+        color: #1f2937;
+      }
 
-        /* Status cell styling */
-        .status-cell {
-            padding: 0.4rem 0.8rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            text-align: center;
-            color: #1f2937;
-        }
-        
-        .dark .status-cell {
-            color: #f9fafb;
-        }
+      .dark .status-cell {
+        color: #f9fafb;
+      }
 
-        /* Custom Dropdown/Checkbox Box */
-        .district-checkbox-dropdown {
-            position: relative;
-            display: inline-block;
-        }
+      /* Custom Dropdown/Checkbox Box */
+      .district-checkbox-dropdown {
+        position: relative;
+        display: inline-block;
+      }
 
-        .district-checkbox-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 250px;
-            max-height: 300px;
-            overflow-y: auto;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 20;
-            border-radius: 0.5rem;
-            margin-top: 0.5rem;
-            right: 0;
-        }
+      .district-checkbox-content {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 250px;
+        max-height: 300px;
+        overflow-y: auto;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 20;
+        border-radius: 0.5rem;
+        margin-top: 0.5rem;
+        right: 0;
+      }
 
-        .dark .district-checkbox-content {
-            background-color: #1f2937;
-            border: 1px solid #374151;
-        }
+      .dark .district-checkbox-content {
+        background-color: #1f2937;
+        border: 1px solid #374151;
+      }
 
-        .district-checkbox-content.show {
-            display: block;
-        }
+      .district-checkbox-content.show {
+        display: block;
+      }
 
-        .district-checkbox-item {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+      .district-checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
 
-        .district-checkbox-item:hover {
-            background-color: #f3f4f6;
-        }
+      .district-checkbox-item:hover {
+        background-color: #f3f4f6;
+      }
 
-        .dark .district-checkbox-item:hover {
-            background-color: #374151;
-        }
+      .dark .district-checkbox-item:hover {
+        background-color: #374151;
+      }
 
-        /* Graph container styling */
-        .graph-container {
-            background: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-        
-        .dark .graph-container {
-            background: #1f2937;
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .graph-container:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
+      /* Graph container styling */
+      .graph-container {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+      }
 
-        /* Sort header styling */
-        .sort-header {
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .sort-header:hover {
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-        
-        .sort-header.active {
-            background-color: rgba(59, 130, 246, 0.2);
-        }
-        
-        .sort-header.active .sort-icon {
-            color: #2563eb;
-        }
+      .dark .graph-container {
+        background: #1f2937;
+        border-color: rgba(255, 255, 255, 0.1);
+      }
 
-        /* Glowing effect for line */
-        .glowing-line {
-            filter: drop-shadow(0 0 8px rgba(107, 114, 128, 0.8));
-        }
-        
-        .dark .glowing-line {
-            filter: drop-shadow(0 0 12px rgba(156, 163, 175, 0.9));
-        }
+      .graph-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
 
-        /* Legend styling */
-        .legend-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.375rem;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        
-        .dark .legend-item {
-            background: rgba(31, 41, 55, 0.8);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
+      /* Sort header styling */
+      .sort-header {
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
 
-        /* Combined selection box */
-        .combined-select-box {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border: 1px solid #cbd5e1;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .dark .combined-select-box {
-            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-            border-color: #4b5563;
-        }
+      .sort-header:hover {
+        background-color: rgba(59, 130, 246, 0.1);
+      }
 
-        /* Language specific elements */
-        .lang-en { display: block; }
-        .lang-hi { display: none; }
-        
-        body.hindi .lang-en { display: none; }
-        body.hindi .lang-hi { display: block; }
+      .sort-header.active {
+        background-color: rgba(59, 130, 246, 0.2);
+      }
+
+      .sort-header.active .sort-icon {
+        color: #2563eb;
+      }
+
+      /* Glowing effect for line */
+      .glowing-line {
+        filter: drop-shadow(0 0 8px rgba(107, 114, 128, 0.8));
+      }
+
+      .dark .glowing-line {
+        filter: drop-shadow(0 0 12px rgba(156, 163, 175, 0.9));
+      }
+
+      /* Legend styling */
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.375rem;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .dark .legend-item {
+        background: rgba(31, 41, 55, 0.8);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      /* Combined selection box */
+      .combined-select-box {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border: 1px solid #cbd5e1;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .dark .combined-select-box {
+        background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+        border-color: #4b5563;
+      }
+
+      /* Language specific elements */
+      .lang-en {
+        display: block;
+      }
+      .lang-hi {
+        display: none;
+      }
+
+      body.hindi .lang-en {
+        display: none;
+      }
+      body.hindi .lang-hi {
+        display: block;
+      }
     </style>
-</head>
-<body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
-
-<nav id="navbar" class="navbar">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+  </head>
+  <body
+    class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen"
+  >
+    <nav id="navbar" class="navbar">
+      <div
+        class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between"
+      >
         <div class="flex items-center gap-3 nav-logo shrink-0">
-            <img src="assets/logo.png" alt="IMD Logo" class="h-8 w-8 object-contain dark:invert hidden sm:block"/> 
-            <div class="text-3xl text-blue-600 dark:text-blue-400"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
-            <div>
-                <h1 class="text-xl font-bold leading-tight gradient-text lang-en">Bihar Monsoon Dashboard</h1>
-                <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">बिहार मानसून डैशबोर्ड</h1>
-                <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">IMD MC Patna — Comprehensive Analysis</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">IMD MC Patna — व्यापक विश्लेषण</div>
+          <img
+            src="assets/logo.png"
+            alt="IMD Logo"
+            class="h-8 w-8 object-contain dark:invert hidden sm:block"
+          />
+          <div class="text-3xl text-blue-600 dark:text-blue-400">
+            <i class="fa-solid fa-cloud-showers-heavy"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold leading-tight gradient-text lang-en">
+              Bihar Monsoon Dashboard
+            </h1>
+            <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">
+              बिहार मानसून डैशबोर्ड
+            </h1>
+            <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">
+              IMD MC Patna — Comprehensive Analysis
             </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">
+              IMD MC Patna — व्यापक विश्लेषण
+            </div>
+          </div>
         </div>
-        
-        <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0">
-            <a href="index.html" class="nav-box lang-en" onclick="setActive(this)">Home</a>
-            <a href="index.html" class="nav-box lang-hi" onclick="setActive(this)">होम</a>
-            <a href="index.html#analysis" class="nav-box lang-en" onclick="setActive(this)">Dashboard</a>    
-            <a href="index.html#analysis" class="nav-box lang-hi" onclick="setActive(this)">डैशबोर्ड</a>    
-            <a href="district.html" class="nav-box active-nav lang-en" onclick="setActive(this)">District-wise</a> 
-            <a href="district.html" class="nav-box active-nav lang-hi" onclick="setActive(this)">जिलावार</a> 
-            <a href="maps.html" class="nav-box lang-en" onclick="setActive(this)">Maps</a>
-            <a href="maps.html" class="nav-box lang-hi" onclick="setActive(this)">मानचित्र</a>
-            <a href="history.html" class="nav-box lang-en" onclick="setActive(this)">Historical</a>
-            <a href="history.html" class="nav-box lang-hi" onclick="setActive(this)">ऐतिहासिक</a>
-            <a href="comparison.html" class="nav-box lang-en" onclick="setActive(this)">Comparison</a>
-            <a href="comparison.html" class="nav-box lang-hi" onclick="setActive(this)">तुलना</a>
+
+        <div
+          class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0"
+        >
+          <a href="index.html" class="nav-box lang-en" onclick="setActive(this)"
+            >Home</a
+          >
+          <a href="index.html" class="nav-box lang-hi" onclick="setActive(this)"
+            >होम</a
+          >
+          <a
+            href="index.html#analysis"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Dashboard</a
+          >
+          <a
+            href="index.html#analysis"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >डैशबोर्ड</a
+          >
+          <a
+            href="district.html"
+            class="nav-box active-nav lang-en"
+            onclick="setActive(this)"
+            >District-wise</a
+          >
+          <a
+            href="district.html"
+            class="nav-box active-nav lang-hi"
+            onclick="setActive(this)"
+            >जिलावार</a
+          >
+          <a
+            href="intensity.html"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Intensity</a
+          >
+          <a
+            href="intensity.html"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >तीव्रता</a
+          >
+          <a href="maps.html" class="nav-box lang-en" onclick="setActive(this)"
+            >Maps</a
+          >
+          <a href="maps.html" class="nav-box lang-hi" onclick="setActive(this)"
+            >मानचित्र</a
+          >
+          <a
+            href="history.html"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Historical</a
+          >
+          <a
+            href="history.html"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >ऐतिहासिक</a
+          >
+          <a
+            href="comparison.html"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Comparison</a
+          >
+          <a
+            href="comparison.html"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >तुलना</a
+          >
         </div>
 
         <div class="flex items-center gap-4 shrink-0">
-            <!-- Language Switcher -->
-            <div class="lang-switcher">
-                <button id="langSwitchBtn" onclick="toggleLanguage()" title="Switch Language / भाषा बदलें">
-                    <i class="fas fa-language"></i>
-                    <span class="lang-en">हिन्दी</span>
-                    <span class="lang-hi">English</span>
-                </button>
-            </div>
-            
-            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
-                <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+          <!-- Language Switcher -->
+          <div class="lang-switcher">
+            <button
+              id="langSwitchBtn"
+              onclick="toggleLanguage()"
+              title="Switch Language / भाषा बदलें"
+            >
+              <i class="fas fa-language"></i>
+              <span class="lang-en">हिन्दी</span>
+              <span class="lang-hi">English</span>
             </button>
+          </div>
+
+          <button
+            onclick="toggleDarkMode()"
+            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          >
+            <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+            <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+          </button>
         </div>
-    </div>
-</nav>
+      </div>
+    </nav>
 
-<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+      <!-- Combined Selection Box -->
+      <div class="combined-select-box">
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+        >
+          <h2 class="text-2xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-table-list text-blue-600"></i>
+            <span class="gradient-text lang-en">Detailed District Data</span>
+            <span class="gradient-text lang-hi">विस्तृत जिला डेटा</span>
+          </h2>
 
-    <!-- Combined Selection Box -->
-    <div class="combined-select-box">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <h2 class="text-2xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-table-list text-blue-600"></i> 
-                <span class="gradient-text lang-en">Detailed District Data</span>
-                <span class="gradient-text lang-hi">विस्तृत जिला डेटा</span>
-            </h2>
-            
-            <div class="flex flex-wrap items-center gap-3">
-                <div class="district-checkbox-dropdown">
-                    <button id="districtDropdownBtn" onclick="toggleDistrictDropdown()" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 flex items-center gap-2">
-                        <i class="fa-solid fa-list-check"></i> 
-                        <span class="lang-en" id="dropdownBtnText">All Districts</span>
-                        <span class="lang-hi" id="dropdownBtnText">सभी जिले</span>
-                        <i class="fa-solid fa-caret-down ml-1"></i>
-                    </button>
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="district-checkbox-dropdown">
+              <button
+                id="districtDropdownBtn"
+                onclick="toggleDistrictDropdown()"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 flex items-center gap-2"
+              >
+                <i class="fa-solid fa-list-check"></i>
+                <span class="lang-en" id="dropdownBtnText">All Districts</span>
+                <span class="lang-hi" id="dropdownBtnText">सभी जिले</span>
+                <i class="fa-solid fa-caret-down ml-1"></i>
+              </button>
 
-                    <div id="districtCheckboxContent" class="district-checkbox-content">
-                        </div>
-                </div>
-                
-                <div class="flex items-center gap-3 bg-white dark:bg-gray-800/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
-                    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2 lang-en">Year:</label>
-                    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2 lang-hi">वर्ष:</label>
-                    <select id="yearSelect" onchange="updateDashboard()" class="bg-transparent border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
-                        <option value="2025" selected>2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                        <option value="2020">2020</option>
-                        <option value="2019">2019</option>
-                        <option value="2018">2018</option>
-                        <option value="2017">2017</option>
-                        <option value="2016">2016</option>
-                        <option value="2015">2015</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex flex-col lg:flex-row gap-6 items-center justify-between mt-4">
-            <div class="flex flex-wrap gap-2 w-full lg:w-auto" id="monthTabsContainer">
-                <button onclick="selectMonth('Overall')" class="month-tab active-tab lang-en" data-month="Overall">Monsoon (June-September)</button>
-                <button onclick="selectMonth('Overall')" class="month-tab active-tab lang-hi" data-month="Overall">मानसून (जून-सितंबर)</button>
-                <button onclick="selectMonth('June')" class="month-tab lang-en" data-month="June">June</button>
-                <button onclick="selectMonth('June')" class="month-tab lang-hi" data-month="June">जून</button>
-                <button onclick="selectMonth('July')" class="month-tab lang-en" data-month="July">July</button>
-                <button onclick="selectMonth('July')" class="month-tab lang-hi" data-month="July">जुलाई</button>
-                <button onclick="selectMonth('August')" class="month-tab lang-en" data-month="August">August</button>
-                <button onclick="selectMonth('August')" class="month-tab lang-hi" data-month="August">अगस्त</button>
-                <button onclick="selectMonth('September')" class="month-tab lang-en" data-month="September">September</button>
-                <button onclick="selectMonth('September')" class="month-tab lang-hi" data-month="September">सितंबर</button>
+              <div
+                id="districtCheckboxContent"
+                class="district-checkbox-content"
+              ></div>
             </div>
 
-            <div class="relative w-full lg:w-72">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-                </div>
-                <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Search District" 
-                    class="lang-en pl-10 w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                <input type="text" id="searchInput" onkeyup="filterData()" placeholder="जिला खोजें" 
-                    class="lang-hi pl-10 w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <div
+              class="flex items-center gap-3 bg-white dark:bg-gray-800/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600"
+            >
+              <label
+                class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2 lang-en"
+                >Year:</label
+              >
+              <label
+                class="text-sm font-semibold text-gray-500 dark:text-gray-400 px-2 lang-hi"
+                >वर्ष:</label
+              >
+              <select
+                id="yearSelect"
+                onchange="updateDashboard()"
+                class="bg-transparent border-none rounded-md px-3 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer"
+              >
+                <option value="2025" selected>2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+                <option value="2018">2018</option>
+                <option value="2017">2017</option>
+                <option value="2016">2016</option>
+                <option value="2015">2015</option>
+              </select>
             </div>
+          </div>
         </div>
-    </div>
 
-    <!-- New Graph District.html -->
-    <div class="graph-container">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-            <h3 class="text-xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-chart-bar text-purple-600"></i> 
-                <span class="gradient-text lang-en" id="dynamicGraphTitle">District-wise Rainfall Analysis - Monsoon (June-September) - 2025</span>
-                <span class="gradient-text lang-hi" id="dynamicGraphTitle">जिलेवार वर्षा विश्लेषण - मानसून (जून-सितंबर) - २०२५</span>
-            </h3>
-            <div class="flex items-center gap-4">
-                <div class="legend-item">
-                    <span class="w-4 h-4 bg-blue-500 rounded mr-2"></span>
-                    <span class="lang-en">Actual R/F (Bar)</span>
-                    <span class="lang-hi">वास्तविक वर्षा (बार)</span>
-                </div>
+        <div
+          class="flex flex-col lg:flex-row gap-6 items-center justify-between mt-4"
+        >
+          <div
+            class="flex flex-wrap gap-2 w-full lg:w-auto"
+            id="monthTabsContainer"
+          >
+            <button
+              onclick="selectMonth('Overall')"
+              class="month-tab active-tab lang-en"
+              data-month="Overall"
+            >
+              Monsoon (June-September)
+            </button>
+            <button
+              onclick="selectMonth('Overall')"
+              class="month-tab active-tab lang-hi"
+              data-month="Overall"
+            >
+              मानसून (जून-सितंबर)
+            </button>
+            <button
+              onclick="selectMonth('June')"
+              class="month-tab lang-en"
+              data-month="June"
+            >
+              June
+            </button>
+            <button
+              onclick="selectMonth('June')"
+              class="month-tab lang-hi"
+              data-month="June"
+            >
+              जून
+            </button>
+            <button
+              onclick="selectMonth('July')"
+              class="month-tab lang-en"
+              data-month="July"
+            >
+              July
+            </button>
+            <button
+              onclick="selectMonth('July')"
+              class="month-tab lang-hi"
+              data-month="July"
+            >
+              जुलाई
+            </button>
+            <button
+              onclick="selectMonth('August')"
+              class="month-tab lang-en"
+              data-month="August"
+            >
+              August
+            </button>
+            <button
+              onclick="selectMonth('August')"
+              class="month-tab lang-hi"
+              data-month="August"
+            >
+              अगस्त
+            </button>
+            <button
+              onclick="selectMonth('September')"
+              class="month-tab lang-en"
+              data-month="September"
+            >
+              September
+            </button>
+            <button
+              onclick="selectMonth('September')"
+              class="month-tab lang-hi"
+              data-month="September"
+            >
+              सितंबर
+            </button>
+          </div>
+
+          <div class="relative w-full lg:w-72">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
             </div>
+            <input
+              type="text"
+              id="searchInput"
+              onkeyup="filterData()"
+              placeholder="Search District"
+              class="lang-en pl-10 w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+            <input
+              type="text"
+              id="searchInput"
+              onkeyup="filterData()"
+              placeholder="जिला खोजें"
+              class="lang-hi pl-10 w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+          </div>
         </div>
-        
+      </div>
+
+      <!-- New Graph District.html -->
+      <div class="graph-container">
+        <div
+          class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4"
+        >
+          <h3 class="text-xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-chart-bar text-purple-600"></i>
+            <span class="gradient-text lang-en" id="dynamicGraphTitle"
+              >District-wise Rainfall Analysis - Monsoon (June-September) -
+              2025</span
+            >
+            <span class="gradient-text lang-hi" id="dynamicGraphTitle"
+              >जिलेवार वर्षा विश्लेषण - मानसून (जून-सितंबर) - २०२५</span
+            >
+          </h3>
+          <div class="flex items-center gap-4">
+            <div class="legend-item">
+              <span class="w-4 h-4 bg-blue-500 rounded mr-2"></span>
+              <span class="lang-en">Actual R/F (Bar)</span>
+              <span class="lang-hi">वास्तविक वर्षा (बार)</span>
+            </div>
+          </div>
+        </div>
+
         <div id="districtGraph" class="w-full h-[500px]"></div>
-    </div>
+      </div>
 
-    <div id="errorContainer" class="hidden text-center py-10 bg-white dark:bg-gray-800 rounded-xl border border-red-200 dark:border-red-900/50">
-        <div class="inline-flex bg-red-100 dark:bg-red-900/30 p-4 rounded-full mb-4">
-            <i class="fa-solid fa-database text-4xl text-red-500"></i>
+      <div
+        id="errorContainer"
+        class="hidden text-center py-10 bg-white dark:bg-gray-800 rounded-xl border border-red-200 dark:border-red-900/50"
+      >
+        <div
+          class="inline-flex bg-red-100 dark:bg-red-900/30 p-4 rounded-full mb-4"
+        >
+          <i class="fa-solid fa-database text-4xl text-red-500"></i>
         </div>
-        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 lang-en">Data Not Available</h3>
-        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 lang-hi">डेटा उपलब्ध नहीं है</h3>
-        <p class="text-gray-500 dark:text-gray-400 mt-2 lang-en">File not available for selected year or month</p>
-        <p class="text-gray-500 dark:text-gray-400 mt-2 lang-hi">चयनित वर्ष या महीने के लिए फाइल मौजूद नहीं है</p>
-    </div>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 lang-en">
+          Data Not Available
+        </h3>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 lang-hi">
+          डेटा उपलब्ध नहीं है
+        </h3>
+        <p class="text-gray-500 dark:text-gray-400 mt-2 lang-en">
+          File not available for selected year or month
+        </p>
+        <p class="text-gray-500 dark:text-gray-400 mt-2 lang-hi">
+          चयनित वर्ष या महीने के लिए फाइल मौजूद नहीं है
+        </p>
+      </div>
 
-    <div id="dataCard" class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700">
-        <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white">
-                <span class="lang-en">Detailed Data:</span>
-                <span class="lang-hi">विस्तृत डेटा:</span>
-                <span class="text-blue-600" id="compTablePeriod">Monsoon (June-September) - 2025</span>
-            </h3>
-            
-            <div class="relative w-full md:w-64">
-                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-                </div>
-                <input type="text" id="searchInput" onkeyup="filterData()" 
-                        placeholder="Search District" 
-                        class="lang-en w-full pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm" />
-                <input type="text" id="searchInput" onkeyup="filterData()" 
-                        placeholder="जिला खोजें" 
-                        class="lang-hi w-full pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm" />
+      <div
+        id="dataCard"
+        class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700"
+      >
+        <div
+          class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row justify-between items-center gap-4"
+        >
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+            <span class="lang-en">Detailed Data:</span>
+            <span class="lang-hi">विस्तृत डेटा:</span>
+            <span class="text-blue-600" id="compTablePeriod"
+              >Monsoon (June-September) - 2025</span
+            >
+          </h3>
+
+          <div class="relative w-full md:w-64">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
             </div>
+            <input
+              type="text"
+              id="searchInput"
+              onkeyup="filterData()"
+              placeholder="Search District"
+              class="lang-en w-full pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm"
+            />
+            <input
+              type="text"
+              id="searchInput"
+              onkeyup="filterData()"
+              placeholder="जिला खोजें"
+              class="lang-hi w-full pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm"
+            />
+          </div>
         </div>
-        
+
         <div class="overflow-x-auto max-h-[500px]">
-            <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0 z-10">
-                    <tr>
-                        <th class="px-6 py-3 cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800" data-sort="district">
-                            <span class="lang-en">District</span>
-                            <span class="lang-hi">जिला</span>
-                            <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
-                        </th>
-                        <th class="px-6 py-3 text-right cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800" data-sort="actual">
-                            <span class="lang-en">Actual R/F (mm)</span>
-                            <span class="lang-hi">वास्तविक वर्षा (मि.मि.)</span>
-                            <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
-                        </th>
-                        <th class="px-6 py-3 text-right cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800" data-sort="normal">
-                            <span class="lang-en">Normal R/F (mm)</span>
-                            <span class="lang-hi">सामान्य वर्षा (मि.मि.)</span>
-                            <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
-                        </th>
-                        <th class="px-6 py-3 text-right cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800" data-sort="deviation">
-                            <span class="lang-en">Departure (%)</span>
-                            <span class="lang-hi">विचलन (%)</span>
-                            <span class="sort-icon ml-1"><i class="fa-solid fa-sort"></i></span>
-                        </th>
-                        <th class="px-6 py-3 text-center">
-                            <span class="lang-en">Status</span>
-                            <span class="lang-hi">स्थिति</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="dataTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
-                    <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500 lang-en">Loading data...</td>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500 lang-hi">डेटा लोड हो रहा है...</td></tr>
-                </tbody>
-            </table>
+          <table
+            class="w-full text-sm text-left text-gray-600 dark:text-gray-300"
+          >
+            <thead
+              class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0 z-10"
+            >
+              <tr>
+                <th
+                  class="px-6 py-3 cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800"
+                  data-sort="district"
+                >
+                  <span class="lang-en">District</span>
+                  <span class="lang-hi">जिला</span>
+                  <span class="sort-icon ml-1"
+                    ><i class="fa-solid fa-sort"></i
+                  ></span>
+                </th>
+                <th
+                  class="px-6 py-3 text-right cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800"
+                  data-sort="actual"
+                >
+                  <span class="lang-en">Actual R/F (mm)</span>
+                  <span class="lang-hi">वास्तविक वर्षा (मि.मि.)</span>
+                  <span class="sort-icon ml-1"
+                    ><i class="fa-solid fa-sort"></i
+                  ></span>
+                </th>
+                <th
+                  class="px-6 py-3 text-right cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800"
+                  data-sort="normal"
+                >
+                  <span class="lang-en">Normal R/F (mm)</span>
+                  <span class="lang-hi">सामान्य वर्षा (मि.मि.)</span>
+                  <span class="sort-icon ml-1"
+                    ><i class="fa-solid fa-sort"></i
+                  ></span>
+                </th>
+                <th
+                  class="px-6 py-3 text-right cursor-pointer sort-header hover:bg-gray-200 dark:hover:bg-gray-800"
+                  data-sort="deviation"
+                >
+                  <span class="lang-en">Departure (%)</span>
+                  <span class="lang-hi">विचलन (%)</span>
+                  <span class="sort-icon ml-1"
+                    ><i class="fa-solid fa-sort"></i
+                  ></span>
+                </th>
+                <th class="px-6 py-3 text-center">
+                  <span class="lang-en">Status</span>
+                  <span class="lang-hi">स्थिति</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              id="dataTableBody"
+              class="divide-y divide-gray-100 dark:divide-gray-700"
+            >
+              <tr>
+                <td
+                  colspan="5"
+                  class="px-6 py-4 text-center text-gray-500 lang-en"
+                >
+                  Loading data...
+                </td>
+                <td
+                  colspan="5"
+                  class="px-6 py-4 text-center text-gray-500 lang-hi"
+                >
+                  डेटा लोड हो रहा है...
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </div>
+      </div>
+    </main>
 
-</main>
+    <script>
+      // --- State Variables ---
+      let currentData = [];
+      let currentSelectedMonth = "Overall";
+      let currentSort = { column: "district", order: "asc" };
+      let availableDistricts = [];
+      let selectedDistricts = [];
+      let currentLanguage = "hi"; // Default to hindi
+      let traceVisibility = { actual: true, normal: true, deviation: true }; // Track trace visibility
 
-<script>
-    // --- State Variables ---
-    let currentData = [];
-    let currentSelectedMonth = 'Overall';
-    let currentSort = { column: 'district', order: 'asc' };
-    let availableDistricts = [];
-    let selectedDistricts = [];
-    let currentLanguage = 'hi'; // Default to hindi
-    let traceVisibility = { actual: true, normal: true, deviation: true }; // Track trace visibility
-    
-    const DEFAULT_TOP_DISTRICTS = ['Patna', 'Gaya', 'Bhagalpur', 'Purnea', 'West Champaran']; 
-    
-    // --- Language Translations ---
-    const translations = {
+      const DEFAULT_TOP_DISTRICTS = [
+        "Patna",
+        "Gaya",
+        "Bhagalpur",
+        "Purnea",
+        "West Champaran",
+      ];
+
+      // --- Language Translations ---
+      const translations = {
         en: {
-            home: 'Home',
-            dashboard: 'Dashboard',
-            district: 'District-wise',
-            maps: 'Maps',
-            historical: 'Historical',
-            comparison: 'Comparison',
-            title: 'Bihar Monsoon Dashboard',
-            subtitle: 'IMD MC Patna — Comprehensive Analysis',
-            mainTitle: 'Detailed District Data',
-            year: 'Year',
-            allDistricts: 'All Districts',
-            searchDistrict: 'Search District',
-            monsoon: 'Monsoon (June-September)',
-            june: 'June',
-            july: 'July',
-            august: 'August',
-            september: 'September',
-            graphTitle: 'District-wise Rainfall Analysis',
-            actualRF: 'Actual R/F (Bar)',
-            normalRF: 'Normal R/F (Line)',
-            detailedData: 'Detailed Data',
-            district: 'District',
-            actualRain: 'Actual R/F (mm)',
-            normalRain: 'Normal R/F (mm)',
-            departure: 'Departure (%)',
-            status: 'Status',
-            loading: 'Loading data...',
-            noResults: 'No results found',
-            dataNotAvailable: 'Data Not Available',
-            fileNotAvailable: 'File not available for selected year or month',
-            selectAll: 'Select All',
-            noDistrict: 'No District',
-            selected: 'Selected',
-            changeLanguage: 'हिन्दी'
+          home: "Home",
+          dashboard: "Dashboard",
+          district: "District-wise",
+          maps: "Maps",
+          historical: "Historical",
+          comparison: "Comparison",
+          title: "Bihar Monsoon Dashboard",
+          subtitle: "IMD MC Patna — Comprehensive Analysis",
+          mainTitle: "Detailed District Data",
+          year: "Year",
+          allDistricts: "All Districts",
+          searchDistrict: "Search District",
+          monsoon: "Monsoon (June-September)",
+          june: "June",
+          july: "July",
+          august: "August",
+          september: "September",
+          graphTitle: "District-wise Rainfall Analysis",
+          actualRF: "Actual R/F (Bar)",
+          normalRF: "Normal R/F (Line)",
+          detailedData: "Detailed Data",
+          district: "District",
+          actualRain: "Actual R/F (mm)",
+          normalRain: "Normal R/F (mm)",
+          departure: "Departure (%)",
+          status: "Status",
+          loading: "Loading data...",
+          noResults: "No results found",
+          dataNotAvailable: "Data Not Available",
+          fileNotAvailable: "File not available for selected year or month",
+          selectAll: "Select All",
+          noDistrict: "No District",
+          selected: "Selected",
+          changeLanguage: "हिन्दी",
         },
         hi: {
-            home: 'होम',
-            dashboard: 'डैशबोर्ड',
-            district: 'जिलावार',
-            maps: 'मानचित्र',
-            historical: 'ऐतिहासिक',
-            comparison: 'तुलना',
-            title: 'बिहार मानसून डैशबोर्ड',
-            subtitle: 'IMD MC Patna — व्यापक विश्लेषण',
-            mainTitle: 'विस्तृत जिला डेटा',
-            year: 'वर्ष',
-            allDistricts: 'सभी जिले',
-            searchDistrict: 'जिला खोजें',
-            monsoon: 'मानसून (जून-सितंबर)',
-            june: 'जून',
-            july: 'जुलाई',
-            august: 'अगस्त',
-            september: 'सितंबर',
-            graphTitle: 'जिलेवार वर्षा विश्लेषण',
-            actualRF: 'वास्तविक वर्षा (बार)',
-            normalRF: 'सामान्य वर्षा (रेखा)',
-            detailedData: 'विस्तृत डेटा',
-            district: 'जिला',
-            actualRain: 'वास्तविक वर्षा (मि.मि.)',
-            normalRain: 'सामान्य वर्षा (मि.मि.)',
-            departure: 'विचलन (%)',
-            status: 'स्थिति',
-            loading: 'डेटा लोड हो रहा है...',
-            noResults: 'कोई परिणाम नहीं मिला',
-            dataNotAvailable: 'डेटा उपलब्ध नहीं है',
-            fileNotAvailable: 'चयनित वर्ष या महीने के लिए फाइल मौजूद नहीं है',
-            selectAll: 'सभी चुनें',
-            noDistrict: 'कोई जिला नहीं',
-            selected: 'चयनित',
-            changeLanguage: 'English'
-        }
-    };
+          home: "होम",
+          dashboard: "डैशबोर्ड",
+          district: "जिलावार",
+          maps: "मानचित्र",
+          historical: "ऐतिहासिक",
+          comparison: "तुलना",
+          title: "बिहार मानसून डैशबोर्ड",
+          subtitle: "IMD MC Patna — व्यापक विश्लेषण",
+          mainTitle: "विस्तृत जिला डेटा",
+          year: "वर्ष",
+          allDistricts: "सभी जिले",
+          searchDistrict: "जिला खोजें",
+          monsoon: "मानसून (जून-सितंबर)",
+          june: "जून",
+          july: "जुलाई",
+          august: "अगस्त",
+          september: "सितंबर",
+          graphTitle: "जिलेवार वर्षा विश्लेषण",
+          actualRF: "वास्तविक वर्षा (बार)",
+          normalRF: "सामान्य वर्षा (रेखा)",
+          detailedData: "विस्तृत डेटा",
+          district: "जिला",
+          actualRain: "वास्तविक वर्षा (मि.मि.)",
+          normalRain: "सामान्य वर्षा (मि.मि.)",
+          departure: "विचलन (%)",
+          status: "स्थिति",
+          loading: "डेटा लोड हो रहा है...",
+          noResults: "कोई परिणाम नहीं मिला",
+          dataNotAvailable: "डेटा उपलब्ध नहीं है",
+          fileNotAvailable: "चयनित वर्ष या महीने के लिए फाइल मौजूद नहीं है",
+          selectAll: "सभी चुनें",
+          noDistrict: "कोई जिला नहीं",
+          selected: "चयनित",
+          changeLanguage: "English",
+        },
+      };
 
-    // --- Language Switching Function ---
-    function toggleLanguage() {
-        currentLanguage = currentLanguage === 'en' ? 'hi' : 'en';
-        document.body.classList.toggle('hindi', currentLanguage === 'hi');
-        
+      // --- Language Switching Function ---
+      function toggleLanguage() {
+        currentLanguage = currentLanguage === "en" ? "hi" : "en";
+        document.body.classList.toggle("hindi", currentLanguage === "hi");
+
         // Update language switcher button text
-        document.getElementById('langSwitchBtn').innerHTML = `
+        document.getElementById("langSwitchBtn").innerHTML = `
             <i class="fas fa-language"></i>
-            ${currentLanguage === 'hi' ? 'English' : 'हिन्दी'}
+            ${currentLanguage === "hi" ? "English" : "हिन्दी"}
         `;
-        
+
         // Update all text elements but preserve month selection
         updateLanguageText();
-        
+
         // Re-render everything with new language
         renderData();
         renderGraph();
         updateDynamicTitles();
-    }
+      }
 
-    function updateLanguageText() {
+      function updateLanguageText() {
         // Update static text elements
-        document.querySelectorAll('[data-translate]').forEach(element => {
-            const key = element.getAttribute('data-translate');
-            if (element.tagName === 'INPUT' || element.tagName === 'SELECT') {
-                element.placeholder = translations[currentLanguage][key];
-            } else {
-                element.textContent = translations[currentLanguage][key];
-            }
+        document.querySelectorAll("[data-translate]").forEach((element) => {
+          const key = element.getAttribute("data-translate");
+          if (element.tagName === "INPUT" || element.tagName === "SELECT") {
+            element.placeholder = translations[currentLanguage][key];
+          } else {
+            element.textContent = translations[currentLanguage][key];
+          }
         });
-        
+
         // Update specific elements
-        document.querySelector('.navbar h1').textContent = translations[currentLanguage].title;
-        document.querySelector('.navbar .text-xs').textContent = translations[currentLanguage].subtitle;
-        document.querySelector('main h2 .lang-en').textContent = translations[currentLanguage].mainTitle;
-        document.querySelector('main h2 .lang-hi').textContent = translations[currentLanguage].mainTitle;
-        
+        document.querySelector(".navbar h1").textContent =
+          translations[currentLanguage].title;
+        document.querySelector(".navbar .text-xs").textContent =
+          translations[currentLanguage].subtitle;
+        document.querySelector("main h2 .lang-en").textContent =
+          translations[currentLanguage].mainTitle;
+        document.querySelector("main h2 .lang-hi").textContent =
+          translations[currentLanguage].mainTitle;
+
         // Update month tabs
-        document.querySelectorAll('.month-tab').forEach(tab => {
-            const month = tab.getAttribute('data-month');
-            if (tab.classList.contains('lang-en')) {
-                tab.textContent = translations[currentLanguage][month.toLowerCase()] || month;
-            } else {
-                tab.textContent = translations[currentLanguage][month.toLowerCase()] || month;
-            }
+        document.querySelectorAll(".month-tab").forEach((tab) => {
+          const month = tab.getAttribute("data-month");
+          if (tab.classList.contains("lang-en")) {
+            tab.textContent =
+              translations[currentLanguage][month.toLowerCase()] || month;
+          } else {
+            tab.textContent =
+              translations[currentLanguage][month.toLowerCase()] || month;
+          }
         });
-        
+
         // Update button texts
-        document.getElementById('dropdownBtnText').textContent = translations[currentLanguage].allDistricts;
-    }
+        document.getElementById("dropdownBtnText").textContent =
+          translations[currentLanguage].allDistricts;
+      }
 
-function updateDynamicTitles() {
-    const year = document.getElementById('yearSelect').value;
-    const month = currentSelectedMonth;
-    
-    const monthNames = {
-        'Overall': { en: 'Monsoon (June-September)', hi: 'मानसून (जून-सितंबर)' },
-        'June': { en: 'June', hi: 'जून' },
-        'July': { en: 'July', hi: 'जुलाई' },
-        'August': { en: 'August', hi: 'अगस्त' },
-        'September': { en: 'September', hi: 'सितंबर' }
-    };
-    
-    const monthText = monthNames[month][currentLanguage];
-    
-    // Update graph title - handle both language versions
-    const graphTitleEn = `${translations['en'].graphTitle} - ${monthNames[month]['en']} - ${year}`;
-    const graphTitleHi = `${translations['hi'].graphTitle} - ${monthNames[month]['hi']} - ${year}`;
-    
-    // Update English title element
-    const graphTitleEnElement = document.querySelector('#dynamicGraphTitle.lang-en');
-    if (graphTitleEnElement) {
-        graphTitleEnElement.textContent = graphTitleEn;
-    }
-    
-    // Update Hindi title element  
-    const graphTitleHiElement = document.querySelector('#dynamicGraphTitle.lang-hi');
-    if (graphTitleHiElement) {
-        graphTitleHiElement.textContent = graphTitleHi;
-    }
-    
-    // Update table period
-    const tablePeriodEn = `${monthNames[month]['en']} - ${year}`;
-    const tablePeriodHi = `${monthNames[month]['hi']} - ${year}`;
-    
-    const tablePeriodElement = document.getElementById('compTablePeriod');
-    if (tablePeriodElement) {
-        tablePeriodElement.textContent = currentLanguage === 'en' ? tablePeriodEn : tablePeriodHi;
-    }
-    
-    // Also update the graph itself if it exists
-    if (currentData.length > 0) {
-        renderGraph();
-    }
-}
+      function updateDynamicTitles() {
+        const year = document.getElementById("yearSelect").value;
+        const month = currentSelectedMonth;
 
-    // --- Rain Status Categorization Logic ---
-    function getRainStatus(deviation) {
-        if (deviation === -100) {
-            return { status: currentLanguage === 'en' ? 'NO RAIN' : 'बिना वर्षा', color: 'bg-status-no-rain', textColor: 'text-gray-800' };
-        } else if (deviation >= 60) {
-            return { status: currentLanguage === 'en' ? 'LARGE EXCESS' : 'अत्यधिक अधिक', color: 'bg-status-large-excess', textColor: 'text-white' };
-        } else if (deviation >= 20) {
-            return { status: currentLanguage === 'en' ? 'EXCESS' : 'अधिक', color: 'bg-status-excess', textColor: 'text-gray-800' };
-        } else if (deviation >= -19) {
-            return { status: currentLanguage === 'en' ? 'NORMAL' : 'सामान्य', color: 'bg-status-normal', textColor: 'text-white' };
-        } else if (deviation >= -59) {
-            return { status: currentLanguage === 'en' ? 'DEFICIENT' : 'कम', color: 'bg-status-def', textColor: 'text-white' };
-        } else if (deviation >= -99) {
-            return { status: currentLanguage === 'en' ? 'LARGE DEFICIENT' : 'अत्यधिक कम', color: 'bg-status-large-def', textColor: 'text-gray-800' };
-        } else {
-            return { status: currentLanguage === 'en' ? 'NO DATA' : 'कोई डेटा नहीं', color: 'bg-gray-400', textColor: 'text-gray-800' };
+        const monthNames = {
+          Overall: {
+            en: "Monsoon (June-September)",
+            hi: "मानसून (जून-सितंबर)",
+          },
+          June: { en: "June", hi: "जून" },
+          July: { en: "July", hi: "जुलाई" },
+          August: { en: "August", hi: "अगस्त" },
+          September: { en: "September", hi: "सितंबर" },
+        };
+
+        const monthText = monthNames[month][currentLanguage];
+
+        // Update graph title - handle both language versions
+        const graphTitleEn = `${translations["en"].graphTitle} - ${monthNames[month]["en"]} - ${year}`;
+        const graphTitleHi = `${translations["hi"].graphTitle} - ${monthNames[month]["hi"]} - ${year}`;
+
+        // Update English title element
+        const graphTitleEnElement = document.querySelector(
+          "#dynamicGraphTitle.lang-en",
+        );
+        if (graphTitleEnElement) {
+          graphTitleEnElement.textContent = graphTitleEn;
         }
-    }
 
-    // --- Color function for departure categories ---
-    function getDepartureColor(deviation) {
-        if (deviation === -100) return '#ffffff'; // NO RAIN
-        if (deviation <= -60) return '#ffd700';  // LARGE DEFICIENT
-        if (deviation <= -20) return '#e53935';  // DEFICIENT
-        if (deviation < 20) return '#4caf50';    // NORMAL
-        if (deviation < 60) return '#4fc3f7';    // EXCESS
-        return '#1565c0';                       // LARGE EXCESS
-    }
+        // Update Hindi title element
+        const graphTitleHiElement = document.querySelector(
+          "#dynamicGraphTitle.lang-hi",
+        );
+        if (graphTitleHiElement) {
+          graphTitleHiElement.textContent = graphTitleHi;
+        }
 
-    // --- District Checkbox Logic ---
-    function getSortedDistricts(allDistricts) {
-        const topDistrictsLower = DEFAULT_TOP_DISTRICTS.map(d => d.toLowerCase());
-        
-        const priorityMatches = allDistricts.filter(d => topDistrictsLower.includes(d.toLowerCase()));
-        
+        // Update table period
+        const tablePeriodEn = `${monthNames[month]["en"]} - ${year}`;
+        const tablePeriodHi = `${monthNames[month]["hi"]} - ${year}`;
+
+        const tablePeriodElement = document.getElementById("compTablePeriod");
+        if (tablePeriodElement) {
+          tablePeriodElement.textContent =
+            currentLanguage === "en" ? tablePeriodEn : tablePeriodHi;
+        }
+
+        // Also update the graph itself if it exists
+        if (currentData.length > 0) {
+          renderGraph();
+        }
+      }
+
+      // --- Rain Status Categorization Logic ---
+      function getRainStatus(deviation) {
+        if (deviation === -100) {
+          return {
+            status: currentLanguage === "en" ? "NO RAIN" : "बिना वर्षा",
+            color: "bg-status-no-rain",
+            textColor: "text-gray-800",
+          };
+        } else if (deviation >= 60) {
+          return {
+            status: currentLanguage === "en" ? "LARGE EXCESS" : "अत्यधिक अधिक",
+            color: "bg-status-large-excess",
+            textColor: "text-white",
+          };
+        } else if (deviation >= 20) {
+          return {
+            status: currentLanguage === "en" ? "EXCESS" : "अधिक",
+            color: "bg-status-excess",
+            textColor: "text-gray-800",
+          };
+        } else if (deviation >= -19) {
+          return {
+            status: currentLanguage === "en" ? "NORMAL" : "सामान्य",
+            color: "bg-status-normal",
+            textColor: "text-white",
+          };
+        } else if (deviation >= -59) {
+          return {
+            status: currentLanguage === "en" ? "DEFICIENT" : "कम",
+            color: "bg-status-def",
+            textColor: "text-white",
+          };
+        } else if (deviation >= -99) {
+          return {
+            status: currentLanguage === "en" ? "LARGE DEFICIENT" : "अत्यधिक कम",
+            color: "bg-status-large-def",
+            textColor: "text-gray-800",
+          };
+        } else {
+          return {
+            status: currentLanguage === "en" ? "NO DATA" : "कोई डेटा नहीं",
+            color: "bg-gray-400",
+            textColor: "text-gray-800",
+          };
+        }
+      }
+
+      // --- Color function for departure categories ---
+      function getDepartureColor(deviation) {
+        if (deviation === -100) return "#ffffff"; // NO RAIN
+        if (deviation <= -60) return "#ffd700"; // LARGE DEFICIENT
+        if (deviation <= -20) return "#e53935"; // DEFICIENT
+        if (deviation < 20) return "#4caf50"; // NORMAL
+        if (deviation < 60) return "#4fc3f7"; // EXCESS
+        return "#1565c0"; // LARGE EXCESS
+      }
+
+      // --- District Checkbox Logic ---
+      function getSortedDistricts(allDistricts) {
+        const topDistrictsLower = DEFAULT_TOP_DISTRICTS.map((d) =>
+          d.toLowerCase(),
+        );
+
+        const priorityMatches = allDistricts.filter((d) =>
+          topDistrictsLower.includes(d.toLowerCase()),
+        );
+
         priorityMatches.sort((a, b) => {
-            const indexA = topDistrictsLower.indexOf(a.toLowerCase());
-            const indexB = topDistrictsLower.indexOf(b.toLowerCase());
-            return indexA - indexB;
+          const indexA = topDistrictsLower.indexOf(a.toLowerCase());
+          const indexB = topDistrictsLower.indexOf(b.toLowerCase());
+          return indexA - indexB;
         });
 
-        let remainingDistricts = allDistricts.filter(d => !topDistrictsLower.includes(d.toLowerCase()));
-        
-        remainingDistricts.sort((a, b) => a.localeCompare(b, 'hi', {sensitivity: 'base'}));
+        let remainingDistricts = allDistricts.filter(
+          (d) => !topDistrictsLower.includes(d.toLowerCase()),
+        );
+
+        remainingDistricts.sort((a, b) =>
+          a.localeCompare(b, "hi", { sensitivity: "base" }),
+        );
 
         return [...priorityMatches, ...remainingDistricts];
-    }
+      }
 
-    function generateDistrictCheckboxes() {
-        const container = document.getElementById('districtCheckboxContent');
-        container.innerHTML = '';
-        
-        const allDistricts = [...new Set(currentData.map(d => d.district))];
+      function generateDistrictCheckboxes() {
+        const container = document.getElementById("districtCheckboxContent");
+        container.innerHTML = "";
+
+        const allDistricts = [...new Set(currentData.map((d) => d.district))];
         availableDistricts = getSortedDistricts(allDistricts);
 
-        if (selectedDistricts.length === 0 || !selectedDistricts.every(d => availableDistricts.includes(d))) {
-             selectedDistricts = availableDistricts; 
+        if (
+          selectedDistricts.length === 0 ||
+          !selectedDistricts.every((d) => availableDistricts.includes(d))
+        ) {
+          selectedDistricts = availableDistricts;
         }
 
-        const selectAll = document.createElement('div');
-        selectAll.className = 'district-checkbox-item border-b dark:border-gray-700 font-bold bg-gray-50 dark:bg-gray-800';
+        const selectAll = document.createElement("div");
+        selectAll.className =
+          "district-checkbox-item border-b dark:border-gray-700 font-bold bg-gray-50 dark:bg-gray-800";
         selectAll.innerHTML = `
             <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)" class="form-checkbox h-4 w-4 text-blue-600 rounded mr-3 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600">
             <label for="selectAllCheckbox" class="text-sm text-gray-900 dark:text-gray-100 cursor-pointer">${translations[currentLanguage].selectAll}</label>
         `;
         container.appendChild(selectAll);
 
-        availableDistricts.forEach(district => {
-            const isChecked = selectedDistricts.includes(district);
-            const item = document.createElement('div');
-            item.className = 'district-checkbox-item';
-            
-            const safeId = `chk-${district.replace(/\s/g, '-')}`; 
+        availableDistricts.forEach((district) => {
+          const isChecked = selectedDistricts.includes(district);
+          const item = document.createElement("div");
+          item.className = "district-checkbox-item";
 
-            item.innerHTML = `
-                <input type="checkbox" id="${safeId}" value="${district}" ${isChecked ? 'checked' : ''} 
+          const safeId = `chk-${district.replace(/\s/g, "-")}`;
+
+          item.innerHTML = `
+                <input type="checkbox" id="${safeId}" value="${district}" ${isChecked ? "checked" : ""} 
                        onchange="handleDistrictSelection(this)"
                        class="form-checkbox h-4 w-4 text-blue-600 rounded mr-3 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600">
                 <label for="${safeId}" class="text-sm text-gray-900 dark:text-gray-100 cursor-pointer">${district}</label>
             `;
-            container.appendChild(item);
+          container.appendChild(item);
         });
 
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const selectAllCheckbox = document.getElementById("selectAllCheckbox");
         if (selectAllCheckbox) {
-            selectAllCheckbox.checked = selectedDistricts.length === availableDistricts.length && availableDistricts.length > 0;
+          selectAllCheckbox.checked =
+            selectedDistricts.length === availableDistricts.length &&
+            availableDistricts.length > 0;
         }
-        
+
         updateDropdownButtonText();
-    }
-    
-    function toggleSelectAll(checked) {
-        const checkboxes = document.querySelectorAll('#districtCheckboxContent input[type="checkbox"]:not(#selectAllCheckbox)');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = checked;
+      }
+
+      function toggleSelectAll(checked) {
+        const checkboxes = document.querySelectorAll(
+          '#districtCheckboxContent input[type="checkbox"]:not(#selectAllCheckbox)',
+        );
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = checked;
         });
 
         if (checked) {
-            selectedDistricts = availableDistricts;
+          selectedDistricts = availableDistricts;
         } else {
-            selectedDistricts = [];
+          selectedDistricts = [];
         }
 
         renderData();
         renderGraph();
         updateDropdownButtonText();
-    }
+      }
 
-    function handleDistrictSelection(checkbox) {
+      function handleDistrictSelection(checkbox) {
         const district = checkbox.value;
         if (checkbox.checked) {
-            if (!selectedDistricts.includes(district)) {
-                selectedDistricts.push(district);
-            }
+          if (!selectedDistricts.includes(district)) {
+            selectedDistricts.push(district);
+          }
         } else {
-            selectedDistricts = selectedDistricts.filter(d => d !== district);
+          selectedDistricts = selectedDistricts.filter((d) => d !== district);
         }
 
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const selectAllCheckbox = document.getElementById("selectAllCheckbox");
         if (selectAllCheckbox) {
-            selectAllCheckbox.checked = selectedDistricts.length === availableDistricts.length && availableDistricts.length > 0;
+          selectAllCheckbox.checked =
+            selectedDistricts.length === availableDistricts.length &&
+            availableDistricts.length > 0;
         }
 
         renderData();
         renderGraph();
         updateDropdownButtonText();
-    }
-    
-    function updateDropdownButtonText() {
-        const btnText = document.getElementById('dropdownBtnText');
+      }
+
+      function updateDropdownButtonText() {
+        const btnText = document.getElementById("dropdownBtnText");
         if (selectedDistricts.length === 0) {
-            btnText.textContent = translations[currentLanguage].noDistrict;
-        } else if (selectedDistricts.length === availableDistricts.length && availableDistricts.length > 0) {
-            btnText.textContent = translations[currentLanguage].allDistricts;
+          btnText.textContent = translations[currentLanguage].noDistrict;
+        } else if (
+          selectedDistricts.length === availableDistricts.length &&
+          availableDistricts.length > 0
+        ) {
+          btnText.textContent = translations[currentLanguage].allDistricts;
         } else {
-            btnText.textContent = `${selectedDistricts.length} ${translations[currentLanguage].selected}`;
+          btnText.textContent = `${selectedDistricts.length} ${translations[currentLanguage].selected}`;
         }
-    }
+      }
 
-    function toggleDistrictDropdown() {
-        document.getElementById('districtCheckboxContent').classList.toggle('show');
-    }
+      function toggleDistrictDropdown() {
+        document
+          .getElementById("districtCheckboxContent")
+          .classList.toggle("show");
+      }
 
-    window.onclick = function(event) {
-        if (!event.target.matches('#districtDropdownBtn') && !event.target.closest('.district-checkbox-dropdown')) {
-            const dropdown = document.getElementById('districtCheckboxContent');
-            if (dropdown && dropdown.classList.contains('show')) {
-                dropdown.classList.remove('show');
-            }
+      window.onclick = function (event) {
+        if (
+          !event.target.matches("#districtDropdownBtn") &&
+          !event.target.closest(".district-checkbox-dropdown")
+        ) {
+          const dropdown = document.getElementById("districtCheckboxContent");
+          if (dropdown && dropdown.classList.contains("show")) {
+            dropdown.classList.remove("show");
+          }
         }
-    }
+      };
 
-// --- Graph Rendering Function (Auto-sync with table sort) ---
-function renderGraph() {
-    const graphData = currentData.filter(d => selectedDistricts.includes(d.district));
-    
-    // Auto-sync with table sort settings
-    const sortedData = sortData([...graphData], currentSort.column, currentSort.order);
+      // --- Graph Rendering Function (Auto-sync with table sort) ---
+      function renderGraph() {
+        const graphData = currentData.filter((d) =>
+          selectedDistricts.includes(d.district),
+        );
 
-    const isDark = document.documentElement.classList.contains('dark');
-    const fontColor = isDark ? '#cbd5e1' : '#334155';
+        // Auto-sync with table sort settings
+        const sortedData = sortData(
+          [...graphData],
+          currentSort.column,
+          currentSort.order,
+        );
 
-    if (sortedData.length === 0) {
-        Plotly.purge('districtGraph');
-        return;
-    }
+        const isDark = document.documentElement.classList.contains("dark");
+        const fontColor = isDark ? "#cbd5e1" : "#334155";
 
-    // Get current month name based on language
-    const monthNames = {
-        'Overall': { en: 'Monsoon (June-September)', hi: 'मानसून (जून-सितंबर)' },
-        'June': { en: 'June', hi: 'जून' },
-        'July': { en: 'July', hi: 'जुलाई' },
-        'August': { en: 'August', hi: 'अगस्त' },
-        'September': { en: 'September', hi: 'सितंबर' }
-    };
+        if (sortedData.length === 0) {
+          Plotly.purge("districtGraph");
+          return;
+        }
 
-    const year = document.getElementById('yearSelect').value;
-    const monthText = monthNames[currentSelectedMonth][currentLanguage];
+        // Get current month name based on language
+        const monthNames = {
+          Overall: {
+            en: "Monsoon (June-September)",
+            hi: "मानसून (जून-सितंबर)",
+          },
+          June: { en: "June", hi: "जून" },
+          July: { en: "July", hi: "जुलाई" },
+          August: { en: "August", hi: "अगस्त" },
+          September: { en: "September", hi: "सितंबर" },
+        };
 
-    // Bar trace for Actual R/F with departure-based colors
-    const barTrace = {
-        x: sortedData.map(d => d.district),
-        y: sortedData.map(d => d.actual),
-        type: 'bar',
-        name: translations[currentLanguage].actualRF,
-        marker: {
-            color: sortedData.map(d => getDepartureColor(d.deviation)),
+        const year = document.getElementById("yearSelect").value;
+        const monthText = monthNames[currentSelectedMonth][currentLanguage];
+
+        // Bar trace for Actual R/F with departure-based colors
+        const barTrace = {
+          x: sortedData.map((d) => d.district),
+          y: sortedData.map((d) => d.actual),
+          type: "bar",
+          name: translations[currentLanguage].actualRF,
+          marker: {
+            color: sortedData.map((d) => getDepartureColor(d.deviation)),
             line: {
-                color: sortedData.map(d => getDepartureColor(d.deviation)),
-                width: 1
-            }
-        },
-        hovertemplate: `<b>%{x}</b><br>${translations[currentLanguage].actualRain}: %{y} mm<br>${translations[currentLanguage].departure}: ` + sortedData.map(d => d.deviation + '%') + '<extra></extra>'
-    };
+              color: sortedData.map((d) => getDepartureColor(d.deviation)),
+              width: 1,
+            },
+          },
+          hovertemplate:
+            `<b>%{x}</b><br>${translations[currentLanguage].actualRain}: %{y} mm<br>${translations[currentLanguage].departure}: ` +
+            sortedData.map((d) => d.deviation + "%") +
+            "<extra></extra>",
+        };
 
-    // Line trace for Normal R/F with glowing gray effect
-    const lineTrace = {
-        x: sortedData.map(d => d.district),
-        y: sortedData.map(d => d.normal),
-        type: 'scatter',
-        mode: 'lines+markers',
-        name: translations[currentLanguage].normalRF,
-        line: {
-            color: isDark ? '#9ca3af' : '#6b7280',
+        // Line trace for Normal R/F with glowing gray effect
+        const lineTrace = {
+          x: sortedData.map((d) => d.district),
+          y: sortedData.map((d) => d.normal),
+          type: "scatter",
+          mode: "lines+markers",
+          name: translations[currentLanguage].normalRF,
+          line: {
+            color: isDark ? "#9ca3af" : "#6b7280",
             width: 4,
-            shape: 'spline',
-            smoothing: 1.3
-        },
-        marker: {
-            color: isDark ? '#9ca3af' : '#6b7280',
+            shape: "spline",
+            smoothing: 1.3,
+          },
+          marker: {
+            color: isDark ? "#9ca3af" : "#6b7280",
             size: 10,
             line: {
-                color: isDark ? '#ffffff' : '#ffffff',
-                width: 2
-            }
-        },
-        yaxis: 'y2',
-        hovertemplate: `<b>%{x}</b><br>${translations[currentLanguage].normalRain}: %{y} mm<extra></extra>`,
-        className: 'glowing-line'
-    };
+              color: isDark ? "#ffffff" : "#ffffff",
+              width: 2,
+            },
+          },
+          yaxis: "y2",
+          hovertemplate: `<b>%{x}</b><br>${translations[currentLanguage].normalRain}: %{y} mm<extra></extra>`,
+          className: "glowing-line",
+        };
 
-    const layout = {
-        // Remove title completely
-        xaxis: {
+        const layout = {
+          // Remove title completely
+          xaxis: {
             title: translations[currentLanguage].district,
             tickangle: -45,
             automargin: true,
-            gridcolor: isDark ? '#374151' : '#e2e8f0'
-        },
-        yaxis: {
-            title: translations[currentLanguage].actualRain + ' (mm)',
-            side: 'left',
-            gridcolor: isDark ? '#374151' : '#e2e8f0'
-        },
-        yaxis2: {
-            title: translations[currentLanguage].normalRain + ' (mm)',
-            overlaying: 'y',
-            side: 'right',
-            gridcolor: isDark ? '#374151' : '#e2e8f0'
-        },
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        font: { family: 'Poppins', color: fontColor },
-        margin: { t: 30, b: 150, l: 50, r: 50 }, // Reduced top margin since no title
-        showlegend: true,
-        legend: {
-            orientation: 'h',
+            gridcolor: isDark ? "#374151" : "#e2e8f0",
+          },
+          yaxis: {
+            title: translations[currentLanguage].actualRain + " (mm)",
+            side: "left",
+            gridcolor: isDark ? "#374151" : "#e2e8f0",
+          },
+          yaxis2: {
+            title: translations[currentLanguage].normalRain + " (mm)",
+            overlaying: "y",
+            side: "right",
+            gridcolor: isDark ? "#374151" : "#e2e8f0",
+          },
+          paper_bgcolor: "rgba(0,0,0,0)",
+          plot_bgcolor: "rgba(0,0,0,0)",
+          font: { family: "Poppins", color: fontColor },
+          margin: { t: 30, b: 150, l: 50, r: 50 }, // Reduced top margin since no title
+          showlegend: true,
+          legend: {
+            orientation: "h",
             y: -0.2,
             font: { size: 12 },
-            itemclick: 'toggleothers', // Enable click to toggle
-            itemdoubleclick: false
-        },
-        barmode: 'group'
-    };
+            itemclick: "toggleothers", // Enable click to toggle
+            itemdoubleclick: false,
+          },
+          barmode: "group",
+        };
 
-    Plotly.newPlot('districtGraph', [barTrace, lineTrace], layout, {
-        responsive: true,
-        displayModeBar: true,
-        displaylogo: false,
-        modebar: { orientation: 'h' }
-    });
-}
+        Plotly.newPlot("districtGraph", [barTrace, lineTrace], layout, {
+          responsive: true,
+          displayModeBar: true,
+          displaylogo: false,
+          modebar: { orientation: "h" },
+        });
+      }
 
-// --- Main Fetch Function ---
-async function updateDashboard() {
-    
-    const year = document.getElementById('yearSelect').value;
-    const month = currentSelectedMonth;
-    
-    let filename = '';
-    if (month === 'Overall') {
-        filename = 'overall_monsoon.csv';
-    } else {
-        filename = `${month.toLowerCase()}.csv`;
-    }
+      // --- Main Fetch Function ---
+      async function updateDashboard() {
+        const year = document.getElementById("yearSelect").value;
+        const month = currentSelectedMonth;
 
-    const filePath = `data/${year}/${filename}`;
+        let filename = "";
+        if (month === "Overall") {
+          filename = "overall_monsoon.csv";
+        } else {
+          filename = `${month.toLowerCase()}.csv`;
+        }
 
-    // Update dynamic titles immediately when year/month changes
-    updateDynamicTitles();
+        const filePath = `data/${year}/${filename}`;
 
-    const tableBody = document.getElementById('dataTableBody');
-    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500"></i><br>${translations[currentLanguage].loading}</td></tr>`;
-    document.getElementById('errorContainer').classList.add('hidden');
-    document.getElementById('dataCard').classList.remove('hidden');
+        // Update dynamic titles immediately when year/month changes
+        updateDynamicTitles();
 
-    try {
-        const response = await fetch(filePath);
-        
-        if (!response.ok) {
+        const tableBody = document.getElementById("dataTableBody");
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500"></i><br>${translations[currentLanguage].loading}</td></tr>`;
+        document.getElementById("errorContainer").classList.add("hidden");
+        document.getElementById("dataCard").classList.remove("hidden");
+
+        try {
+          const response = await fetch(filePath);
+
+          if (!response.ok) {
             throw new Error("File not found");
+          }
+
+          const csvText = await response.text();
+          const parsedData = parseCSV(csvText);
+
+          if (parsedData.length === 0) throw new Error("Empty Data");
+
+          currentData = parsedData;
+
+          const newAvailableDistricts = [
+            ...new Set(currentData.map((d) => d.district)),
+          ];
+
+          const needToResetSelection =
+            selectedDistricts.length === 0 ||
+            !selectedDistricts.every((d) => newAvailableDistricts.includes(d));
+
+          if (needToResetSelection) {
+            selectedDistricts = newAvailableDistricts;
+          }
+
+          generateDistrictCheckboxes();
+          renderData();
+          renderGraph();
+        } catch (error) {
+          console.error("Error loading data:", error);
+          document.getElementById("dataCard").classList.add("hidden");
+          document.getElementById("errorContainer").classList.remove("hidden");
+          availableDistricts = [];
+          selectedDistricts = [];
+          generateDistrictCheckboxes();
+          Plotly.purge("districtGraph");
         }
+      }
 
-        const csvText = await response.text();
-        const parsedData = parseCSV(csvText);
-        
-        if(parsedData.length === 0) throw new Error("Empty Data");
-
-        currentData = parsedData;
-        
-        const newAvailableDistricts = [...new Set(currentData.map(d => d.district))];
-        
-        const needToResetSelection = selectedDistricts.length === 0 || !selectedDistricts.every(d => newAvailableDistricts.includes(d));
-        
-        if (needToResetSelection) {
-             selectedDistricts = newAvailableDistricts; 
-        }
-
-        generateDistrictCheckboxes();
-        renderData();
-        renderGraph();
-
-    } catch (error) {
-        console.error("Error loading data:", error);
-        document.getElementById('dataCard').classList.add('hidden');
-        document.getElementById('errorContainer').classList.remove('hidden');
-        availableDistricts = [];
-        selectedDistricts = [];
-        generateDistrictCheckboxes();
-        Plotly.purge('districtGraph');
-    }
-}
-
-    // --- CSV Parser Helper ---
-    function parseCSV(csv) {
-        const lines = csv.split('\n').filter(line => line.trim() !== '');
+      // --- CSV Parser Helper ---
+      function parseCSV(csv) {
+        const lines = csv.split("\n").filter((line) => line.trim() !== "");
         if (lines.length < 2) return [];
 
-        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-        
-        const distIndex = headers.findIndex(h => h.includes('district'));
-        const actIndex = headers.findIndex(h => h.includes('actual'));
-        const normIndex = headers.findIndex(h => h.includes('normal'));
-        const depIndex = headers.findIndex(h => h.includes('dep') || h.includes('dev') || h.includes('%'));
+        const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
+
+        const distIndex = headers.findIndex((h) => h.includes("district"));
+        const actIndex = headers.findIndex((h) => h.includes("actual"));
+        const normIndex = headers.findIndex((h) => h.includes("normal"));
+        const depIndex = headers.findIndex(
+          (h) => h.includes("dep") || h.includes("dev") || h.includes("%"),
+        );
 
         if (distIndex === -1 || actIndex === -1) return [];
 
         const result = [];
-        
+
         for (let i = 1; i < lines.length; i++) {
-            const row = lines[i].split(',');
-            if (row.length < headers.length) continue;
+          const row = lines[i].split(",");
+          if (row.length < headers.length) continue;
 
-            const district = row[distIndex].trim().replace(/"/g, ''); 
-            const actual = parseFloat(row[actIndex]);
-            const normal = parseFloat(row[normIndex]);
-            
-            let deviation = 0;
-            if (depIndex !== -1 && row[depIndex]) {
-                deviation = parseFloat(row[depIndex]);
-            } else if (normal > 0) {
-                deviation = ((actual - normal) / normal) * 100;
-            }
+          const district = row[distIndex].trim().replace(/"/g, "");
+          const actual = parseFloat(row[actIndex]);
+          const normal = parseFloat(row[normIndex]);
 
-            if (!district) continue;
+          let deviation = 0;
+          if (depIndex !== -1 && row[depIndex]) {
+            deviation = parseFloat(row[depIndex]);
+          } else if (normal > 0) {
+            deviation = ((actual - normal) / normal) * 100;
+          }
 
-            result.push({
-                district: district,
-                actual: isNaN(actual) ? 0 : actual,
-                normal: isNaN(normal) ? 0 : normal,
-                deviation: isNaN(deviation) ? 0 : Math.round(deviation)
-            });
+          if (!district) continue;
+
+          result.push({
+            district: district,
+            actual: isNaN(actual) ? 0 : actual,
+            normal: isNaN(normal) ? 0 : normal,
+            deviation: isNaN(deviation) ? 0 : Math.round(deviation),
+          });
         }
         return result;
-    }
+      }
 
-    // --- Rendering Logic ---
-    function renderData() {
-        const searchVal = document.getElementById('searchInput').value.toLowerCase();
-        
-        let displayData = currentData.filter(d => 
-            d.district.toLowerCase().includes(searchVal) && selectedDistricts.includes(d.district)
+      // --- Rendering Logic ---
+      function renderData() {
+        const searchVal = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+
+        let displayData = currentData.filter(
+          (d) =>
+            d.district.toLowerCase().includes(searchVal) &&
+            selectedDistricts.includes(d.district),
         );
 
-        displayData = sortData(displayData, currentSort.column, currentSort.order);
+        displayData = sortData(
+          displayData,
+          currentSort.column,
+          currentSort.order,
+        );
 
-        const tbody = document.getElementById('dataTableBody');
-        tbody.innerHTML = '';
-        
+        const tbody = document.getElementById("dataTableBody");
+        tbody.innerHTML = "";
+
         if (displayData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 font-semibold">${translations[currentLanguage].noResults}</td></tr>`;
-            return;
+          tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 font-semibold">${translations[currentLanguage].noResults}</td></tr>`;
+          return;
         }
 
-        displayData.forEach(d => {
-            const statusInfo = getRainStatus(d.deviation);
+        displayData.forEach((d) => {
+          const statusInfo = getRainStatus(d.deviation);
 
-            const tr = document.createElement('tr');
-            tr.className = "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition duration-150";
-            
-            const textClass = d.deviation < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
-            
-            tr.innerHTML = `
+          const tr = document.createElement("tr");
+          tr.className =
+            "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition duration-150";
+
+          const textClass =
+            d.deviation < 0
+              ? "text-red-600 dark:text-red-400"
+              : "text-green-600 dark:text-green-400";
+
+          tr.innerHTML = `
                 <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>
                 <td class="px-6 py-4 text-right">${d.actual.toFixed(1)}</td>
                 <td class="px-6 py-4 text-right">${d.normal.toFixed(1)}</td>
-                <td class="px-6 py-4 text-right font-bold ${textClass}">${d.deviation > 0 ? '+' : ''}${d.deviation}%</td>
+                <td class="px-6 py-4 text-right font-bold ${textClass}">${d.deviation > 0 ? "+" : ""}${d.deviation}%</td>
                 <td class="px-6 py-4 text-center">
                     <span class="status-cell ${statusInfo.color} ${statusInfo.textColor}">${statusInfo.status}</span>
                 </td>
             `;
-            tbody.appendChild(tr);
+          tbody.appendChild(tr);
         });
-        
+
         updateSortIcons();
-    }
+      }
 
-    // --- Sorting Logic ---
-    function sortData(data, column, order) {
+      // --- Sorting Logic ---
+      function sortData(data, column, order) {
         return data.sort((a, b) => {
-            let valA = a[column];
-            let valB = b[column];
+          let valA = a[column];
+          let valB = b[column];
 
-            if (column === 'district') {
-                valA = valA.toLowerCase();
-                valB = valB.toLowerCase();
-            }
+          if (column === "district") {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+          }
 
-            if (valA < valB) return order === 'asc' ? -1 : 1;
-            if (valA > valB) return order === 'asc' ? 1 : -1;
-            return 0;
+          if (valA < valB) return order === "asc" ? -1 : 1;
+          if (valA > valB) return order === "asc" ? 1 : -1;
+          return 0;
         });
-    }
+      }
 
-    function updateSortIcons() {
-        document.querySelectorAll('.sort-header').forEach(h => {
-            h.classList.remove('active');
-            const icon = h.querySelector('.sort-icon i');
-            icon.className = 'fa-solid fa-sort text-gray-400'; 
+      function updateSortIcons() {
+        document.querySelectorAll(".sort-header").forEach((h) => {
+          h.classList.remove("active");
+          const icon = h.querySelector(".sort-icon i");
+          icon.className = "fa-solid fa-sort text-gray-400";
 
-            if (h.getAttribute('data-sort') === currentSort.column) {
-                h.classList.add('active');
-                icon.classList.remove('text-gray-400');
-                icon.classList.add('text-blue-600');
-                if (currentSort.order === 'asc') {
-                    icon.className = 'fa-solid fa-sort-up text-blue-600';
-                } else {
-                    icon.className = 'fa-solid fa-sort-down text-blue-600';
-                }
-            }
-        });
-    }
-
-    // --- Interaction Handlers ---
-    function selectMonth(month) {
-        currentSelectedMonth = month;
-        
-        // Save month selection to localStorage
-        localStorage.setItem('selectedMonth', month);
-        
-        document.querySelectorAll('.month-tab').forEach(btn => {
-            if(btn.getAttribute('data-month') === month) {
-                btn.classList.add('active-tab');
+          if (h.getAttribute("data-sort") === currentSort.column) {
+            h.classList.add("active");
+            icon.classList.remove("text-gray-400");
+            icon.classList.add("text-blue-600");
+            if (currentSort.order === "asc") {
+              icon.className = "fa-solid fa-sort-up text-blue-600";
             } else {
-                btn.classList.remove('active-tab');
+              icon.className = "fa-solid fa-sort-down text-blue-600";
             }
+          }
+        });
+      }
+
+      // --- Interaction Handlers ---
+      function selectMonth(month) {
+        currentSelectedMonth = month;
+
+        // Save month selection to localStorage
+        localStorage.setItem("selectedMonth", month);
+
+        document.querySelectorAll(".month-tab").forEach((btn) => {
+          if (btn.getAttribute("data-month") === month) {
+            btn.classList.add("active-tab");
+          } else {
+            btn.classList.remove("active-tab");
+          }
         });
 
         updateDashboard();
-    }
+      }
 
-    function filterData() {
+      function filterData() {
         renderData();
         renderGraph();
-    }
+      }
 
-    function toggleDarkMode() {
-        document.documentElement.classList.toggle('dark');
+      function toggleDarkMode() {
+        document.documentElement.classList.toggle("dark");
         renderGraph();
-    }
+      }
 
-    // Event Listeners for Sorting
-    document.querySelectorAll('.sort-header').forEach(header => {
-        header.addEventListener('click', function() {
-            const column = this.getAttribute('data-sort');
-            let order = this.getAttribute('data-order');
+      // Event Listeners for Sorting
+      document.querySelectorAll(".sort-header").forEach((header) => {
+        header.addEventListener("click", function () {
+          const column = this.getAttribute("data-sort");
+          let order = this.getAttribute("data-order");
 
-            if (column === currentSort.column) {
-                order = order === 'asc' ? 'desc' : 'asc';
-            } else {
-                order = this.getAttribute('data-order') || 'asc'; 
-            }
+          if (column === currentSort.column) {
+            order = order === "asc" ? "desc" : "asc";
+          } else {
+            order = this.getAttribute("data-order") || "asc";
+          }
 
-            currentSort = { column, order };
-            this.setAttribute('data-order', order);
-            renderData();
-            renderGraph(); // Auto-sync graph with table sorting
+          currentSort = { column, order };
+          this.setAttribute("data-order", order);
+          renderData();
+          renderGraph(); // Auto-sync graph with table sorting
         });
-    });
+      });
 
-        // --- Initialize ---
-    document.addEventListener('DOMContentLoaded', () => {
+      // --- Initialize ---
+      document.addEventListener("DOMContentLoaded", () => {
         // Set Hindi as default language
-        document.body.classList.add('hindi');
-        currentLanguage = 'hi';
-        
+        document.body.classList.add("hindi");
+        currentLanguage = "hi";
+
         // Set up language switcher
-        document.getElementById('langSwitchBtn').innerHTML = `
+        document.getElementById("langSwitchBtn").innerHTML = `
             <i class="fas fa-language"></i>
             English
         `;
-        
-        // Preserve month selection on language change
-        const savedMonth = localStorage.getItem('selectedMonth') || 'Overall';
-        currentSelectedMonth = savedMonth;
-        
-        // Update month tabs to reflect saved selection
-        document.querySelectorAll('.month-tab').forEach(btn => {
-            if(btn.getAttribute('data-month') === savedMonth) {
-                btn.classList.add('active-tab');
-            } else {
-                btn.classList.remove('active-tab');
-            }
-        });
-        
-        updateDashboard();
-    });
 
-</script>
-</body>
+        // Preserve month selection on language change
+        const savedMonth = localStorage.getItem("selectedMonth") || "Overall";
+        currentSelectedMonth = savedMonth;
+
+        // Update month tabs to reflect saved selection
+        document.querySelectorAll(".month-tab").forEach((btn) => {
+          if (btn.getAttribute("data-month") === savedMonth) {
+            btn.classList.add("active-tab");
+          } else {
+            btn.classList.remove("active-tab");
+          }
+        });
+
+        updateDashboard();
+      });
+    </script>
+  </body>
 </html>

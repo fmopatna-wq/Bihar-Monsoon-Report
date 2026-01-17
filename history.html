@@ -1,459 +1,683 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="hi" class="light">
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ऐतिहासिक वर्षा तुलना - बिहार मानसून (2025 तक)</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'app-bg': '#F0F9FF', 
-                        'dark-app-bg': '#030712', 
-                        primary: '#2E8B57',
-                        secondary: '#E6F4EA',
-                        darkbg: '#1a202c',
-                        carddark: '#2d3748',
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "app-bg": "#F0F9FF",
+              "dark-app-bg": "#030712",
+              primary: "#2E8B57",
+              secondary: "#E6F4EA",
+              darkbg: "#1a202c",
+              carddark: "#2d3748",
+            },
+          },
+        },
+      };
     </script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap');
-        
-        body { 
-            font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif; 
-            scroll-behavior: smooth; 
-        }
-        
-        .card { 
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .dark .card { border: 1px solid rgba(255,255,255,0.1); }
-        
-        .gradient-text {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: inline-block;
-        }
-        .dark .gradient-text {
-            background: linear-gradient(to right, #60a5fa, #2dd4bf);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: inline-block;
-        }
-        
-        #historicalChart {
-            height: 500px;
-            width: 100%;
-        }
-        
-        .nav-box {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid transparent;
-            color: #4b5563;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .dark .nav-box { color: #d1d5db; }
-        .nav-box:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-            background-color: white;
-        }
-        .dark .nav-box:hover { background-color: #374151; }
-        .nav-box.active-nav {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            color: white !important;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-            border: none;
-        }
-        
-        .navbar {
-            background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            position: fixed !important; 
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            z-index: 1000 !important;
-        }
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tiro+Devanagari+Hindi&display=swap");
 
+      body {
+        font-family: "Poppins", "Tiro Devanagari Hindi", sans-serif;
+        scroll-behavior: smooth;
+      }
+
+      .card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      .dark .card {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .gradient-text {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: inline-block;
+      }
+      .dark .gradient-text {
+        background: linear-gradient(to right, #60a5fa, #2dd4bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: inline-block;
+      }
+
+      #historicalChart {
+        height: 500px;
+        width: 100%;
+      }
+
+      .nav-box {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid transparent;
+        color: #4b5563;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .dark .nav-box {
+        color: #d1d5db;
+      }
+      .nav-box:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        background-color: white;
+      }
+      .dark .nav-box:hover {
+        background-color: #374151;
+      }
+      .nav-box.active-nav {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white !important;
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        border: none;
+      }
+
+      .navbar {
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 1000 !important;
+      }
+
+      body {
+        padding-top: 150px !important;
+      }
+
+      @media (max-width: 1023px) {
         body {
-            padding-top: 150px !important;
+          padding-top: 220px !important;
         }
+      }
 
-        @media (max-width: 1023px) {
-            body {
-                padding-top: 220px !important;
-            }
-        }
+      #overview {
+        padding-top: 0 !important;
+        margin-top: -20px !important;
+      }
 
-        #overview {
-            padding-top: 0 !important;
-            margin-top: -20px !important;
-        }
+      h2,
+      .gradient-text {
+        line-height: 1.5 !important;
+        padding-top: 5px;
+      }
 
-        h2, .gradient-text {
-            line-height: 1.5 !important;
-            padding-top: 5px;
-        }
+      .dark .navbar {
+        background-color: rgba(30, 41, 59, 0.9) !important;
+      }
 
-        .dark .navbar {
-            background-color: rgba(30, 41, 59, 0.9) !important;
-        }       
-
-        .navbar.scrolled {
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        }
-        .dark .navbar.scrolled {
-            background-color: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-        }
+      .navbar.scrolled {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        box-shadow:
+          0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      }
+      .dark .navbar.scrolled {
+        background-color: rgba(30, 41, 59, 0.95);
+        backdrop-filter: blur(8px);
+        box-shadow:
+          0 1px 3px 0 rgba(0, 0, 0, 0.3),
+          0 1px 2px 0 rgba(0, 0, 0, 0.2);
+      }
+      .nav-links-container {
+        display: flex;
+        gap: 1.5rem;
+      }
+      @media (max-width: 1023px) {
         .nav-links-container {
-            display: flex;
-            gap: 1.5rem;
+          gap: 0.75rem;
+          overflow-x: auto;
+          white-space: nowrap;
+          padding-bottom: 4px;
+          flex-grow: 1;
+          justify-content: flex-start;
         }
-        @media (max-width: 1023px) {
-            .nav-links-container {
-                gap: 0.75rem;
-                overflow-x: auto;
-                white-space: nowrap;
-                padding-bottom: 4px;
-                flex-grow: 1;
-                justify-content: flex-start;
-            }
-        }
-        
-        /* Language Switcher Styles - Matching index.html */
-        .lang-switcher {
-            position: relative;
-            display: inline-block;
-        }
+      }
 
-        .lang-switcher button {
-            background: linear-gradient(to right, #2563eb, #0d9488);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+      /* Language Switcher Styles - Matching index.html */
+      .lang-switcher {
+        position: relative;
+        display: inline-block;
+      }
 
-        .lang-switcher button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+      .lang-switcher button {
+        background: linear-gradient(to right, #2563eb, #0d9488);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
 
-        /* Language specific elements - Default to Hindi */
-        .lang-en { display: none; }
-        .lang-hi { display: block; }
-        
-        body.english .lang-en { display: block; }
-        body.english .lang-hi { display: none; }
+      .lang-switcher button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Language specific elements - Default to Hindi */
+      .lang-en {
+        display: none;
+      }
+      .lang-hi {
+        display: block;
+      }
+
+      body.english .lang-en {
+        display: block;
+      }
+      body.english .lang-hi {
+        display: none;
+      }
     </style>
-</head>
-<body class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
-
-<svg height="0" width="0" style="position: absolute;">
-    <defs>
+  </head>
+  <body
+    class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen"
+  >
+    <svg height="0" width="0" style="position: absolute">
+      <defs>
         <linearGradient id="gradient-dark" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#2dd4bf;stop-opacity:1" />
+          <stop offset="0%" style="stop-color: #60a5fa; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #2dd4bf; stop-opacity: 1" />
         </linearGradient>
-    </defs>
-</svg>
+      </defs>
+    </svg>
 
-<nav id="navbar" class="navbar">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+    <nav id="navbar" class="navbar">
+      <div
+        class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between"
+      >
         <div class="flex items-center gap-3 nav-logo shrink-0">
-            <img 
-                src="assets/logo.png" 
-                alt="बिहार मानसून लोगो" 
-                class="h-10 w-10 dark:invert"
-            >
-            <div>
-                <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">बिहार मानसून डैशबोर्ड</h1>
-                <h1 class="text-xl font-bold leading-tight gradient-text lang-en">Bihar Monsoon Dashboard</h1>
-                <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">IMD MC Patna — ऐतिहासिक विश्लेषण</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">IMD MC Patna — Historical Analysis</div>
+          <img
+            src="assets/logo.png"
+            alt="बिहार मानसून लोगो"
+            class="h-10 w-10 dark:invert"
+          />
+          <div>
+            <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">
+              बिहार मानसून डैशबोर्ड
+            </h1>
+            <h1 class="text-xl font-bold leading-tight gradient-text lang-en">
+              Bihar Monsoon Dashboard
+            </h1>
+            <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">
+              IMD MC Patna — ऐतिहासिक विश्लेषण
             </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">
+              IMD MC Patna — Historical Analysis
+            </div>
+          </div>
         </div>
 
-        <div class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0">
-            <a href="index.html" class="nav-box lang-hi" onclick="setActive(this)">होम</a>
-            <a href="index.html" class="nav-box lang-en" onclick="setActive(this)">Home</a>
-            <a href="index.html#analysis" class="nav-box lang-hi" onclick="setActive(this)">डैशबोर्ड</a>    
-            <a href="index.html#analysis" class="nav-box lang-en" onclick="setActive(this)">Dashboard</a>    
-            <a href="district.html" class="nav-box lang-hi" onclick="setActive(this)">जिलावार</a> 
-            <a href="district.html" class="nav-box lang-en" onclick="setActive(this)">District-wise</a> 
-            <a href="maps.html" class="nav-box lang-hi" onclick="setActive(this)">मानचित्र</a>
-            <a href="maps.html" class="nav-box lang-en" onclick="setActive(this)">Maps</a>
-            <a href="history.html" class="nav-box active-nav lang-hi" onclick="setActive(this)">ऐतिहासिक</a>
-            <a href="history.html" class="nav-box active-nav lang-en" onclick="setActive(this)">Historical</a>
-            <a href="comparison.html" class="nav-box lang-hi" onclick="setActive(this)">तुलना</a>
-            <a href="comparison.html" class="nav-box lang-en" onclick="setActive(this)">Comparison</a>
+        <div
+          class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0"
+        >
+          <a href="index.html" class="nav-box lang-hi" onclick="setActive(this)"
+            >होम</a
+          >
+          <a href="index.html" class="nav-box lang-en" onclick="setActive(this)"
+            >Home</a
+          >
+          <a
+            href="index.html#analysis"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >डैशबोर्ड</a
+          >
+          <a
+            href="index.html#analysis"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Dashboard</a
+          >
+          <a
+            href="district.html"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >जिलावार</a
+          >
+          <a
+            href="district.html"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >District-wise</a
+          >
+          <a
+            href="intensity.html"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >तीव्रता</a
+          >
+          <a
+            href="intensity.html"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Intensity</a
+          >
+          <a href="maps.html" class="nav-box lang-hi" onclick="setActive(this)"
+            >मानचित्र</a
+          >
+          <a href="maps.html" class="nav-box lang-en" onclick="setActive(this)"
+            >Maps</a
+          >
+          <a
+            href="history.html"
+            class="nav-box active-nav lang-hi"
+            onclick="setActive(this)"
+            >ऐतिहासिक</a
+          >
+          <a
+            href="history.html"
+            class="nav-box active-nav lang-en"
+            onclick="setActive(this)"
+            >Historical</a
+          >
+          <a
+            href="comparison.html"
+            class="nav-box lang-hi"
+            onclick="setActive(this)"
+            >तुलना</a
+          >
+          <a
+            href="comparison.html"
+            class="nav-box lang-en"
+            onclick="setActive(this)"
+            >Comparison</a
+          >
         </div>
 
         <div class="flex items-center gap-4 shrink-0">
-            <!-- Language Switcher - Matching index.html -->
-            <div class="lang-switcher">
-                <button id="langSwitchBtn" onclick="toggleLanguage()" title="Switch Language / भाषा बदलें">
-                    <i class="fas fa-language"></i>
-                    <span class="lang-hi">English</span>
-                    <span class="lang-en">हिन्दी</span>
-                </button>
-            </div>
-            
-            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
-                <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+          <!-- Language Switcher - Matching index.html -->
+          <div class="lang-switcher">
+            <button
+              id="langSwitchBtn"
+              onclick="toggleLanguage()"
+              title="Switch Language / भाषा बदलें"
+            >
+              <i class="fas fa-language"></i>
+              <span class="lang-hi">English</span>
+              <span class="lang-en">हिन्दी</span>
             </button>
+          </div>
+
+          <button
+            onclick="toggleDarkMode()"
+            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          >
+            <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+            <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+          </button>
         </div>
-    </div>
-</nav>
+      </div>
+    </nav>
 
-<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
-
-    <section class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
+      <section class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
         <div class="border-b border-gray-100 dark:border-gray-700 pb-4 mb-6">
-            <h3 class="text-2xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-chart-bar text-indigo-600"></i> 
-                <span class="gradient-text lang-hi">ऐतिहासिक वर्षा ग्राफ़ का तुलनात्मक अध्ययन</span>
-                <span class="gradient-text lang-en">Comparative Study of Historical Rainfall Graph</span>
-            </h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 lang-hi">वर्ष 2002 से 2025 तक बिहार में मानसूनी वर्षा का तुलनात्मक विश्लेषण</p>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 lang-en">Comparative analysis of monsoon rainfall in Bihar from 2002 to 2025</p>
+          <h3 class="text-2xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-chart-bar text-indigo-600"></i>
+            <span class="gradient-text lang-hi"
+              >ऐतिहासिक वर्षा ग्राफ़ का तुलनात्मक अध्ययन</span
+            >
+            <span class="gradient-text lang-en"
+              >Comparative Study of Historical Rainfall Graph</span
+            >
+          </h3>
+          <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 lang-hi">
+            वर्ष 2002 से 2025 तक बिहार में मानसूनी वर्षा का तुलनात्मक विश्लेषण
+          </p>
+          <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 lang-en">
+            Comparative analysis of monsoon rainfall in Bihar from 2002 to 2025
+          </p>
         </div>
-        
+
         <div class="text-center p-4">
-            <img 
-                src="rainfall_comparative_24years.jpg" 
-                alt="24 वर्षों की ऐतिहासिक वर्षा तुलना" 
-                class="w-full h-auto max-w-5xl mx-auto border-2 border-gray-300 dark:border-gray-700 rounded-lg shadow-xl"
-            />
-            
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center text-sm">
-                <div class="bg-blue-50 dark:bg-gray-700 p-3 rounded-lg shadow-inner">
-                    <span class="block text-gray-500 dark:text-gray-400 font-medium lang-hi">दीर्घकालिक औसत (LPA)</span>
-                    <span class="block text-gray-500 dark:text-gray-400 font-medium lang-en">Long Period Average (LPA)</span>
-                    <span class="font-bold text-blue-700 dark:text-blue-300 text-lg">996.0 मिमी</span>
-                </div>
-                <div class="bg-green-50 dark:bg-gray-700 p-3 rounded-lg shadow-inner">
-                    <span class="block text-gray-500 dark:text-gray-400 font-medium lang-hi">सर्वाधिक वर्षा (वर्ष)</span>
-                    <span class="block text-gray-500 dark:text-gray-400 font-medium lang-en">Highest Rainfall (Year)</span>
-                    <span class="font-bold text-green-700 dark:text-green-300 text-lg">2007 (1343.0 मिमी)</span>
-                </div>
-                <div class="bg-red-50 dark:bg-gray-700 p-3 rounded-lg shadow-inner">
-                    <span class="block text-gray-500 dark:text-gray-400 font-medium lang-hi">सबसे सूखा (वर्ष)</span>
-                    <span class="block text-gray-500 dark:text-gray-400 font-medium lang-en">Driest Year</span>
-                    <span class="font-bold text-red-700 dark:text-red-300 text-lg">2022 (683.3 मिमी)</span>
-                </div>
+          <img
+            src="rainfall_comparative_24years.jpg"
+            alt="24 वर्षों की ऐतिहासिक वर्षा तुलना"
+            class="w-full h-auto max-w-5xl mx-auto border-2 border-gray-300 dark:border-gray-700 rounded-lg shadow-xl"
+          />
+
+          <div
+            class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center text-sm"
+          >
+            <div
+              class="bg-blue-50 dark:bg-gray-700 p-3 rounded-lg shadow-inner"
+            >
+              <span
+                class="block text-gray-500 dark:text-gray-400 font-medium lang-hi"
+                >दीर्घकालिक औसत (LPA)</span
+              >
+              <span
+                class="block text-gray-500 dark:text-gray-400 font-medium lang-en"
+                >Long Period Average (LPA)</span
+              >
+              <span class="font-bold text-blue-700 dark:text-blue-300 text-lg"
+                >996.0 मिमी</span
+              >
             </div>
+            <div
+              class="bg-green-50 dark:bg-gray-700 p-3 rounded-lg shadow-inner"
+            >
+              <span
+                class="block text-gray-500 dark:text-gray-400 font-medium lang-hi"
+                >सर्वाधिक वर्षा (वर्ष)</span
+              >
+              <span
+                class="block text-gray-500 dark:text-gray-400 font-medium lang-en"
+                >Highest Rainfall (Year)</span
+              >
+              <span class="font-bold text-green-700 dark:text-green-300 text-lg"
+                >2007 (1343.0 मिमी)</span
+              >
+            </div>
+            <div class="bg-red-50 dark:bg-gray-700 p-3 rounded-lg shadow-inner">
+              <span
+                class="block text-gray-500 dark:text-gray-400 font-medium lang-hi"
+                >सबसे सूखा (वर्ष)</span
+              >
+              <span
+                class="block text-gray-500 dark:text-gray-400 font-medium lang-en"
+                >Driest Year</span
+              >
+              <span class="font-bold text-red-700 dark:text-red-300 text-lg"
+                >2022 (683.3 मिमी)</span
+              >
+            </div>
+          </div>
         </div>
-    </section>
-    
-    <section class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+      </section>
+
+      <section class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
         <h3 class="text-2xl font-bold flex items-center gap-2 mb-4">
-            <i class="fa-solid fa-chart-line text-indigo-600"></i> 
-            <span class="gradient-text lang-hi">ऐतिहासिक वर्षा का तुलनात्मक अध्ययन (बार चार्ट)</span>
-            <span class="gradient-text lang-en">Comparative Study of Historical Rainfall (Bar Chart)</span>
+          <i class="fa-solid fa-chart-line text-indigo-600"></i>
+          <span class="gradient-text lang-hi"
+            >ऐतिहासिक वर्षा का तुलनात्मक अध्ययन (बार चार्ट)</span
+          >
+          <span class="gradient-text lang-en"
+            >Comparative Study of Historical Rainfall (Bar Chart)</span
+          >
         </h3>
         <div id="historicalChart" class="w-full h-[500px]"></div>
-        
+
         <div class="mt-8">
-            <h3 class="text-lg font-semibold mb-3 lang-hi">वर्षा वर्गीकरण $\text{Legends}$ (प्रयुक्त रंग):</h3>
-            <h3 class="text-lg font-semibold mb-3 lang-en">Rainfall Classification $\text{Legends}$ (Used Colors):</h3>
-            <div id="legendContainer" class="flex flex-wrap gap-4 text-xs">
-                </div>
+          <h3 class="text-lg font-semibold mb-3 lang-hi">
+            वर्षा वर्गीकरण $\text{Legends}$ (प्रयुक्त रंग):
+          </h3>
+          <h3 class="text-lg font-semibold mb-3 lang-en">
+            Rainfall Classification $\text{Legends}$ (Used Colors):
+          </h3>
+          <div id="legendContainer" class="flex flex-wrap gap-4 text-xs"></div>
         </div>
-    </section>
+      </section>
+    </main>
 
-</main>
-
-<script>
-    // --- LANGUAGE TRANSLATIONS ---
-    const translations = {
+    <script>
+      // --- LANGUAGE TRANSLATIONS ---
+      const translations = {
         hi: {
-            'chart-main-title': 'वर्षवार वास्तविक वर्षा बनाम दीर्घकालिक औसत (LPA)',
-            'chart-xaxis-title': 'वर्ष',
-            'chart-yaxis-title': 'कुल वर्षा (मिमी)',
-            'chart-actual-rain': 'वास्तविक वर्षा (मिमी)',
-            'chart-normal-rain': 'सामान्य LPA',
-            'legend-large-excess': 'LARGE EXCESS',
-            'legend-excess': 'EXCESS',
-            'legend-normal': 'NORMAL',
-            'legend-deficient': 'DEFICIENT',
-            'legend-large-deficient': 'LARGE DEFICIENT',
-            'legend-no-rain': 'NO RAIN',
-            'legend-large-excess-label': '+60% या अधिक',
-            'legend-excess-label': '+20% से +59%',
-            'legend-normal-label': '-19% से +19%',
-            'legend-deficient-label': '-59% से -20%',
-            'legend-large-deficient-label': '-60% या कम',
-            'legend-no-rain-label': '-100%'
+          "chart-main-title":
+            "वर्षवार वास्तविक वर्षा बनाम दीर्घकालिक औसत (LPA)",
+          "chart-xaxis-title": "वर्ष",
+          "chart-yaxis-title": "कुल वर्षा (मिमी)",
+          "chart-actual-rain": "वास्तविक वर्षा (मिमी)",
+          "chart-normal-rain": "सामान्य LPA",
+          "legend-large-excess": "LARGE EXCESS",
+          "legend-excess": "EXCESS",
+          "legend-normal": "NORMAL",
+          "legend-deficient": "DEFICIENT",
+          "legend-large-deficient": "LARGE DEFICIENT",
+          "legend-no-rain": "NO RAIN",
+          "legend-large-excess-label": "+60% या अधिक",
+          "legend-excess-label": "+20% से +59%",
+          "legend-normal-label": "-19% से +19%",
+          "legend-deficient-label": "-59% से -20%",
+          "legend-large-deficient-label": "-60% या कम",
+          "legend-no-rain-label": "-100%",
         },
         en: {
-            'chart-main-title': 'Year-wise Actual Rainfall vs Long Period Average (LPA)',
-            'chart-xaxis-title': 'Year',
-            'chart-yaxis-title': 'Total Rainfall (mm)',
-            'chart-actual-rain': 'Actual Rainfall (mm)',
-            'chart-normal-rain': 'Normal LPA',
-            'legend-large-excess': 'LARGE EXCESS',
-            'legend-excess': 'EXCESS',
-            'legend-normal': 'NORMAL',
-            'legend-deficient': 'DEFICIENT',
-            'legend-large-deficient': 'LARGE DEFICIENT',
-            'legend-no-rain': 'NO RAIN',
-            'legend-large-excess-label': '+60% or more',
-            'legend-excess-label': '+20% to +59%',
-            'legend-normal-label': '-19% to +19%',
-            'legend-deficient-label': '-59% to -20%',
-            'legend-large-deficient-label': '-60% or less',
-            'legend-no-rain-label': '-100%'
-        }
-    };
+          "chart-main-title":
+            "Year-wise Actual Rainfall vs Long Period Average (LPA)",
+          "chart-xaxis-title": "Year",
+          "chart-yaxis-title": "Total Rainfall (mm)",
+          "chart-actual-rain": "Actual Rainfall (mm)",
+          "chart-normal-rain": "Normal LPA",
+          "legend-large-excess": "LARGE EXCESS",
+          "legend-excess": "EXCESS",
+          "legend-normal": "NORMAL",
+          "legend-deficient": "DEFICIENT",
+          "legend-large-deficient": "LARGE DEFICIENT",
+          "legend-no-rain": "NO RAIN",
+          "legend-large-excess-label": "+60% or more",
+          "legend-excess-label": "+20% to +59%",
+          "legend-normal-label": "-19% to +19%",
+          "legend-deficient-label": "-59% to -20%",
+          "legend-large-deficient-label": "-60% or less",
+          "legend-no-rain-label": "-100%",
+        },
+      };
 
-    let currentLanguage = 'hi'; // Default to Hindi
+      let currentLanguage = "hi"; // Default to Hindi
 
-    // --- LANGUAGE SWITCHING FUNCTION - Matching index.html ---
-    function toggleLanguage() {
-        document.body.classList.toggle('english');
-        currentLanguage = document.body.classList.contains('english') ? 'en' : 'hi';
-        
+      // --- LANGUAGE SWITCHING FUNCTION - Matching index.html ---
+      function toggleLanguage() {
+        document.body.classList.toggle("english");
+        currentLanguage = document.body.classList.contains("english")
+          ? "en"
+          : "hi";
+
         // Update language switcher button
-        document.getElementById('langSwitchBtn').innerHTML = `
+        document.getElementById("langSwitchBtn").innerHTML = `
             <i class="fas fa-language"></i>
-            ${currentLanguage === 'en' ? 'हिन्दी' : 'English'}
+            ${currentLanguage === "en" ? "हिन्दी" : "English"}
         `;
-        
+
         renderHistoricalChart();
         renderLegends();
-    }
+      }
 
-    // --- UI Logic: Active Tab Switching ---
-    function setActive(element) {
-        document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('active-nav'));
-        element.classList.add('active-nav');
-    }
-    
-    // --- INJECTED DATA FROM CSV FILES (2025 तक) ---
-    const historicalData = {
-        "years": [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
-        "actual_rainfall": [1004.0, 1140.0, 934.0, 853.0, 913.0, 1343.0, 1043.0, 752.0, 796.0, 1059.0, 813.0, 722.0, 849.0, 745.0, 975.0, 937.0, 771.0, 1050.0, 1272.5, 1044.5, 683.3, 760.5, 798.2, 686.3],
-        "departures": [-2.0, 12.0, -9.0, -17.0, -11.0, 32.0, 2.0, -27.0, -23.0, 3.0, -21.0, -31.0, -18.0, -28.0, -5.0, -9.0, -25.0, 6.0, 28.0, 5.0, -31.0, -23.0, -20.0, -31.0]
-    };
+      // --- UI Logic: Active Tab Switching ---
+      function setActive(element) {
+        document
+          .querySelectorAll(".nav-box")
+          .forEach((el) => el.classList.remove("active-nav"));
+        element.classList.add("active-nav");
+      }
 
-    // --- INJECTED LEGEND RULES FROM CSV ---
-    const legendRules = [
-        {"category": "LARGE EXCESS", "min_dep": 60, "max_dep": 1000, "color": "#0d9488", "label_hi": "+60% या अधिक", "label_en": "+60% or more"}, 
-        {"category": "EXCESS", "min_dep": 20, "max_dep": 59, "color": "#22c55e", "label_hi": "+20% से +59%", "label_en": "+20% to +59%"}, 
-        {"category": "NORMAL", "min_dep": -19, "max_dep": 19, "color": "#3b82f6", "label_hi": "-19% से +19%", "label_en": "-19% to +19%"}, 
-        {"category": "DEFICIENT", "min_dep": -59, "max_dep": -20, "color": "#f97316", "label_hi": "-59% से -20%", "label_en": "-59% to -20%"}, 
-        {"category": "LARGE DEFICIENT", "min_dep": -1000, "max_dep": -60, "color": "#ef4444", "label_hi": "-60% या कम", "label_en": "-60% or less"}, 
-        {"category": "NO RAIN", "min_dep": -100, "max_dep": -100, "color": "#6b7280", "label_hi": "-100%", "label_en": "-100%"}
-    ];
-    
-    const lpaValue = 996.0;
+      // --- INJECTED DATA FROM CSV FILES (2025 तक) ---
+      const historicalData = {
+        years: [
+          2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+          2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
+          2024, 2025,
+        ],
+        actual_rainfall: [
+          1004.0, 1140.0, 934.0, 853.0, 913.0, 1343.0, 1043.0, 752.0, 796.0,
+          1059.0, 813.0, 722.0, 849.0, 745.0, 975.0, 937.0, 771.0, 1050.0,
+          1272.5, 1044.5, 683.3, 760.5, 798.2, 686.3,
+        ],
+        departures: [
+          -2.0, 12.0, -9.0, -17.0, -11.0, 32.0, 2.0, -27.0, -23.0, 3.0, -21.0,
+          -31.0, -18.0, -28.0, -5.0, -9.0, -25.0, 6.0, 28.0, 5.0, -31.0, -23.0,
+          -20.0, -31.0,
+        ],
+      };
 
-    function getBarColor(departure) {
+      // --- INJECTED LEGEND RULES FROM CSV ---
+      const legendRules = [
+        {
+          category: "LARGE EXCESS",
+          min_dep: 60,
+          max_dep: 1000,
+          color: "#0d9488",
+          label_hi: "+60% या अधिक",
+          label_en: "+60% or more",
+        },
+        {
+          category: "EXCESS",
+          min_dep: 20,
+          max_dep: 59,
+          color: "#22c55e",
+          label_hi: "+20% से +59%",
+          label_en: "+20% to +59%",
+        },
+        {
+          category: "NORMAL",
+          min_dep: -19,
+          max_dep: 19,
+          color: "#3b82f6",
+          label_hi: "-19% से +19%",
+          label_en: "-19% to +19%",
+        },
+        {
+          category: "DEFICIENT",
+          min_dep: -59,
+          max_dep: -20,
+          color: "#f97316",
+          label_hi: "-59% से -20%",
+          label_en: "-59% to -20%",
+        },
+        {
+          category: "LARGE DEFICIENT",
+          min_dep: -1000,
+          max_dep: -60,
+          color: "#ef4444",
+          label_hi: "-60% या कम",
+          label_en: "-60% or less",
+        },
+        {
+          category: "NO RAIN",
+          min_dep: -100,
+          max_dep: -100,
+          color: "#6b7280",
+          label_hi: "-100%",
+          label_en: "-100%",
+        },
+      ];
+
+      const lpaValue = 996.0;
+
+      function getBarColor(departure) {
         for (const rule of legendRules) {
-            if (departure >= rule.min_dep && departure <= rule.max_dep) {
-                return rule.color;
-            }
+          if (departure >= rule.min_dep && departure <= rule.max_dep) {
+            return rule.color;
+          }
         }
-        return '#6b7280';
-    }
+        return "#6b7280";
+      }
 
-    function renderHistoricalChart() {
-        const isDark = document.documentElement.classList.contains('dark');
-        
+      function renderHistoricalChart() {
+        const isDark = document.documentElement.classList.contains("dark");
+
         const years = historicalData.years;
         const rainfall = historicalData.actual_rainfall;
         const departures = historicalData.departures;
-        
+
         const colors = departures.map(getBarColor);
 
         const layout = {
-            title: {
-                text: translations[currentLanguage]['chart-main-title'],
-                font: { size: 20, color: isDark ? '#f8fafc' : '#1e293b' }
-            },
-            paper_bgcolor: isDark ? '#1f2937' : 'rgba(255,255,255,0)', 
-            plot_bgcolor: isDark ? '#1f2937' : 'rgba(255,255,255,0)',
-            font: { family: 'Poppins', color: isDark ? '#cbd5e1' : '#334155' },
-            xaxis: { 
-                title: translations[currentLanguage]['chart-xaxis-title'], 
-                type: 'category', 
-                tickfont: { color: isDark ? '#9ca3af' : '#4b5563' },
-                linecolor: isDark ? '#374151' : '#e2e8f0',
-            },
-            yaxis: { 
-                title: translations[currentLanguage]['chart-yaxis-title'], 
-                showgrid: true, 
-                gridcolor: isDark ? '#374151' : '#e2e8f0', 
-                linecolor: isDark ? '#374151' : '#e2e8f0',
-                tickfont: { color: isDark ? '#9ca3af' : '#4b5563' },
-            },
-            margin: { t: 60, b: 50, l: 60, r: 20 },
-            hovermode: 'x unified'
+          title: {
+            text: translations[currentLanguage]["chart-main-title"],
+            font: { size: 20, color: isDark ? "#f8fafc" : "#1e293b" },
+          },
+          paper_bgcolor: isDark ? "#1f2937" : "rgba(255,255,255,0)",
+          plot_bgcolor: isDark ? "#1f2937" : "rgba(255,255,255,0)",
+          font: { family: "Poppins", color: isDark ? "#cbd5e1" : "#334155" },
+          xaxis: {
+            title: translations[currentLanguage]["chart-xaxis-title"],
+            type: "category",
+            tickfont: { color: isDark ? "#9ca3af" : "#4b5563" },
+            linecolor: isDark ? "#374151" : "#e2e8f0",
+          },
+          yaxis: {
+            title: translations[currentLanguage]["chart-yaxis-title"],
+            showgrid: true,
+            gridcolor: isDark ? "#374151" : "#e2e8f0",
+            linecolor: isDark ? "#374151" : "#e2e8f0",
+            tickfont: { color: isDark ? "#9ca3af" : "#4b5563" },
+          },
+          margin: { t: 60, b: 50, l: 60, r: 20 },
+          hovermode: "x unified",
         };
 
         const trace1 = {
-            x: years, y: rainfall, type: 'bar',
-            marker: { color: colors, opacity: 0.9 }, 
-            name: translations[currentLanguage]['chart-actual-rain'],
-            hovertemplate: 
-                '<b>' + translations[currentLanguage]['chart-xaxis-title'] + ':</b> %{x}<br>' +
-                '<b>' + translations[currentLanguage]['chart-yaxis-title'] + ':</b> %{y} मिमी<br>' +
-                '<b>विचलन:</b> %{customdata:.1f}%<extra></extra>',
-            customdata: departures
+          x: years,
+          y: rainfall,
+          type: "bar",
+          marker: { color: colors, opacity: 0.9 },
+          name: translations[currentLanguage]["chart-actual-rain"],
+          hovertemplate:
+            "<b>" +
+            translations[currentLanguage]["chart-xaxis-title"] +
+            ":</b> %{x}<br>" +
+            "<b>" +
+            translations[currentLanguage]["chart-yaxis-title"] +
+            ":</b> %{y} मिमी<br>" +
+            "<b>विचलन:</b> %{customdata:.1f}%<extra></extra>",
+          customdata: departures,
         };
-        
+
         const trace2 = {
-            x: years, y: Array(years.length).fill(lpaValue), 
-            type: 'scatter', mode: 'lines',
-            line: { color: isDark ? '#94a3b8' : '#475569', dash: 'dash', width: 2 },
-            name: translations[currentLanguage]['chart-normal-rain'],
-            hovertemplate: 
-                '<b>सामान्य LPA:</b> %{y} मिमी<extra></extra>'
+          x: years,
+          y: Array(years.length).fill(lpaValue),
+          type: "scatter",
+          mode: "lines",
+          line: {
+            color: isDark ? "#94a3b8" : "#475569",
+            dash: "dash",
+            width: 2,
+          },
+          name: translations[currentLanguage]["chart-normal-rain"],
+          hovertemplate: "<b>सामान्य LPA:</b> %{y} मिमी<extra></extra>",
         };
 
-        Plotly.newPlot('historicalChart', [trace1, trace2], layout, {responsive: true, displayModeBar: false});
-    }
+        Plotly.newPlot("historicalChart", [trace1, trace2], layout, {
+          responsive: true,
+          displayModeBar: false,
+        });
+      }
 
-    function renderLegends() {
-        const container = document.getElementById('legendContainer');
-        container.innerHTML = legendRules.map(rule => {
-            const label = currentLanguage === 'hi' ? rule.label_hi : rule.label_en;
+      function renderLegends() {
+        const container = document.getElementById("legendContainer");
+        container.innerHTML = legendRules
+          .map((rule) => {
+            const label =
+              currentLanguage === "hi" ? rule.label_hi : rule.label_en;
             return `
                 <div class="flex items-center gap-2 p-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
                     <span class="w-4 h-4 rounded-full" style="background-color: ${rule.color};"></span>
@@ -461,27 +685,28 @@
                     <span class="text-gray-500 dark:text-gray-400">(${label})</span>
                 </div>
             `;
-        }).join('');
-    }
-    
-    function toggleDarkMode() {
-        document.documentElement.classList.toggle('dark');
-        renderHistoricalChart();
-    }
-    
-    window.addEventListener('scroll', () => {
-        const navbar = document.getElementById('navbar');
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    });
+          })
+          .join("");
+      }
 
-    document.addEventListener('DOMContentLoaded', () => {
+      function toggleDarkMode() {
+        document.documentElement.classList.toggle("dark");
+        renderHistoricalChart();
+      }
+
+      window.addEventListener("scroll", () => {
+        const navbar = document.getElementById("navbar");
+        if (window.scrollY > 50) {
+          navbar.classList.add("scrolled");
+        } else {
+          navbar.classList.remove("scrolled");
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
         renderHistoricalChart();
         renderLegends();
-    });
-</script>
-</body>
+      });
+    </script>
+  </body>
 </html>
