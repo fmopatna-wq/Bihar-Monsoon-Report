@@ -240,6 +240,73 @@
       .dark .month-checkbox-item:hover {
         background-color: #374151;
       }
+
+      /* --- Hover-based Toolbar Styles (From Comparison) --- */
+      .chart-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      .plotly-toolbar {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
+        border-radius: 6px;
+        padding: 4px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        z-index: 50;
+        display: none;
+        gap: 4px;
+        align-items: center;
+        transition: opacity 0.2s ease;
+      }
+
+      .chart-container:hover .plotly-toolbar {
+        display: flex !important;
+      }
+
+      .dark .plotly-toolbar {
+        background: rgba(30, 41, 59, 0.9);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      }
+
+      .toolbar-btn {
+        background: transparent;
+        border: none;
+        padding: 4px 6px;
+        border-radius: 4px;
+        cursor: pointer;
+        color: #4b5563;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .dark .toolbar-btn {
+        color: #d1d5db;
+      }
+
+      .toolbar-btn:hover {
+        background: rgba(59, 130, 246, 0.1);
+        color: #2563eb;
+      }
+
+      .dark .toolbar-btn:hover {
+        background: rgba(59, 130, 246, 0.2);
+        color: #60a5fa;
+      }
+
+      /* Breakdown Card Styles */
+      .breakdown-box {
+        transition: transform 0.2s;
+      }
+      .breakdown-box:hover {
+        transform: translateY(-2px);
+      }
     </style>
   </head>
   <body
@@ -370,7 +437,9 @@
       </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6 flex-grow flex flex-col w-full">
+    <main
+      class="max-w-7xl mx-auto p-4 md:p-6 space-y-6 flex-grow flex flex-col w-full"
+    >
       <!-- Controls Section -->
       <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
         <div
@@ -411,6 +480,7 @@
                 class="bg-white dark:bg-gray-800 border-none rounded-md px-2 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer"
               >
                 <option value="block">Block Wise (Raw)</option>
+                <option value="district_top_block">District (Top Block)</option>
                 <option value="district" selected>District Wise (Avg)</option>
               </select>
             </div>
@@ -528,6 +598,25 @@
         </div>
       </div>
 
+      <!-- Category Breakdown Section -->
+      <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-indigo-600"></i>
+          <span class="gradient-text lang-hi"
+            >श्रेणीवार वर्षा दिवसों का विवरण</span
+          >
+          <span class="gradient-text lang-en"
+            >Category-wise Rainy Days Breakdown</span
+          >
+        </h3>
+        <div
+          class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4"
+          id="breakdownContainer"
+        >
+          <!-- Dynamic Content -->
+        </div>
+      </div>
+
       <!-- Heatmap Section -->
       <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg mb-6">
         <div
@@ -540,8 +629,27 @@
               >Week-wise Intensity Heatmap</span
             >
           </h3>
+          <!-- Toolbar -->
+          <div class="plotly-toolbar">
+            <button
+              class="toolbar-btn"
+              onclick="downloadChart('heatmapChart', 'heatmap.png')"
+              title="Download"
+            >
+              <i class="fa-solid fa-download"></i>
+            </button>
+            <button
+              class="toolbar-btn"
+              onclick="resetZoom('heatmapChart')"
+              title="Reset Zoom"
+            >
+              <i class="fa-solid fa-expand-arrows-alt"></i>
+            </button>
+          </div>
         </div>
-        <div id="heatmapChart" class="w-full h-[800px]"></div>
+        <div class="chart-container">
+          <div id="heatmapChart" class="w-full h-[800px]"></div>
+        </div>
         <div id="loadingMessage" class="hidden text-center py-10 text-gray-500">
           <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
           <span class="lang-hi">डेटा लोड हो रहा है...</span>
@@ -567,8 +675,41 @@
               >Total Rainy Days (Selected Intensity)</span
             >
           </h3>
+          <!-- Toolbar -->
+          <div class="plotly-toolbar">
+            <button
+              class="toolbar-btn"
+              onclick="downloadChart('barChart', 'barchart.png')"
+              title="Download"
+            >
+              <i class="fa-solid fa-download"></i>
+            </button>
+            <button
+              class="toolbar-btn"
+              onclick="resetZoom('barChart')"
+              title="Reset Zoom"
+            >
+              <i class="fa-solid fa-expand-arrows-alt"></i>
+            </button>
+            <button
+              class="toolbar-btn"
+              onclick="togglePanMode('barChart')"
+              title="Pan"
+            >
+              <i class="fa-solid fa-hand-paper"></i>
+            </button>
+            <button
+              class="toolbar-btn"
+              onclick="toggleZoomMode('barChart')"
+              title="Zoom"
+            >
+              <i class="fa-solid fa-search-plus"></i>
+            </button>
+          </div>
         </div>
-        <div id="barChart" class="w-full h-[500px]"></div>
+        <div class="chart-container">
+          <div id="barChart" class="w-full h-[500px]"></div>
+        </div>
       </div>
 
       <!-- Data Table Section -->
@@ -825,6 +966,17 @@
         },
       };
 
+      // Colors from index.html for Heatmap
+      const RAINFALL_COLORS_HEX = {
+        "LARGE EXCESS": "#1565c0", // Dark Blue
+        EXCESS: "#4fc3f7", // Light Blue
+        NORMAL: "#4caf50", // Green
+        DEFICIENT: "#e53935", // Red
+        "LARGE DEFICIENT": "#ffd700", // Yellow
+        "NO RAIN": "#ffffff", // White
+      };
+
+      let currentMode = {}; // For toolbar state
       // --- State ---
       let rawData = [];
       let currentLanguage = "hi";
@@ -1345,6 +1497,26 @@
           }));
         }
 
+        if (viewLevel === "district_top_block") {
+          // Group by District AND Date to find the top block for each day
+          const dailyMaxMap = {};
+
+          filtered.forEach((d) => {
+            const key = `${d.district}|${d.dateStr}`;
+            if (!dailyMaxMap[key]) {
+              dailyMaxMap[key] = d;
+            } else {
+              // If current record has higher rainfall than stored, replace it
+              if (d.value > dailyMaxMap[key].value) {
+                dailyMaxMap[key] = d;
+              }
+            }
+          });
+
+          // Flatten back to array
+          processed = Object.values(dailyMaxMap);
+        }
+
         // Final Intensity Filter
         const finalData = processed.filter((d) =>
           selectedCats.some((cat) => d.value >= cat.min && d.value <= cat.max),
@@ -1353,9 +1525,41 @@
         document.getElementById("totalDaysCount").innerText =
           finalData.length.toLocaleString();
 
+        renderBreakdown(finalData);
+
         renderHeatmap(finalData, viewLevel);
         renderBarChart(finalData, viewLevel);
         renderTable(finalData, viewLevel);
+      }
+
+      // --- Breakdown Renderer ---
+      function renderBreakdown(data) {
+        const container = document.getElementById("breakdownContainer");
+        const counts = {};
+
+        // Initialize counts
+        INTENSITY_CATEGORIES.forEach((cat) => (counts[cat.id] = 0));
+
+        // Count data
+        data.forEach((d) => {
+          const cat = INTENSITY_CATEGORIES.find(
+            (c) => d.value >= c.min && d.value <= c.max,
+          );
+          if (cat) counts[cat.id]++;
+        });
+
+        container.innerHTML = INTENSITY_CATEGORIES.map((cat) => {
+          const label = currentLanguage === "en" ? cat.name_en : cat.name_hi;
+          const count = counts[cat.id];
+          return `
+                <div class="breakdown-box bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center">
+                    <div class="w-full h-1 rounded-full mb-2" style="background-color: ${cat.color}"></div>
+                    <span class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">${label}</span>
+                    <span class="text-xs text-gray-400 mb-1">${cat.range}</span>
+                    <span class="text-xl font-bold text-gray-800 dark:text-white">${count.toLocaleString()}</span>
+                </div>
+            `;
+        }).join("");
       }
 
       // --- Visualizations ---
@@ -1433,12 +1637,12 @@
           y: yLabels,
           type: "heatmap",
           colorscale: [
-            [0, "rgb(200, 230, 255)"],
-            [0.2, "rgb(135, 206, 235)"],
-            [0.4, "rgb(144, 238, 144)"],
-            [0.6, "rgb(255, 215, 0)"],
-            [0.8, "rgb(255, 140, 0)"],
-            [1, "rgb(255, 0, 0)"],
+            [0.0, RAINFALL_COLORS_HEX["NO RAIN"]], // White (Low)
+            [0.2, RAINFALL_COLORS_HEX["LARGE DEFICIENT"]], // Yellow
+            [0.4, RAINFALL_COLORS_HEX["DEFICIENT"]], // Red
+            [0.6, RAINFALL_COLORS_HEX["NORMAL"]], // Green
+            [0.8, RAINFALL_COLORS_HEX["EXCESS"]], // Light Blue
+            [1.0, RAINFALL_COLORS_HEX["LARGE EXCESS"]], // Dark Blue (High)
           ],
           colorbar: {
             title: currentLanguage === "en" ? "Count" : "संख्या",
@@ -1579,6 +1783,59 @@
             icon.className = "fa-solid fa-sort ml-1 text-gray-400";
             if (currentTableSort.column === col)
               icon.className = `fa-solid fa-sort-${currentTableSort.order === "asc" ? "up" : "down"} ml-1 text-blue-600`;
+          }
+        });
+      }
+
+      // --- Toolbar Functions ---
+      function downloadChart(chartId, filename) {
+        Plotly.downloadImage(chartId, {
+          format: "png",
+          width: 1200,
+          height: 800,
+          filename: filename,
+        });
+      }
+
+      function resetZoom(chartId) {
+        Plotly.relayout(chartId, {
+          "xaxis.autorange": true,
+          "yaxis.autorange": true,
+        });
+      }
+
+      function togglePanMode(chartId) {
+        const plotDiv = document.getElementById(chartId);
+        if (!currentMode[chartId]) currentMode[chartId] = "zoom";
+        const newMode = currentMode[chartId] === "pan" ? "zoom" : "pan";
+        currentMode[chartId] = newMode;
+        Plotly.relayout(chartId, { dragmode: newMode });
+        updateToolbarState(chartId, newMode);
+      }
+
+      function toggleZoomMode(chartId) {
+        const plotDiv = document.getElementById(chartId);
+        if (!currentMode[chartId]) currentMode[chartId] = "zoom";
+        const newMode = currentMode[chartId] === "zoom" ? "pan" : "zoom";
+        currentMode[chartId] = newMode;
+        Plotly.relayout(chartId, { dragmode: newMode });
+        updateToolbarState(chartId, newMode);
+      }
+
+      function updateToolbarState(chartId, mode) {
+        const container = document.getElementById(chartId).closest(".card");
+        const btns = container.querySelectorAll(".toolbar-btn");
+        btns.forEach((btn) => {
+          const title = btn.getAttribute("title");
+          if (title === "Pan") {
+            btn.style.backgroundColor =
+              mode === "pan" ? "rgba(59, 130, 246, 0.2)" : "transparent";
+            btn.style.color = mode === "pan" ? "#2563eb" : "";
+          }
+          if (title === "Zoom") {
+            btn.style.backgroundColor =
+              mode === "zoom" ? "rgba(59, 130, 246, 0.2)" : "transparent";
+            btn.style.color = mode === "zoom" ? "#2563eb" : "";
           }
         });
       }

@@ -87,7 +87,7 @@
 
       /* बॉडी को और नीचे धकेला गया है (Tiro Font के लिए) */
       body {
-        padding-top: 150px !important; /* कंप्यूटर के लिए गैप बढ़ाया गया */
+        padding-top: 180px !important; /* कंप्यूटर के लिए गैप बढ़ाया गया (2 rows) */
       }
 
       @media (max-width: 1023px) {
@@ -274,17 +274,17 @@
 
       /* Language specific elements - Default to Hindi */
       .lang-en {
-        display: none;
+        display: none !important;
       }
       .lang-hi {
-        display: block;
+        display: block !important;
       }
 
       body.english .lang-en {
-        display: block;
+        display: block !important;
       }
       body.english .lang-hi {
-        display: none;
+        display: none !important;
       }
 
       /* Combined selection box */
@@ -325,11 +325,378 @@
         color: #2563eb;
         font-weight: bold;
       }
+
+      /* --- Weather Background Animation --- */
+      /* Body Background (Day Mode) */
+      body {
+        /* Animated Blue Sky Gradient */
+        background: linear-gradient(-45deg, #87ceeb, #00bfff, #1e90ff, #87cefa);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        background-attachment: fixed;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* Weather Background Container */
+      .weather-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      /* Sun & Clouds (Day Elements) */
+      .sun {
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 220, 0.6) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        border-radius: 50%;
+        filter: blur(30px);
+        animation: sun-pulse 8s infinite alternate;
+        transition:
+          opacity 1s ease,
+          transform 1s ease;
+      }
+
+      .cloud {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50px;
+        filter: blur(8px);
+        transition: opacity 1s ease;
+      }
+
+      .cloud::after,
+      .cloud::before {
+        content: "";
+        position: absolute;
+        background: inherit;
+        border-radius: 50%;
+      }
+
+      .cloud1 {
+        width: 140px;
+        height: 50px;
+        top: 10%;
+        left: -160px;
+        animation: float-cloud 35s infinite linear;
+      }
+      .cloud1::after {
+        width: 60px;
+        height: 60px;
+        top: -30px;
+        left: 25px;
+      }
+      .cloud1::before {
+        width: 50px;
+        height: 50px;
+        top: -20px;
+        left: 70px;
+      }
+
+      .cloud2 {
+        width: 100px;
+        height: 40px;
+        top: 25%;
+        left: -120px;
+        animation: float-cloud 45s infinite linear 12s;
+      }
+      .cloud2::after {
+        width: 45px;
+        height: 45px;
+        top: -25px;
+        left: 15px;
+      }
+      .cloud2::before {
+        width: 40px;
+        height: 40px;
+        top: -15px;
+        left: 50px;
+      }
+
+      .cloud3 {
+        width: 180px;
+        height: 60px;
+        top: 15%;
+        left: -200px;
+        animation: float-cloud 50s infinite linear 5s;
+      }
+      .cloud3::after {
+        width: 80px;
+        height: 80px;
+        top: -40px;
+        left: 30px;
+      }
+      .cloud3::before {
+        width: 60px;
+        height: 60px;
+        top: -25px;
+        left: 90px;
+      }
+
+      @keyframes float-cloud {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(120vw);
+        }
+      }
+
+      @keyframes sun-pulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(1.1);
+          opacity: 0.7;
+        }
+      }
+
+      /* Moon & Stars (Night Elements) */
+      .moon {
+        position: absolute;
+        top: 60px;
+        right: 80px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        box-shadow: -20px 10px 0 0 #f6e58d;
+        opacity: 0;
+        transform: translateY(-50px) rotate(-20deg);
+        transition: all 1s ease;
+      }
+
+      .star {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 1s ease;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+      }
+
+      .star1 {
+        width: 3px;
+        height: 3px;
+        top: 15%;
+        left: 10%;
+        animation-delay: 0s;
+      }
+      .star2 {
+        width: 4px;
+        height: 4px;
+        top: 25%;
+        left: 30%;
+        animation-delay: 1s;
+      }
+      .star3 {
+        width: 2px;
+        height: 2px;
+        top: 10%;
+        left: 50%;
+        animation-delay: 2s;
+      }
+      .star4 {
+        width: 3px;
+        height: 3px;
+        top: 35%;
+        left: 70%;
+        animation-delay: 0.5s;
+      }
+      .star5 {
+        width: 4px;
+        height: 4px;
+        top: 20%;
+        left: 85%;
+        animation-delay: 1.5s;
+      }
+      .star6 {
+        width: 2px;
+        height: 2px;
+        top: 45%;
+        left: 20%;
+        animation-delay: 2.5s;
+      }
+      .star7 {
+        width: 3px;
+        height: 3px;
+        top: 5%;
+        left: 60%;
+        animation-delay: 0.8s;
+      }
+
+      /* Dark Mode Styles (Night Theme) */
+      .dark body {
+        background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #000000);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+      }
+
+      /* Hide Sun/Clouds and Show Moon/Stars in Dark Mode */
+      .dark .sun {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      .dark .cloud {
+        opacity: 0;
+      }
+      .dark .moon {
+        opacity: 1;
+        transform: translateY(0) rotate(-20deg);
+      }
+      .dark .star {
+        animation: twinkle 3s infinite ease-in-out;
+        opacity: 1;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.2;
+          transform: scale(0.8);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.2);
+        }
+      }
+
+      /* --- New Language Toggle Switch --- */
+      .lang-switch-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.6);
+        padding: 4px 8px;
+        border-radius: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(4px);
+      }
+      .dark .lang-switch-wrapper {
+        background: rgba(30, 41, 59, 0.6);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      .lang-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: all 0.3s;
+        user-select: none;
+      }
+      .dark .lang-label {
+        color: #94a3b8;
+      }
+      .lang-label.active {
+        opacity: 1;
+        color: #2563eb;
+      }
+      .dark .lang-label.active {
+        color: #60a5fa;
+      }
+
+      .toggle-switch {
+        position: relative;
+        width: 36px;
+        height: 20px;
+        display: inline-block;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e1;
+        transition: 0.4s;
+        border-radius: 20px;
+      }
+      .dark .toggle-slider {
+        background-color: #475569;
+      }
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .toggle-switch input:checked + .toggle-slider {
+        background-color: #2563eb;
+      }
+      .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(16px);
+      }
+
+      /* Simple Background Mode */
+      body.simple-bg {
+        background: #f0f9ff !important;
+        animation: none !important;
+      }
+      .dark body.simple-bg {
+        background: #111827 !important;
+      }
+      body.simple-bg .weather-bg {
+        display: none !important;
+      }
     </style>
   </head>
   <body
-    class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col"
+    class="text-gray-800 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col"
   >
+    <div class="weather-bg">
+      <div class="sun"></div>
+      <div class="cloud cloud1"></div>
+      <div class="cloud cloud2"></div>
+      <div class="cloud cloud3"></div>
+      <div class="moon"></div>
+      <div class="star star1"></div>
+      <div class="star star2"></div>
+      <div class="star star3"></div>
+      <div class="star star4"></div>
+      <div class="star star5"></div>
+      <div class="star star6"></div>
+      <div class="star star7"></div>
+    </div>
+
     <svg height="0" width="0" style="position: absolute">
       <defs>
         <linearGradient
@@ -356,135 +723,153 @@
     </svg>
 
     <nav id="navbar" class="navbar">
-      <div
-        class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between"
-      >
-        <div class="flex items-center gap-3 nav-logo shrink-0">
-          <img
-            src="assets/logo.png"
-            alt="IMD Logo"
-            class="h-8 w-8 object-contain dark:invert"
-          />
-          <div>
-            <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">
-              बिहार मानसून डैशबोर्ड
-            </h1>
-            <h1 class="text-xl font-bold leading-tight gradient-text lang-en">
-              Bihar Monsoon Dashboard
-            </h1>
-            <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">
-              IMD MC Patna — व्यापक विश्लेषण
-            </div>
-            <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">
-              IMD MC Patna — Comprehensive Analysis
+      <div class="max-w-7xl mx-auto px-4 py-2 flex flex-col gap-2">
+        <!-- Top Row: Branding & Controls -->
+        <div class="flex flex-wrap items-center justify-between w-full gap-4">
+          <div class="flex items-center gap-3 nav-logo shrink-0">
+            <img
+              src="assets/logo.png"
+              alt="IMD Logo"
+              class="h-8 w-8 object-contain dark:invert"
+            />
+            <div>
+              <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">
+                बिहार मानसून डैशबोर्ड
+              </h1>
+              <h1 class="text-xl font-bold leading-tight gradient-text lang-en">
+                Bihar Monsoon Dashboard
+              </h1>
+              <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">
+                IMD MC Patna — व्यापक विश्लेषण
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">
+                IMD MC Patna — Comprehensive Analysis
+              </div>
             </div>
           </div>
-        </div>
 
-        <div
-          class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0"
-        >
-          <a
-            href="index.html"
-            class="nav-box active-nav lang-hi"
-            onclick="setActive(this)"
-            >होम</a
-          >
-          <a
-            href="index.html"
-            class="nav-box active-nav lang-en"
-            onclick="setActive(this)"
-            >Home</a
-          >
-          <a
-            href="#analysis"
-            class="nav-box lang-hi"
-            onclick="smoothScrollToAnalysis(event)"
-            >डैशबोर्ड</a
-          >
-          <a
-            href="#analysis"
-            class="nav-box lang-en"
-            onclick="smoothScrollToAnalysis(event)"
-            >Dashboard</a
-          >
-          <a
-            href="district.html"
-            class="nav-box lang-hi"
-            onclick="setActive(this)"
-            >जिलावार</a
-          >
-          <a
-            href="district.html"
-            class="nav-box lang-en"
-            onclick="setActive(this)"
-            >District-wise</a
-          >
-          <a
-            href="intensity.html"
-            class="nav-box lang-hi"
-            onclick="setActive(this)"
-            >तीव्रता</a
-          >
-          <a
-            href="intensity.html"
-            class="nav-box lang-en"
-            onclick="setActive(this)"
-            >Intensity</a
-          >
-          <a href="maps.html" class="nav-box lang-hi" onclick="setActive(this)"
-            >मानचित्र</a
-          >
-          <a href="maps.html" class="nav-box lang-en" onclick="setActive(this)"
-            >Maps</a
-          >
-          <a
-            href="history.html"
-            class="nav-box lang-hi"
-            onclick="setActive(this)"
-            >ऐतिहासिक</a
-          >
-          <a
-            href="history.html"
-            class="nav-box lang-en"
-            onclick="setActive(this)"
-            >Historical</a
-          >
-          <a
-            href="comparison.html"
-            class="nav-box lang-hi"
-            onclick="setActive(this)"
-            >तुलना</a
-          >
-          <a
-            href="comparison.html"
-            class="nav-box lang-en"
-            onclick="setActive(this)"
-            >Comparison</a
-          >
-        </div>
+          <div class="flex items-center gap-4 shrink-0">
+            <!-- Language Switcher -->
+            <div class="lang-switch-wrapper">
+              <span
+                class="lang-label active"
+                id="lblHi"
+                onclick="
+                  document.getElementById('langToggle').checked = false;
+                  toggleLanguage();
+                "
+                >HI</span
+              >
+              <label class="toggle-switch">
+                <input
+                  type="checkbox"
+                  id="langToggle"
+                  onchange="toggleLanguage()"
+                />
+                <span class="toggle-slider"></span>
+              </label>
+              <span
+                class="lang-label"
+                id="lblEn"
+                onclick="
+                  document.getElementById('langToggle').checked = true;
+                  toggleLanguage();
+                "
+                >EN</span
+              >
+            </div>
 
-        <div class="flex items-center gap-4 shrink-0">
-          <!-- Language Switcher -->
-          <div class="lang-switcher">
             <button
-              id="langSwitchBtn"
-              onclick="toggleLanguage()"
-              title="Switch Language / भाषा बदलें"
+              onclick="toggleDarkMode()"
+              class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
             >
-              <i class="fas fa-language"></i>
-              <span class="lang-hi">English</span>
-              <span class="lang-en">हिन्दी</span>
+              <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+              <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
             </button>
           </div>
+        </div>
 
-          <button
-            onclick="toggleDarkMode()"
-            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-          >
-            <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
-            <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
-          </button>
+        <!-- Bottom Row: Navigation Links -->
+        <div class="flex justify-center w-full overflow-x-auto pb-1">
+          <div class="flex nav-links-container text-sm font-semibold gap-4">
+            <a
+              href="index.html"
+              class="nav-box active-nav lang-hi"
+              onclick="setActive(this)"
+              >होम</a
+            >
+            <a
+              href="index.html"
+              class="nav-box active-nav lang-en"
+              onclick="setActive(this)"
+              >Home</a
+            >
+
+            <a
+              href="district.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >जिलावार</a
+            >
+            <a
+              href="district.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >District-wise</a
+            >
+
+            <a
+              href="intensity.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >तीव्रता</a
+            >
+            <a
+              href="intensity.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >Intensity</a
+            >
+
+            <a
+              href="maps.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >मानचित्र</a
+            >
+            <a
+              href="maps.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >Maps</a
+            >
+
+            <a
+              href="history.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >ऐतिहासिक</a
+            >
+            <a
+              href="history.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >Historical</a
+            >
+
+            <a
+              href="comparison.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >तुलना</a
+            >
+            <a
+              href="comparison.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >Comparison</a
+            >
+          </div>
         </div>
       </div>
     </nav>
@@ -1060,16 +1445,19 @@
       let currentLanguage = "hi"; // Default to Hindi
 
       function toggleLanguage() {
-        document.body.classList.toggle("english");
-        currentLanguage = document.body.classList.contains("english")
-          ? "en"
-          : "hi";
+        const toggle = document.getElementById("langToggle");
+        const isEnglish = toggle.checked;
+        currentLanguage = isEnglish ? "en" : "hi";
 
-        // Update language switcher button
-        document.getElementById("langSwitchBtn").innerHTML = `
-            <i class="fas fa-language"></i>
-            ${currentLanguage === "en" ? "हिन्दी" : "English"}
-        `;
+        if (isEnglish) {
+          document.body.classList.add("english");
+          document.getElementById("lblEn").classList.add("active");
+          document.getElementById("lblHi").classList.remove("active");
+        } else {
+          document.body.classList.remove("english");
+          document.getElementById("lblHi").classList.add("active");
+          document.getElementById("lblEn").classList.remove("active");
+        }
 
         updateLanguageContent();
         if (window.globalData) {
@@ -2183,21 +2571,10 @@
         document.body.classList.add("hindi");
         currentLanguage = "hi";
 
-        // 3. भाषा बदलने वाले बटन को सेट करें
-        const langBtn = document.getElementById("langSwitchBtn");
-        if (langBtn) {
-          // बटन का टेक्स्ट सेट करें
-          langBtn.innerHTML = `<i class="fas fa-language"></i> English`;
-
-          // बटन पर क्लिक करने का पक्का इंतजाम (Event Listener)
-          langBtn.onclick = function (e) {
-            e.preventDefault();
-            if (typeof toggleLanguage === "function") {
-              toggleLanguage();
-            } else {
-              console.error("toggleLanguage function missing!");
-            }
-          };
+        // 3. टॉगल स्विच को इनिशियलाइज़ करें
+        const toggle = document.getElementById("langToggle");
+        if (toggle) {
+          toggle.checked = false; // Default Hindi
         }
 
         // 4. मानसून आगमन की CSV फाइल लोड करें
