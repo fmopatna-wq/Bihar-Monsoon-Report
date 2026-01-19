@@ -834,7 +834,7 @@
               href="intensity.html"
               class="nav-box lang-hi"
               onclick="setActive(this)"
-              >तीव्रता</a
+              >तीव्रता विश्लेषण</a
             >
             <a
               href="intensity.html"
@@ -938,20 +938,11 @@
               onchange="updateDashboard()"
               class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-bold w-64"
             >
-              <option value="overall_monsoon" selected class="lang-hi">
-                मानसून (जून-सितंबर)
-              </option>
-              <option value="overall_monsoon" selected class="lang-en">
-                Monsoon (June-September)
-              </option>
-              <option value="june" class="lang-hi">जून</option>
-              <option value="june" class="lang-en">June</option>
-              <option value="july" class="lang-hi">जुलाई</option>
-              <option value="july" class="lang-en">July</option>
-              <option value="august" class="lang-hi">अगस्त</option>
-              <option value="august" class="lang-en">August</option>
-              <option value="september" class="lang-hi">सितंबर</option>
-              <option value="september" class="lang-en">September</option>
+              <option value="overall_monsoon">मानसून (जून-सितंबर)</option>
+              <option value="june">जून</option>
+              <option value="july">जुलाई</option>
+              <option value="august">अगस्त</option>
+              <option value="september">सितंबर</option>
             </select>
           </div>
         </div>
@@ -1042,29 +1033,67 @@
             जिलों की संख्या:- सामान्य से कम
           </div>
         </div>
-        <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl">
-          <div class="text-teal-600 dark:text-teal-400 text-3xl mb-2">
-            <i class="fa-solid fa-trophy"></i>
+        <div
+          class="card bg-white dark:bg-gray-800 p-4 rounded-xl flex flex-col justify-between gap-3"
+        >
+          <!-- Max Rain -->
+          <div class="flex items-center gap-3">
+            <div
+              class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400 shrink-0"
+            >
+              <i class="fa-solid fa-cloud-showers-water text-xl"></i>
+            </div>
+            <div class="overflow-hidden min-w-0">
+              <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">
+                Max Rainfall
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">
+                सर्वाधिक वर्षा
+              </div>
+              <div
+                class="font-bold truncate text-gray-800 dark:text-gray-200 text-sm"
+                id="statMaxDist"
+              >
+                --
+              </div>
+              <div
+                class="text-xs font-bold text-blue-600 dark:text-blue-400"
+                id="statMaxVal"
+              >
+                --
+              </div>
+            </div>
           </div>
+
+          <!-- Min Rain -->
           <div
-            class="text-xl font-bold truncate gradient-text"
-            id="statMaxDist"
+            class="flex items-center gap-3 border-t border-gray-100 dark:border-gray-700 pt-3"
           >
-            <span class="lang-en">--</span>
-            <span class="lang-hi">--</span>
-          </div>
-          <div
-            class="text-sm font-bold text-gray-600 dark:text-gray-300"
-            id="statMaxVal"
-          >
-            <span class="lang-en">--</span>
-            <span class="lang-hi">--</span>
-          </div>
-          <div class="text-sm text-gray-500 mt-1 lang-en">
-            Highest Rainfall Receive District
-          </div>
-          <div class="text-sm text-gray-500 mt-1 lang-hi">
-            सर्वाधिक वर्षा प्राप्त करने वाला जिला
+            <div
+              class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg text-red-600 dark:text-red-400 shrink-0"
+            >
+              <i class="fa-solid fa-sun text-xl"></i>
+            </div>
+            <div class="overflow-hidden min-w-0">
+              <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">
+                Min Rainfall
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">
+                न्यूनतम वर्षा
+              </div>
+              <div
+                class="font-bold truncate text-gray-800 dark:text-gray-200 text-sm"
+                id="statMinDist"
+              >
+                --
+              </div>
+              <div
+                class="text-xs font-bold text-red-600 dark:text-red-400"
+                id="statMinVal"
+              >
+                --
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1093,13 +1122,11 @@
             <i class="fa-solid fa-chart-line text-purple-600"></i>
             <div class="gradient-text lang-hi">
               वास्तविक, सामान्य वर्षा और उसके विचलन का ग्राफ़
-              <span class="dynamic-month-label lang-hi"
-                >मानसून (जून-सितंबर)</span
-              >
+              <span class="dynamic-month-label">मानसून (जून-सितंबर)</span>
             </div>
             <span class="gradient-text lang-en"
               >Graph of Actual, Normal Rainfall and its Departure
-              <span class="dynamic-month-label lang-en"
+              <span class="dynamic-month-label"
                 >Monsoon (June-September)</span
               ></span
             >
@@ -1116,13 +1143,11 @@
             <i class="fa-solid fa-chart-column text-blue-600"></i>
             <span class="gradient-text lang-hi"
               >जिलावार वर्षा (विचलन)
-              <span id="monthDisplay" class="dynamic-month-label lang-hi"
-                >मानसून (जून-सितंबर)</span
-              ></span
+              <span class="dynamic-month-label">मानसून (जून-सितंबर)</span></span
             >
             <span class="gradient-text lang-en"
               >District-wise Rainfall Anomalies (Departure)
-              <span id="monthDisplay" class="dynamic-month-label lang-en"
+              <span class="dynamic-month-label"
                 >Monsoon (June-September)</span
               ></span
             >
@@ -1156,15 +1181,13 @@
           <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
             <i class="fa-solid fa-chart-pie text-orange-600"></i>
             <span class="gradient-text lang-hi"
-              >जिलेवार वर्षा वर्गीकरण का % वितरण (Pie Chart)<span
-                id="monthDisplay"
-                class="dynamic-month-label lang-hi"
-                >मानसून (जून-सितंबर)</span
-              ></span
+              >जिलेवार वर्षा वर्गीकरण का % वितरण (Pie Chart)
+              <span class="dynamic-month-label">मानसून (जून-सितंबर)</span></span
             >
             <span class="gradient-text lang-en"
               >% Distribution of District-wise Rainfall Classification (Pie
-              Chart)<span id="monthDisplay" class="dynamic-month-label lang-en"
+              Chart)
+              <span class="dynamic-month-label"
                 >Monsoon (June-September)</span
               ></span
             >
@@ -1201,16 +1224,12 @@
           <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
             <i class="fa-solid fa-table-cells text-teal-600"></i>
             <span class="gradient-text lang-hi"
-              >वर्षा वितरण मैट्रिक्स (Heatmap)<span
-                id="monthDisplay"
-                class="dynamic-month-label lang-hi"
-                >मानसून (जून-सितंबर)</span
-              ></span
+              >वर्षा वितरण मैट्रिक्स (Heatmap)
+              <span class="dynamic-month-label">मानसून (जून-सितंबर)</span></span
             >
             <span class="gradient-text lang-en"
-              >Rainfall Distribution Matrix (Heatmap)<span
-                id="monthDisplay"
-                class="dynamic-month-label lang-en"
+              >Rainfall Distribution Matrix (Heatmap)
+              <span class="dynamic-month-label"
                 >Monsoon (June-September)</span
               ></span
             >
@@ -1263,15 +1282,8 @@
           <h3 class="text-xl font-bold text-gray-800 dark:text-white">
             <span class="gradient-text lang-hi">विस्तृत जिलावार डेटा:</span>
             <span class="gradient-text lang-en">Detailed District Data:</span>
-            <span
-              id="tableMonthLabel"
-              class="dynamic-month-label text-blue-600 lang-hi"
+            <span class="dynamic-month-label text-blue-600"
               >मानसून (जून-सितंबर)
-            </span>
-            <span
-              id="tableMonthLabel"
-              class="dynamic-month-label text-blue-600 lang-en"
-              >Monsoon (June-September)
             </span>
           </h3>
           <div class="flex items-center gap-4">
@@ -1286,7 +1298,7 @@
                 id="searchTable"
                 onkeyup="filterAndSortTable()"
                 placeholder="Search District / जिला खोजें"
-                class="lang-en lang-hi pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm w-64"
+                class="pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm w-64"
               />
             </div>
             <select
@@ -1312,7 +1324,7 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto max-h-[500px]">
+        <div class="overflow-x-auto max-h-[700px]">
           <table
             class="w-full text-sm text-left text-gray-600 dark:text-gray-300"
           >
@@ -1483,7 +1495,7 @@
 
       function updateLanguageContent() {
         const isEnglish = currentLanguage === "en";
-        const year = document.getElementById("yearDisplay").textContent;
+        const year = document.getElementById("yearSelect").value;
         const periodKey = document.getElementById("periodSelect").value;
         const monthLabel = getMonthLabel(periodKey, isEnglish);
         const fullLabel = `${monthLabel} - ${year}`;
@@ -1535,17 +1547,15 @@
           ? "block"
           : "none";
 
-        // Update max/min box
-        document.querySelector("#maxRainDistrict").textContent =
-          document.querySelector("#maxRainDistrict").textContent;
-        document.querySelector("#minRainDistrict").textContent =
-          document.querySelector("#minRainDistrict").textContent;
-
-        // Update stats
-        updateStatsLanguage();
-
         // Update table headers
         updateTableHeaders(isEnglish);
+
+        // Update periodSelect options
+        const periodSelect = document.getElementById("periodSelect");
+        Array.from(periodSelect.options).forEach((option) => {
+          const label = getMonthLabel(option.value, isEnglish);
+          if (label) option.text = label;
+        });
       }
 
       function getMonthLabel(periodKey, isEnglish) {
@@ -1560,25 +1570,6 @@
           september: { en: "September", hi: "सितंबर" },
         };
         return monthNames[periodKey][isEnglish ? "en" : "hi"];
-      }
-
-      function updateStatsLanguage() {
-        const isEnglish = currentLanguage === "en";
-        const avgRain = document.getElementById("statAvgRain");
-        const avgRainText = avgRain.textContent
-          .replace(" मिमी", "")
-          .replace(" mm", "");
-        avgRain.innerHTML = `<span class="lang-en">${avgRainText} mm</span><span class="lang-hi">${avgRainText} मिमी</span>`;
-
-        document.getElementById("statDevLabel").textContent = isEnglish
-          ? "Departure"
-          : "विचलन";
-        document.getElementById("statDeficitCount").innerHTML =
-          `<span class="lang-en">${document.getElementById("statDeficitCount").textContent}</span><span class="lang-hi">${document.getElementById("statDeficitCount").textContent}</span>`;
-        document.getElementById("statMaxDist").innerHTML =
-          `<span class="lang-en">${document.getElementById("statMaxDist").textContent}</span><span class="lang-hi">${document.getElementById("statMaxDist").textContent}</span>`;
-        document.getElementById("statMaxVal").innerHTML =
-          `<span class="lang-en">${document.getElementById("statMaxVal").textContent.replace(" मिमी", " mm")}</span><span class="lang-hi">${document.getElementById("statMaxVal").textContent.replace(" mm", " मिमी")}</span>`;
       }
 
       function updateTableHeaders(isEnglish) {
@@ -1649,6 +1640,49 @@
         august: { en: "August", hi: "अगस्त" },
         july: { en: "July", hi: "जुलाई" },
         june: { en: "June", hi: "जून" },
+      };
+
+      const districtTranslations = {
+        ARARIA: "अररिया",
+        ARWAL: "अरवल",
+        AURANGABAD: "औरंगाबाद",
+        BANKA: "बांका",
+        BEGUSARAI: "बेगूसराय",
+        BHAGALPUR: "भागलपुर",
+        BHOJPUR: "भोजपुर",
+        BUXAR: "बक्सर",
+        DARBHANGA: "दरभंगा",
+        "EAST CHAMPARAN": "पूर्वी चंपारण",
+        GAYA: "गया",
+        GOPALGANJ: "गोपालगंज",
+        JAMUI: "जमुई",
+        JEHANABAD: "जहानाबाद",
+        "KAIMUR (BHABUA)": "कैमूर (भभुआ)",
+        KAIMUR: "कैमूर",
+        KATIHAR: "कटिहार",
+        KHAGARIA: "खगड़िया",
+        KISHANGANJ: "किशनगंज",
+        LAKHISARAI: "लखीसराय",
+        MADHEPURA: "मधेपुरा",
+        MADHUBANI: "मधुबनी",
+        MUNGER: "मुंगेर",
+        MUZAFFARPUR: "मुजफ्फरपुर",
+        NALANDA: "नालंदा",
+        NAWADA: "नवादा",
+        PATNA: "पटना",
+        PURNEA: "पूर्णिया",
+        PURNIA: "पूर्णिया",
+        ROHTAS: "रोहतास",
+        SAHARSA: "सहरसा",
+        SAMASTIPUR: "समस्तीपुर",
+        SARAN: "सारण",
+        SHEIKHPURA: "शेखपुरा",
+        SHEOHAR: "शिवहर",
+        SITAMARHI: "सीतामढ़ी",
+        SIWAN: "सीवान",
+        SUPAUL: "सुपौल",
+        VAISHALI: "वैशाली",
+        "WEST CHAMPARAN": "पश्चिमी चंपारण",
       };
 
       // वैश्विक वैरिएबल
@@ -1826,8 +1860,6 @@
         yearElements.forEach((el) => {
           el.innerText = year;
         });
-        document.getElementById("monthDisplay").innerText = fullLabel;
-        document.getElementById("tableMonthLabel").innerText = fullLabel;
         document
           .querySelectorAll(".dynamic-month-label")
           .forEach((el) => (el.innerText = fullLabel));
@@ -1961,6 +1993,8 @@
           document.getElementById("statDeficitCount").innerText = "--";
           document.getElementById("statMaxDist").innerText = "--";
           document.getElementById("statMaxVal").innerText = "--";
+          document.getElementById("statMinDist").innerText = "--";
+          document.getElementById("statMinVal").innerText = "--";
           return;
         }
 
@@ -1978,6 +2012,9 @@
         const deficitCount = data.filter((d) => d.deviation < -19).length;
         const maxDist = data.reduce((prev, current) =>
           prev.actual > current.actual ? prev : current,
+        );
+        const minDist = data.reduce((prev, current) =>
+          prev.actual < current.actual ? prev : current,
         );
 
         document.getElementById("statAvgRain").innerText =
@@ -2013,6 +2050,9 @@
         document.getElementById("statMaxDist").innerText = maxDist.district;
         document.getElementById("statMaxVal").innerText =
           `${maxDist.actual} ${currentLanguage === "en" ? "mm" : "मिमी"}`;
+        document.getElementById("statMinDist").innerText = minDist.district;
+        document.getElementById("statMinVal").innerText =
+          `${minDist.actual} ${currentLanguage === "en" ? "mm" : "मिमी"}`;
       }
 
       function renderMainCharts(data) {
@@ -2413,6 +2453,23 @@
 
         const districts = [...new Set(data.map((d) => d.district))].sort();
 
+        // Keep districts in English as per user request
+        const displayDistricts = districts;
+
+        // Translate months for display
+        const monthTranslations = {
+          June: "जून",
+          July: "जुलाई",
+          August: "अगस्त",
+          September: "सितंबर",
+        };
+        const displayMonths = monthsToShow.map((m) => {
+          if (currentLanguage === "hi") {
+            return monthTranslations[m] || m;
+          }
+          return m;
+        });
+
         const zData = districts.map((district) => {
           return monthsToShow.map((month) => {
             const record = data.find(
@@ -2437,8 +2494,8 @@
           [
             {
               z: zData,
-              x: monthsToShow,
-              y: districts,
+              x: displayMonths,
+              y: displayDistricts,
               type: "heatmap",
               colorscale: customColorScale,
               zmin: -100,
