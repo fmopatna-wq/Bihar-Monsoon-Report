@@ -704,6 +704,44 @@
         </div>
       </div>
 
+      <!-- Weekly Progress Bar Chart Section (New) -->
+      <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg mb-6">
+        <div
+          class="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-700 pb-4"
+        >
+          <h3 class="text-xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-chart-column text-indigo-500"></i>
+            <span class="gradient-text lang-hi"
+              >साप्ताहिक तीव्रता प्रगति (बार ग्राफ)</span
+            >
+            <span class="gradient-text lang-en"
+              >Weekly Intensity Progress (Bar Graph)</span
+            >
+          </h3>
+          <div class="plotly-toolbar">
+            <button
+              class="toolbar-btn"
+              onclick="
+                downloadChart('weeklyProgressChart', 'weekly_progress.png')
+              "
+              title="Download"
+            >
+              <i class="fa-solid fa-download"></i>
+            </button>
+            <button
+              class="toolbar-btn"
+              onclick="resetZoom('weeklyProgressChart')"
+              title="Reset Zoom"
+            >
+              <i class="fa-solid fa-expand-arrows-alt"></i>
+            </button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <div id="weeklyProgressChart" class="w-full h-[500px]"></div>
+        </div>
+      </div>
+
       <!-- Heatmap Section -->
       <div class="card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg mb-6">
         <div
@@ -1570,6 +1608,7 @@
           document.getElementById("totalDaysCount").innerText = "0";
           Plotly.purge("heatmapChart");
           Plotly.purge("barChart");
+          Plotly.purge("weeklyProgressChart");
           document.getElementById("dataTableBody").innerHTML =
             '<tr><td colspan="3" class="px-6 py-4 text-center">No Data</td></tr>';
           return;
@@ -1624,6 +1663,7 @@
         renderBreakdown(finalData);
 
         renderHeatmap(finalData, viewLevel);
+        renderWeeklyProgressChart(finalData);
         renderBarChart(finalData, viewLevel);
         renderTable(finalData, viewLevel);
       }
@@ -1656,6 +1696,119 @@
                 </div>
             `;
         }).join("");
+      }
+
+      // --- Weekly Progress Chart Renderer ---
+      function renderWeeklyProgressChart(data) {
+        const monthNames = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        const weekMap = {};
+        const weeksSet = new Set();
+
+        // 1. Group Data by Week and Category
+        data.forEach((d) => {
+          // Calculate Week
+          const date = new Date(
+            d.dateObj.year,
+            d.dateObj.month - 1,
+            d.dateObj.day,
+          );
+          const start = new Date(date.getFullYear(), 0, 1);
+          const weekNo = Math.ceil(
+            ((date - start) / 86400000 + start.getDay() + 1) / 7,
+          );
+
+          const mName = monthNames[d.dateObj.month - 1];
+          const weekLabel = `${mName}-W${weekNo}`; // Key for sorting
+          weeksSet.add(weekLabel);
+
+          // Find Category
+          const cat = INTENSITY_CATEGORIES.find(
+            (c) => d.value >= c.min && d.value <= c.max,
+          );
+          if (cat) {
+            if (!weekMap[weekLabel]) weekMap[weekLabel] = {};
+            if (!weekMap[weekLabel][cat.id]) weekMap[weekLabel][cat.id] = 0;
+            weekMap[weekLabel][cat.id]++;
+          }
+        });
+
+        // 2. Sort Weeks
+        const sortedWeeks = Array.from(weeksSet).sort((a, b) => {
+          const [m1, w1] = a.split("-W");
+          const [m2, w2] = b.split("-W");
+          const mi1 = monthNames.indexOf(m1);
+          const mi2 = monthNames.indexOf(m2);
+          if (mi1 !== mi2) return mi1 - mi2;
+          return parseInt(w1) - parseInt(w2);
+        });
+
+        // 3. Format X-Axis Labels
+        let displayWeeks = sortedWeeks;
+        if (selectedMonths.length === 1) {
+          // If single month, show Week 1, Week 2...
+          displayWeeks = sortedWeeks.map((_, i) =>
+            currentLanguage === "en" ? `Week ${i + 1}` : `सप्ताह ${i + 1}`,
+          );
+        }
+
+        // 4. Create Traces for each Category
+        const traces = INTENSITY_CATEGORIES.map((cat) => {
+          const yValues = sortedWeeks.map((week) =>
+            weekMap[week] && weekMap[week][cat.id] ? weekMap[week][cat.id] : 0,
+          );
+          return {
+            x: displayWeeks,
+            y: yValues,
+            name: currentLanguage === "en" ? cat.name_en : cat.name_hi,
+            type: "bar",
+            marker: { color: cat.color },
+            hovertemplate: `<b>%{x}</b><br>${currentLanguage === "en" ? cat.name_en : cat.name_hi}: %{y}<extra></extra>`,
+          };
+        });
+
+        const isDark = document.documentElement.classList.contains("dark");
+        const fontColor = isDark ? "#cbd5e1" : "#334155";
+
+        const layout = {
+          barmode: "stack",
+          paper_bgcolor: "rgba(0,0,0,0)",
+          plot_bgcolor: "rgba(0,0,0,0)",
+          font: { family: "Poppins", color: fontColor },
+          margin: { t: 30, b: 80, l: 60, r: 20 },
+          xaxis: {
+            title: currentLanguage === "en" ? "Weeks" : "सप्ताह",
+            tickangle: -45,
+          },
+          yaxis: {
+            title:
+              currentLanguage === "en" ? "Number of Days" : "दिनों की संख्या",
+            gridcolor: isDark ? "#374151" : "#e2e8f0",
+          },
+          legend: {
+            orientation: "h",
+            y: -0.3, // Move legend below chart
+            x: 0.5,
+            xanchor: "center",
+          },
+        };
+
+        Plotly.newPlot("weeklyProgressChart", traces, layout, {
+          responsive: true,
+          displayModeBar: false,
+        });
       }
 
       // --- Visualizations ---
