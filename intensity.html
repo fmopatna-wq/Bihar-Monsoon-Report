@@ -2017,6 +2017,13 @@
         processAndRender();
       }
 
+      function highlightMatch(text, term) {
+        if (!term || !text) return text;
+        const strText = String(text);
+        const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        return strText.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-700 text-black dark:text-white rounded-sm px-0.5">$1</mark>');
+      }
+
       // --- Processing ---
       function processAndRender() {
         if (rawData.length === 0) {
@@ -2542,21 +2549,21 @@
         // Update Header
         let headerHTML = `
               <tr>
-                <th class="px-6 py-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('district')">
+                <th class="px-6 py-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition bg-gray-100 dark:bg-gray-900" onclick="sortTable('district')">
                   <div class="flex items-center">
                     <span class="lang-hi">जिला</span>
                     <span class="lang-en">District</span>
                     <i id="sort-icon-district" class="fa-solid fa-sort ml-1 text-gray-400"></i>
                   </div>
                 </th>
-                <th class="px-6 py-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('block')">
+                <th class="px-6 py-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition bg-gray-100 dark:bg-gray-900" onclick="sortTable('block')">
                   <div class="flex items-center">
                     <span class="lang-hi">ब्लॉक / स्तर</span>
                     <span class="lang-en">Block / Level</span>
                     <i id="sort-icon-block" class="fa-solid fa-sort ml-1 text-gray-400"></i>
                   </div>
                 </th>
-                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('count')">
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition bg-gray-100 dark:bg-gray-900" onclick="sortTable('count')">
                   <div class="flex items-center justify-end">
                     <span class="lang-hi">कुल वर्षा दिवस</span>
                     <span class="lang-en">Total Rainy Days</span>
@@ -2566,35 +2573,35 @@
         `;
 
         headerHTML += `
-                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('heavy')">
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition bg-gray-100 dark:bg-gray-900" onclick="sortTable('heavy')">
                   <div class="flex items-center justify-end">
                     <span class="lang-hi">भारी वर्षा</span>
                     <span class="lang-en">Heavy Rain</span>
                     <i id="sort-icon-heavy" class="fa-solid fa-sort ml-1 text-gray-400"></i>
                   </div>
                 </th>
-                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('veryHeavy')">
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition bg-gray-100 dark:bg-gray-900" onclick="sortTable('veryHeavy')">
                   <div class="flex items-center justify-end">
                     <span class="lang-hi">बहुत भारी</span>
                     <span class="lang-en">Very Heavy</span>
                     <i id="sort-icon-veryHeavy" class="fa-solid fa-sort ml-1 text-gray-400"></i>
                   </div>
                 </th>
-                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('extHeavy')">
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition bg-gray-100 dark:bg-gray-900" onclick="sortTable('extHeavy')">
                   <div class="flex items-center justify-end">
                     <span class="lang-hi">अत्यधिक भारी</span>
                     <span class="lang-en">Ext. Heavy</span>
                     <i id="sort-icon-extHeavy" class="fa-solid fa-sort ml-1 text-gray-400"></i>
                   </div>
                 </th>
-                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('maxRain')">
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition bg-gray-100 dark:bg-gray-900" onclick="sortTable('maxRain')">
                   <div class="flex items-center justify-end">
                     <span class="lang-hi">अधिकतम वर्षा (मिमी)</span>
                     <span class="lang-en">Max RF (mm)</span>
                     <i id="sort-icon-maxRain" class="fa-solid fa-sort ml-1 text-gray-400"></i>
                   </div>
                 </th>
-                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('maxRainDate')">
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition bg-gray-100 dark:bg-gray-900" onclick="sortTable('maxRainDate')">
                   <div class="flex items-center justify-end">
                     <span class="lang-hi">दिनांक</span>
                     <span class="lang-en">Date</span>
@@ -2607,11 +2614,12 @@
 
         const search = document
           .getElementById("tableSearchInput")
-          .value.toLowerCase();
+          .value.toLowerCase().trim();
 
-        let display = tableData.filter((d) =>
-          d.district.toLowerCase().includes(search),
-        );
+        let display = tableData.filter((d) => {
+            if (!search) return true;
+            return Object.values(d).some(val => String(val).toLowerCase().includes(search));
+        });
         display.sort((a, b) => {
           let valA = a[currentTableSort.column];
           let valB = b[currentTableSort.column];
@@ -2635,18 +2643,20 @@
           tr.className =
             "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700";
 
+          const h = (val) => highlightMatch(val, search);
+
           let rowHTML = `
-                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>
-                <td class="px-6 py-4 text-gray-600 dark:text-gray-300">${d.block}</td>
-                <td class="px-6 py-4 text-right font-bold text-blue-600 dark:text-blue-400">${d.count}</td>
+                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${h(d.district)}</td>
+                <td class="px-6 py-4 text-gray-600 dark:text-gray-300">${h(d.block)}</td>
+                <td class="px-6 py-4 text-right font-bold text-blue-600 dark:text-blue-400">${h(d.count)}</td>
             `;
 
           rowHTML += `
-                <td class="px-6 py-4 text-right font-bold text-orange-500">${d.heavy}</td>
-                <td class="px-6 py-4 text-right font-bold text-red-500">${d.veryHeavy}</td>
-                <td class="px-6 py-4 text-right font-bold text-red-700">${d.extHeavy}</td>
-                <td class="px-6 py-4 text-right font-bold text-gray-800 dark:text-gray-200">${d.maxRain.toFixed(1)}</td>
-                <td class="px-6 py-4 text-right text-gray-600 dark:text-gray-400 whitespace-nowrap">${d.maxRainDate}</td>
+                <td class="px-6 py-4 text-right font-bold text-orange-500">${h(d.heavy)}</td>
+                <td class="px-6 py-4 text-right font-bold text-red-500">${h(d.veryHeavy)}</td>
+                <td class="px-6 py-4 text-right font-bold text-red-700">${h(d.extHeavy)}</td>
+                <td class="px-6 py-4 text-right font-bold text-gray-800 dark:text-gray-200">${h(d.maxRain.toFixed(1))}</td>
+                <td class="px-6 py-4 text-right text-gray-600 dark:text-gray-400 whitespace-nowrap">${h(d.maxRainDate)}</td>
               `;
 
           tr.innerHTML = rowHTML;
