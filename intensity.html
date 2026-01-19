@@ -907,18 +907,68 @@
                 id="yearSelect"
                 onchange="loadData()"
                 class="bg-white dark:bg-gray-800 border-none rounded-md px-3 py-1 text-lg font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer"
-              >
-                <option value="2025" selected>2025</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-                <option value="2021">2021</option>
-              </select>
+              ></select>
             </div>
           </div>
         </div>
 
         <div class="border-t border-gray-100 dark:border-gray-700 pt-4">
+          <!-- Special Sections -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Clear All Section -->
+            <div
+              class="flex items-center p-3 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30 transition cursor-pointer"
+              onclick="handleClearAllSection()"
+            >
+              <div class="mr-3 text-red-600 dark:text-red-400">
+                <i class="fa-solid fa-square-xmark text-2xl"></i>
+              </div>
+              <div class="flex-1">
+                <div class="font-bold text-red-800 dark:text-red-200">
+                  <span class="lang-hi">सभी अनुभाग साफ़ करें (Clear All)</span>
+                  <span class="lang-en">Clear All Section</span>
+                </div>
+                <div class="text-xs text-red-600 dark:text-red-300">
+                  <span class="lang-hi">सभी चयनित श्रेणियों को हटा दें</span>
+                  <span class="lang-en">Uncheck all selected categories</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Special Heavy Rain Selection -->
+            <div
+              class="flex items-center p-3 rounded-lg border border-orange-200 bg-orange-50 dark:bg-orange-900/20 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition cursor-pointer"
+              onclick="document.getElementById('specialHeavyRain').click()"
+            >
+              <input
+                type="checkbox"
+                id="specialHeavyRain"
+                value="special"
+                class="intensity-checkbox mr-3"
+                onclick="
+                  event.stopPropagation();
+                  handleSpecialHeavyRain(this);
+                "
+              />
+              <div class="flex-1">
+                <div class="font-bold text-orange-800 dark:text-orange-200">
+                  <span class="lang-hi"
+                    >(केवल भारी वर्षा अनुभाग)</span
+                  >
+                  <span class="lang-en">(Only Heavy Rain Section)</span>
+                </div>
+                <div class="text-xs text-orange-600 dark:text-orange-300">
+                  <span class="lang-hi"
+                    >भारी, बहुत भारी और अत्यधिक भारी वर्षा का चयन करता है</span
+                  >
+                  <span class="lang-en"
+                    >Selects Heavy, Very Heavy & Ext. Heavy Rain</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
             id="categoryContainer"
@@ -1182,7 +1232,7 @@
             class="w-full text-sm text-left text-gray-600 dark:text-gray-300"
           >
             <thead
-              class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0"
+              class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-900 dark:text-gray-300 sticky top-0 z-10"
             >
               <tr>
                 <th
@@ -1425,6 +1475,7 @@
       // --- Initialization ---
       document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add("hindi");
+        populateYearDropdown();
         generateCheckboxes();
         generateMonthCheckboxes();
         const toggle = document.getElementById("langToggle");
@@ -1521,6 +1572,18 @@
                 : translations[val].hi;
           }
         }
+      }
+
+      function populateYearDropdown() {
+        const yearSelect = document.getElementById("yearSelect");
+        if (!yearSelect) return;
+        const startYear = 2000;
+        const endYear = 2025;
+        let options = "";
+        for (let y = endYear; y >= startYear; y--) {
+          options += `<option value="${y}" ${y === 2025 ? "selected" : ""}>${y}</option>`;
+        }
+        yearSelect.innerHTML = options;
       }
 
       function setActive(el) {
@@ -1927,6 +1990,33 @@
         return { day, month, year };
       }
 
+      // --- Special Heavy Rain Handler ---
+      function handleSpecialHeavyRain(checkbox) {
+        const idsToToggle = ["heavy", "very_heavy", "ext_heavy"];
+        const isChecked = checkbox.checked;
+
+        idsToToggle.forEach((id) => {
+          const cb = document.getElementById(id);
+          if (cb) {
+            cb.checked = isChecked;
+          }
+        });
+        processAndRender();
+      }
+
+      function handleClearAllSection() {
+        document
+          .querySelectorAll(
+            ".intensity-checkbox:not(.district-chk):not(.month-chk):not(.period-chk)",
+          )
+          .forEach((cb) => {
+            cb.checked = false;
+          });
+        const specialCb = document.getElementById("specialHeavyRain");
+        if (specialCb) specialCb.checked = false;
+        processAndRender();
+      }
+
       // --- Processing ---
       function processAndRender() {
         if (rawData.length === 0) {
@@ -1962,6 +2052,17 @@
           const mName = monthNames[d.dateObj.month - 1];
           return selectedMonths.includes(mName);
         });
+
+        // Update Special Checkbox State based on individual selections
+        const specialCb = document.getElementById("specialHeavyRain");
+        if (specialCb) {
+          const heavyIds = ["heavy", "very_heavy", "ext_heavy"];
+          const allHeavyChecked = heavyIds.every((id) => {
+            const cb = document.getElementById(id);
+            return cb && cb.checked;
+          });
+          specialCb.checked = allHeavyChecked;
+        }
 
         // Filter by Intensity
         const selectedCats = [];
@@ -2022,6 +2123,25 @@
           processed = Object.values(dailyMaxMap);
         }
 
+        // Calculate Top Block Stats for District Level (using filtered data)
+        const districtMaxStats = {};
+        if (viewLevel === "district") {
+          filtered.forEach((d) => {
+            if (!districtMaxStats[d.district]) {
+              districtMaxStats[d.district] = { maxVal: 0, blocks: new Set(), date: "-" };
+            }
+            const stats = districtMaxStats[d.district];
+            if (d.value > stats.maxVal) {
+              stats.maxVal = d.value;
+              stats.blocks.clear();
+              stats.blocks.add(d.block);
+              stats.date = d.dateStr;
+            } else if (d.value === stats.maxVal && stats.maxVal > 0) {
+              stats.blocks.add(d.block);
+            }
+          });
+        }
+
         // Final Intensity Filter
         const finalData = processed.filter((d) =>
           selectedCats.some((cat) => d.value >= cat.min && d.value <= cat.max),
@@ -2035,7 +2155,7 @@
         renderHeatmap(finalData, viewLevel);
         renderWeeklyProgressChart(finalData);
         renderBarChart(finalData, viewLevel);
-        renderTable(finalData, viewLevel);
+        renderTable(finalData, viewLevel, districtMaxStats);
       }
 
       // --- Breakdown Renderer ---
@@ -2339,7 +2459,7 @@
         );
       }
 
-      function renderTable(data, viewLevel) {
+      function renderTable(data, viewLevel, districtMaxStats) {
         const groupedStats = {};
 
         data.forEach((d) => {
@@ -2353,6 +2473,7 @@
               veryHeavy: 0,
               extHeavy: 0,
               maxRain: 0,
+              maxRainDate: "-",
             };
           }
 
@@ -2368,21 +2489,43 @@
           if (d.value >= 124.5 && d.value <= 244.4) stats.veryHeavy++;
           if (d.value >= 244.5) stats.extHeavy++;
 
-          if (d.value > stats.maxRain) stats.maxRain = d.value;
+          if (d.value > stats.maxRain) {
+            stats.maxRain = d.value;
+            stats.maxRainDate = d.dateStr;
+          }
         });
 
         tableData = Object.keys(groupedStats).map((k) => {
           const [d, b] = k.split("|");
           const stats = groupedStats[k];
+
+          let blockDisplay =
+            b || (currentLanguage === "en" ? "District Avg" : "जिला औसत");
+          let maxRainDisplay = stats.maxRain;
+          let maxRainDateDisplay = stats.maxRainDate;
+
+          if (viewLevel === "district" && districtMaxStats) {
+            const dStats = districtMaxStats[d];
+            if (dStats && dStats.maxVal > 0) {
+              maxRainDisplay = dStats.maxVal;
+              blockDisplay = Array.from(dStats.blocks).join(", ");
+              maxRainDateDisplay = dStats.date;
+            } else {
+              maxRainDisplay = 0;
+              blockDisplay = "-";
+              maxRainDateDisplay = "-";
+            }
+          }
+
           return {
             district: d,
-            block:
-              b || (currentLanguage === "en" ? "District Avg" : "जिला औसत"),
+            block: blockDisplay,
             count: stats.count,
             heavy: stats.heavy,
             veryHeavy: stats.veryHeavy,
             extHeavy: stats.extHeavy,
-            maxRain: stats.maxRain,
+            maxRain: maxRainDisplay,
+            maxRainDate: maxRainDateDisplay,
           };
         });
         renderTableUI();
@@ -2395,7 +2538,6 @@
         tbody.innerHTML = "";
 
         const viewLevel = document.getElementById("viewLevelSelect").value;
-        const isDistrictLevel = viewLevel === "district";
 
         // Update Header
         let headerHTML = `
@@ -2423,8 +2565,7 @@
                 </th>
         `;
 
-        if (isDistrictLevel) {
-          headerHTML += `
+        headerHTML += `
                 <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('heavy')">
                   <div class="flex items-center justify-end">
                     <span class="lang-hi">भारी वर्षा</span>
@@ -2453,8 +2594,14 @@
                     <i id="sort-icon-maxRain" class="fa-solid fa-sort ml-1 text-gray-400"></i>
                   </div>
                 </th>
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('maxRainDate')">
+                  <div class="flex items-center justify-end">
+                    <span class="lang-hi">दिनांक</span>
+                    <span class="lang-en">Date</span>
+                    <i id="sort-icon-maxRainDate" class="fa-solid fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
             `;
-        }
         headerHTML += `</tr>`;
         thead.innerHTML = headerHTML;
 
@@ -2478,7 +2625,7 @@
         });
 
         if (display.length === 0) {
-          const colSpan = isDistrictLevel ? 7 : 3;
+          const colSpan = 8;
           tbody.innerHTML = `<tr><td colspan="${colSpan}" class="px-6 py-4 text-center">No Data</td></tr>`;
           return;
         }
@@ -2494,14 +2641,13 @@
                 <td class="px-6 py-4 text-right font-bold text-blue-600 dark:text-blue-400">${d.count}</td>
             `;
 
-          if (isDistrictLevel) {
-            rowHTML += `
+          rowHTML += `
                 <td class="px-6 py-4 text-right font-bold text-orange-500">${d.heavy}</td>
                 <td class="px-6 py-4 text-right font-bold text-red-500">${d.veryHeavy}</td>
                 <td class="px-6 py-4 text-right font-bold text-red-700">${d.extHeavy}</td>
                 <td class="px-6 py-4 text-right font-bold text-gray-800 dark:text-gray-200">${d.maxRain.toFixed(1)}</td>
+                <td class="px-6 py-4 text-right text-gray-600 dark:text-gray-400 whitespace-nowrap">${d.maxRainDate}</td>
               `;
-          }
 
           tr.innerHTML = rowHTML;
           tbody.appendChild(tr);
@@ -2529,6 +2675,7 @@
           "veryHeavy",
           "extHeavy",
           "maxRain",
+          "maxRainDate",
         ].forEach((col) => {
           const icon = document.getElementById(`sort-icon-${col}`);
           if (icon) {
@@ -2592,5 +2739,7 @@
         });
       }
     </script>
+  </body>
+</html>
   </body>
 </html>
