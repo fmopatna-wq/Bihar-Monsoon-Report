@@ -366,6 +366,12 @@
         color: #60a5fa;
       }
 
+      /* Compact toolbar for better mobile experience */
+      .toolbar-compact {
+        flex-wrap: wrap;
+        max-width: 120px;
+      }
+
       /* Breakdown Card Styles */
       .breakdown-box {
         transition: transform 0.2s;
@@ -1053,7 +1059,9 @@
               >Weekly Intensity Progress (Bar Graph)</span
             >
           </h3>
-          <div class="plotly-toolbar">
+        </div>
+        <div class="chart-container">
+          <div class="plotly-toolbar toolbar-compact">
             <button
               class="toolbar-btn"
               onclick="
@@ -1070,9 +1078,19 @@
             >
               <i class="fa-solid fa-expand-arrows-alt"></i>
             </button>
+            <button class="toolbar-btn" onclick="toggleAutoscale('weeklyProgressChart')" title="Autoscale">
+              <i class="fa-solid fa-arrows-alt-v"></i>
+            </button>
+            <button class="toolbar-btn" onclick="toggleSpikelines('weeklyProgressChart')" title="Spikelines">
+              <i class="fa-solid fa-crosshairs"></i>
+            </button>
+            <button class="toolbar-btn" onclick="togglePanMode('weeklyProgressChart')" title="Pan">
+              <i class="fa-solid fa-hand-paper"></i>
+            </button>
+            <button class="toolbar-btn" onclick="toggleZoomMode('weeklyProgressChart')" title="Zoom">
+              <i class="fa-solid fa-search-plus"></i>
+            </button>
           </div>
-        </div>
-        <div class="chart-container">
           <div id="weeklyProgressChart" class="w-full h-[500px]"></div>
         </div>
       </div>
@@ -1106,35 +1124,41 @@
               <span class="lang-en">Expanded View</span>
             </label>
           </div>
-
-          <!-- Toolbar -->
-          <div class="plotly-toolbar">
-            <button
-              class="toolbar-btn"
-              onclick="downloadChart('heatmapChart', 'heatmap.png')"
-              title="Download"
-            >
+        </div>
+        
+        <!-- Wrapper for toolbar positioning over scrollable heatmap -->
+        <div class="chart-container relative">
+          <div class="plotly-toolbar toolbar-compact">
+            <button class="toolbar-btn" onclick="downloadChart('heatmapChart', 'heatmap.png')" title="Download">
               <i class="fa-solid fa-download"></i>
             </button>
-            <button
-              class="toolbar-btn"
-              onclick="resetZoom('heatmapChart')"
-              title="Reset Zoom"
-            >
+            <button class="toolbar-btn" onclick="resetZoom('heatmapChart')" title="Reset Zoom">
               <i class="fa-solid fa-expand-arrows-alt"></i>
             </button>
+            <button class="toolbar-btn" onclick="toggleAutoscale('heatmapChart')" title="Autoscale">
+              <i class="fa-solid fa-arrows-alt-v"></i>
+            </button>
+            <button class="toolbar-btn" onclick="toggleSpikelines('heatmapChart')" title="Spikelines">
+              <i class="fa-solid fa-crosshairs"></i>
+            </button>
+            <button class="toolbar-btn" onclick="togglePanMode('heatmapChart')" title="Pan">
+              <i class="fa-solid fa-hand-paper"></i>
+            </button>
+            <button class="toolbar-btn" onclick="toggleZoomMode('heatmapChart')" title="Zoom">
+              <i class="fa-solid fa-search-plus"></i>
+            </button>
           </div>
-        </div>
-        <div
-          class="chart-container"
-          id="heatmapContainer"
-          style="
-            max-height: 800px;
-            overflow-y: auto;
-            transition: max-height 0.3s ease;
-          "
-        >
-          <div id="heatmapChart" class="w-full"></div>
+          
+          <div
+            id="heatmapContainer"
+            style="
+              max-height: 800px;
+              overflow-y: auto;
+              transition: max-height 0.3s ease;
+            "
+          >
+            <div id="heatmapChart" class="w-full"></div>
+          </div>
         </div>
         <div id="loadingMessage" class="hidden text-center py-10 text-gray-500">
           <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
@@ -1161,39 +1185,28 @@
               >Total Rainy Days (Selected Intensity)</span
             >
           </h3>
-          <!-- Toolbar -->
-          <div class="plotly-toolbar">
-            <button
-              class="toolbar-btn"
-              onclick="downloadChart('barChart', 'barchart.png')"
-              title="Download"
-            >
+        </div>
+        <div class="chart-container">
+          <div class="plotly-toolbar toolbar-compact">
+            <button class="toolbar-btn" onclick="downloadChart('barChart', 'barchart.png')" title="Download">
               <i class="fa-solid fa-download"></i>
             </button>
-            <button
-              class="toolbar-btn"
-              onclick="resetZoom('barChart')"
-              title="Reset Zoom"
-            >
+            <button class="toolbar-btn" onclick="resetZoom('barChart')" title="Reset Zoom">
               <i class="fa-solid fa-expand-arrows-alt"></i>
             </button>
-            <button
-              class="toolbar-btn"
-              onclick="togglePanMode('barChart')"
-              title="Pan"
-            >
+            <button class="toolbar-btn" onclick="toggleAutoscale('barChart')" title="Autoscale">
+              <i class="fa-solid fa-arrows-alt-v"></i>
+            </button>
+            <button class="toolbar-btn" onclick="toggleSpikelines('barChart')" title="Spikelines">
+              <i class="fa-solid fa-crosshairs"></i>
+            </button>
+            <button class="toolbar-btn" onclick="togglePanMode('barChart')" title="Pan">
               <i class="fa-solid fa-hand-paper"></i>
             </button>
-            <button
-              class="toolbar-btn"
-              onclick="toggleZoomMode('barChart')"
-              title="Zoom"
-            >
+            <button class="toolbar-btn" onclick="toggleZoomMode('barChart')" title="Zoom">
               <i class="fa-solid fa-search-plus"></i>
             </button>
           </div>
-        </div>
-        <div class="chart-container">
           <div id="barChart" class="w-full h-[500px]"></div>
         </div>
       </div>
@@ -2645,6 +2658,13 @@
 
           const h = (val) => highlightMatch(val, search);
 
+          // Determine color for maxRain based on INTENSITY_CATEGORIES
+          let maxRainStyle = "";
+          const cat = INTENSITY_CATEGORIES.find(c => d.maxRain >= c.min && d.maxRain <= c.max);
+          if (cat) {
+              maxRainStyle = `style="color: ${cat.color}"`;
+          }
+
           let rowHTML = `
                 <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${h(d.district)}</td>
                 <td class="px-6 py-4 text-gray-600 dark:text-gray-300">${h(d.block)}</td>
@@ -2655,7 +2675,7 @@
                 <td class="px-6 py-4 text-right font-bold text-orange-500">${h(d.heavy)}</td>
                 <td class="px-6 py-4 text-right font-bold text-red-500">${h(d.veryHeavy)}</td>
                 <td class="px-6 py-4 text-right font-bold text-red-700">${h(d.extHeavy)}</td>
-                <td class="px-6 py-4 text-right font-bold text-gray-800 dark:text-gray-200">${h(d.maxRain.toFixed(1))}</td>
+                <td class="px-6 py-4 text-right font-bold text-gray-800 dark:text-gray-200" ${maxRainStyle}>${h(d.maxRain.toFixed(1))}</td>
                 <td class="px-6 py-4 text-right text-gray-600 dark:text-gray-400 whitespace-nowrap">${h(d.maxRainDate)}</td>
               `;
 
@@ -2711,6 +2731,46 @@
           "xaxis.autorange": true,
           "yaxis.autorange": true,
         });
+      }
+
+      function toggleAutoscale(chartId) {
+        try {
+          const plotDiv = document.getElementById(chartId);
+          const currentLayout = plotDiv._fullLayout;
+          const newFixedRange = !currentLayout.yaxis.fixedrange;
+          Plotly.relayout(chartId, {
+            "yaxis.fixedrange": newFixedRange,
+            "xaxis.fixedrange": false,
+          });
+          const button = event.target.closest(".toolbar-btn");
+          button.style.background = newFixedRange
+            ? "rgba(59, 130, 246, 0.2)"
+            : "transparent";
+        } catch (error) {
+          console.error("Autoscale toggle failed:", error);
+        }
+      }
+
+      function toggleSpikelines(chartId) {
+        try {
+          const plotDiv = document.getElementById(chartId);
+          const currentSpikes = plotDiv._fullLayout.xaxis.showspikes || false;
+          const newSpikeState = !currentSpikes;
+          Plotly.relayout(chartId, {
+            "xaxis.showspikes": newSpikeState,
+            "yaxis.showspikes": newSpikeState,
+            "xaxis.spikemode": "across",
+            "yaxis.spikemode": "across",
+            "xaxis.spikesnap": "cursor",
+            "yaxis.spikesnap": "cursor",
+          });
+          const button = event.target.closest(".toolbar-btn");
+          button.style.background = newSpikeState
+            ? "rgba(59, 130, 246, 0.2)"
+            : "transparent";
+        } catch (error) {
+          console.error("Spikelines toggle failed:", error);
+        }
       }
 
       function togglePanMode(chartId) {
