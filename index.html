@@ -783,6 +783,15 @@
             </div>
 
             <button
+              id="bgToggleBtn"
+              onclick="toggleBackground()"
+              class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              title="Toggle Background / बैकग्राउंड बदलें"
+            >
+              <i class="fa-solid fa-image text-blue-500 dark:text-blue-300"></i>
+            </button>
+
+            <button
               onclick="toggleDarkMode()"
               class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
             >
@@ -1609,6 +1618,25 @@
           renderMonthlyCharts(window.globalMonthlyData, periodKey);
         }
         renderLegendTable();
+      }
+
+      // --- Background Toggle ---
+      function toggleBackground() {
+        document.body.classList.toggle("simple-bg");
+        const isSimple = document.body.classList.contains("simple-bg");
+        localStorage.setItem("simpleBackground", isSimple ? "true" : "false");
+        updateBackgroundBtnIcon(isSimple);
+      }
+
+      function updateBackgroundBtnIcon(isSimple) {
+        const btn = document.getElementById("bgToggleBtn");
+        if (!btn) return;
+        if (isSimple) {
+          btn.innerHTML = '<i class="fa-solid fa-ban text-gray-400"></i>';
+        } else {
+          btn.innerHTML =
+            '<i class="fa-solid fa-image text-blue-500 dark:text-blue-300"></i>';
+        }
       }
 
       // --- Data Mapping ---
@@ -2579,6 +2607,12 @@
         if (toggle) {
           toggle.checked = false; // Default Hindi
         }
+
+        const savedSimple = localStorage.getItem("simpleBackground") === "true";
+        if (savedSimple) {
+          document.body.classList.add("simple-bg");
+        }
+        updateBackgroundBtnIcon(savedSimple);
 
         // 4. मानसून आगमन की CSV फाइल लोड करें
         if (typeof Papa !== "undefined") {

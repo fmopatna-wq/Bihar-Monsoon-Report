@@ -373,11 +373,286 @@
       .breakdown-box:hover {
         transform: translateY(-2px);
       }
+
+      /* --- Weather Background Animation --- */
+      /* Body Background (Day Mode) */
+      body {
+        /* Animated Blue Sky Gradient */
+        background: linear-gradient(-45deg, #87ceeb, #00bfff, #1e90ff, #87cefa);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        background-attachment: fixed;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* Weather Background Container */
+      .weather-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      /* Sun & Clouds (Day Elements) */
+      .sun {
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 220, 0.6) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        border-radius: 50%;
+        filter: blur(30px);
+        animation: sun-pulse 8s infinite alternate;
+        transition:
+          opacity 1s ease,
+          transform 1s ease;
+      }
+
+      .cloud {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50px;
+        filter: blur(8px);
+        transition: opacity 1s ease;
+      }
+
+      .cloud::after,
+      .cloud::before {
+        content: "";
+        position: absolute;
+        background: inherit;
+        border-radius: 50%;
+      }
+
+      .cloud1 {
+        width: 140px;
+        height: 50px;
+        top: 10%;
+        left: -160px;
+        animation: float-cloud 35s infinite linear;
+      }
+      .cloud1::after {
+        width: 60px;
+        height: 60px;
+        top: -30px;
+        left: 25px;
+      }
+      .cloud1::before {
+        width: 50px;
+        height: 50px;
+        top: -20px;
+        left: 70px;
+      }
+
+      .cloud2 {
+        width: 100px;
+        height: 40px;
+        top: 25%;
+        left: -120px;
+        animation: float-cloud 45s infinite linear 12s;
+      }
+      .cloud2::after {
+        width: 45px;
+        height: 45px;
+        top: -25px;
+        left: 15px;
+      }
+      .cloud2::before {
+        width: 40px;
+        height: 40px;
+        top: -15px;
+        left: 50px;
+      }
+
+      .cloud3 {
+        width: 180px;
+        height: 60px;
+        top: 15%;
+        left: -200px;
+        animation: float-cloud 50s infinite linear 5s;
+      }
+      .cloud3::after {
+        width: 80px;
+        height: 80px;
+        top: -40px;
+        left: 30px;
+      }
+      .cloud3::before {
+        width: 60px;
+        height: 60px;
+        top: -25px;
+        left: 90px;
+      }
+
+      @keyframes float-cloud {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(120vw);
+        }
+      }
+
+      @keyframes sun-pulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(1.1);
+          opacity: 0.7;
+        }
+      }
+
+      /* Moon & Stars (Night Elements) */
+      .moon {
+        position: absolute;
+        top: 60px;
+        right: 80px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        box-shadow: -20px 10px 0 0 #f6e58d;
+        opacity: 0;
+        transform: translateY(-50px) rotate(-20deg);
+        transition: all 1s ease;
+      }
+
+      .star {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 1s ease;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+      }
+
+      .star1 {
+        width: 3px;
+        height: 3px;
+        top: 15%;
+        left: 10%;
+        animation-delay: 0s;
+      }
+      .star2 {
+        width: 4px;
+        height: 4px;
+        top: 25%;
+        left: 30%;
+        animation-delay: 1s;
+      }
+      .star3 {
+        width: 2px;
+        height: 2px;
+        top: 10%;
+        left: 50%;
+        animation-delay: 2s;
+      }
+      .star4 {
+        width: 3px;
+        height: 3px;
+        top: 35%;
+        left: 70%;
+        animation-delay: 0.5s;
+      }
+      .star5 {
+        width: 4px;
+        height: 4px;
+        top: 20%;
+        left: 85%;
+        animation-delay: 1.5s;
+      }
+      .star6 {
+        width: 2px;
+        height: 2px;
+        top: 45%;
+        left: 20%;
+        animation-delay: 2.5s;
+      }
+      .star7 {
+        width: 3px;
+        height: 3px;
+        top: 5%;
+        left: 60%;
+        animation-delay: 0.8s;
+      }
+
+      /* Dark Mode Styles (Night Theme) */
+      .dark body {
+        background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #000000);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+      }
+
+      .dark .sun {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      .dark .cloud {
+        opacity: 0;
+      }
+      .dark .moon {
+        opacity: 1;
+        transform: translateY(0) rotate(-20deg);
+      }
+      .dark .star {
+        animation: twinkle 3s infinite ease-in-out;
+        opacity: 1;
+      }
+
+      /* Simple Background Mode */
+      body.simple-bg {
+        background: #f0f9ff !important;
+        animation: none !important;
+      }
+      .dark body.simple-bg {
+        background: #111827 !important;
+      }
+      body.simple-bg .weather-bg {
+        display: none !important;
+      }
     </style>
   </head>
   <body
     class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col"
   >
+    <div class="weather-bg">
+      <div class="sun"></div>
+      <div class="cloud cloud1"></div>
+      <div class="cloud cloud2"></div>
+      <div class="cloud cloud3"></div>
+      <div class="moon"></div>
+      <div class="star star1"></div>
+      <div class="star star2"></div>
+      <div class="star star3"></div>
+      <div class="star star4"></div>
+      <div class="star star5"></div>
+      <div class="star star6"></div>
+      <div class="star star7"></div>
+    </div>
+
     <nav id="navbar" class="navbar">
       <div class="max-w-7xl mx-auto px-4 py-2 flex flex-col gap-2">
         <div class="flex flex-wrap items-center justify-between w-full gap-4">
@@ -435,6 +710,16 @@
                 >EN</span
               >
             </div>
+
+            <button
+              id="bgToggleBtn"
+              onclick="toggleBackground()"
+              class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              title="Toggle Background / बैकग्राउंड बदलें"
+            >
+              <i class="fa-solid fa-image text-blue-500 dark:text-blue-300"></i>
+            </button>
+
             <button
               onclick="toggleDarkMode()"
               class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
@@ -1119,6 +1404,12 @@
         const toggle = document.getElementById("langToggle");
         if (toggle) toggle.checked = false;
         loadData();
+
+        const savedSimple = localStorage.getItem("simpleBackground") === "true";
+        if (savedSimple) {
+          document.body.classList.add("simple-bg");
+        }
+        updateBackgroundBtnIcon(savedSimple);
       });
 
       function toggleLanguage() {
@@ -1146,6 +1437,25 @@
         updateDropdownButtonText();
         updateMonthDropdownText();
         processAndRender();
+      }
+
+      // --- Background Toggle ---
+      function toggleBackground() {
+        document.body.classList.toggle("simple-bg");
+        const isSimple = document.body.classList.contains("simple-bg");
+        localStorage.setItem("simpleBackground", isSimple ? "true" : "false");
+        updateBackgroundBtnIcon(isSimple);
+      }
+
+      function updateBackgroundBtnIcon(isSimple) {
+        const btn = document.getElementById("bgToggleBtn");
+        if (!btn) return;
+        if (isSimple) {
+          btn.innerHTML = '<i class="fa-solid fa-ban text-gray-400"></i>';
+        } else {
+          btn.innerHTML =
+            '<i class="fa-solid fa-image text-blue-500 dark:text-blue-300"></i>';
+        }
       }
 
       function toggleDarkMode() {

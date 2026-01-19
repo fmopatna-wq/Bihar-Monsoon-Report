@@ -2024,6 +2024,25 @@
         renderGraph();
       }
 
+      // --- Background Toggle ---
+      function toggleBackground() {
+        document.body.classList.toggle("simple-bg");
+        const isSimple = document.body.classList.contains("simple-bg");
+        localStorage.setItem("simpleBackground", isSimple ? "true" : "false");
+        updateBackgroundBtnIcon(isSimple);
+      }
+
+      function updateBackgroundBtnIcon(isSimple) {
+        const btn = document.getElementById("bgToggleBtn");
+        if (!btn) return;
+        if (isSimple) {
+          btn.innerHTML = '<i class="fa-solid fa-ban text-gray-400"></i>';
+        } else {
+          btn.innerHTML =
+            '<i class="fa-solid fa-image text-blue-500 dark:text-blue-300"></i>';
+        }
+      }
+
       // Event Listeners for Sorting
       document.querySelectorAll(".sort-header").forEach((header) => {
         header.addEventListener("click", function () {
@@ -2042,27 +2061,6 @@
           renderGraph(); // Auto-sync graph with table sorting
         });
       });
-
-      // --- Weather Animation Toggle ---
-      function toggleWeatherAnimation() {
-        const bg = document.querySelector(".weather-bg");
-        if (!bg) return;
-        const isHidden = bg.classList.toggle("hidden");
-        localStorage.setItem("weatherAnimation", isHidden ? "off" : "on");
-        updateWeatherBtnIcon(isHidden);
-      }
-
-      function updateWeatherBtnIcon(isHidden) {
-        const btn = document.getElementById("weatherToggleBtn");
-        if (!btn) return;
-        if (isHidden) {
-          btn.innerHTML =
-            '<i class="fa-solid fa-cloud-slash text-gray-400"></i>';
-        } else {
-          btn.innerHTML =
-            '<i class="fa-solid fa-cloud text-blue-500 dark:text-blue-300"></i>';
-        }
-      }
 
       // --- Initialize ---
       document.addEventListener("DOMContentLoaded", () => {

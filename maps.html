@@ -198,28 +198,83 @@
       }
 
       /* Language Switcher Styles */
-      .lang-switcher {
-        position: relative;
-        display: inline-block;
-      }
-
-      .lang-switcher button {
-        background: linear-gradient(to right, #2563eb, #0d9488);
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
+      /* --- New Language Toggle Switch --- */
+      .lang-switch-wrapper {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.6);
+        padding: 4px 8px;
+        border-radius: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(4px);
+      }
+      .dark .lang-switch-wrapper {
+        background: rgba(30, 41, 59, 0.6);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      .lang-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: all 0.3s;
+        user-select: none;
+      }
+      .dark .lang-label {
+        color: #94a3b8;
+      }
+      .lang-label.active {
+        opacity: 1;
+        color: #2563eb;
+      }
+      .dark .lang-label.active {
+        color: #60a5fa;
       }
 
-      .lang-switcher button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      .toggle-switch {
+        position: relative;
+        width: 36px;
+        height: 20px;
+        display: inline-block;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e1;
+        transition: 0.4s;
+        border-radius: 20px;
+      }
+      .dark .toggle-slider {
+        background-color: #475569;
+      }
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .toggle-switch input:checked + .toggle-slider {
+        background-color: #2563eb;
+      }
+      .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(16px);
       }
 
       /* Responsive Navigation */
@@ -471,7 +526,6 @@
         animation: gradientBG 15s ease infinite;
       }
 
-      /* Hide Sun/Clouds and Show Moon/Stars in Dark Mode */
       .dark .sun {
         opacity: 0;
         transform: translateY(50px);
@@ -488,95 +542,16 @@
         opacity: 1;
       }
 
-      @keyframes twinkle {
-        0%,
-        100% {
-          opacity: 0.2;
-          transform: scale(0.8);
-        }
-        50% {
-          opacity: 1;
-          transform: scale(1.2);
-        }
+      /* Simple Background Mode */
+      body.simple-bg {
+        background: #f0f9ff !important;
+        animation: none !important;
       }
-
-      /* --- New Language Toggle Switch --- */
-      .lang-switch-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(255, 255, 255, 0.6);
-        padding: 4px 8px;
-        border-radius: 20px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(4px);
+      .dark body.simple-bg {
+        background: #111827 !important;
       }
-      .dark .lang-switch-wrapper {
-        background: rgba(30, 41, 59, 0.6);
-        border-color: rgba(255, 255, 255, 0.1);
-      }
-      .lang-label {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #64748b;
-        cursor: pointer;
-        opacity: 0.5;
-        transition: all 0.3s;
-        user-select: none;
-      }
-      .dark .lang-label {
-        color: #94a3b8;
-      }
-      .lang-label.active {
-        opacity: 1;
-        color: #2563eb;
-      }
-      .dark .lang-label.active {
-        color: #60a5fa;
-      }
-
-      .toggle-switch {
-        position: relative;
-        width: 36px;
-        height: 20px;
-        display: inline-block;
-      }
-      .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-      .toggle-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #cbd5e1;
-        transition: 0.4s;
-        border-radius: 20px;
-      }
-      .dark .toggle-slider {
-        background-color: #475569;
-      }
-      .toggle-slider:before {
-        position: absolute;
-        content: "";
-        height: 16px;
-        width: 16px;
-        left: 2px;
-        bottom: 2px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      }
-      .toggle-switch input:checked + .toggle-slider {
-        background-color: #2563eb;
-      }
-      .toggle-switch input:checked + .toggle-slider:before {
-        transform: translateX(16px);
+      body.simple-bg .weather-bg {
+        display: none !important;
       }
     </style>
   </head>
@@ -662,6 +637,15 @@
                 >EN</span
               >
             </div>
+
+            <button
+              id="bgToggleBtn"
+              onclick="toggleBackground()"
+              class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              title="Toggle Background / बैकग्राउंड बदलें"
+            >
+              <i class="fa-solid fa-image text-blue-500 dark:text-blue-300"></i>
+            </button>
 
             <button
               onclick="toggleDarkMode()"
@@ -1139,6 +1123,25 @@
         return monthMap[month] || month;
       }
 
+      // --- Background Toggle ---
+      function toggleBackground() {
+        document.body.classList.toggle("simple-bg");
+        const isSimple = document.body.classList.contains("simple-bg");
+        localStorage.setItem("simpleBackground", isSimple ? "true" : "false");
+        updateBackgroundBtnIcon(isSimple);
+      }
+
+      function updateBackgroundBtnIcon(isSimple) {
+        const btn = document.getElementById("bgToggleBtn");
+        if (!btn) return;
+        if (isSimple) {
+          btn.innerHTML = '<i class="fa-solid fa-ban text-gray-400"></i>';
+        } else {
+          btn.innerHTML =
+            '<i class="fa-solid fa-image text-blue-500 dark:text-blue-300"></i>';
+        }
+      }
+
       // --- General Logic ---
 
       function toggleDarkMode() {
@@ -1158,11 +1161,9 @@
         document.body.classList.add("hindi");
         currentLanguage = "hi";
 
-        // Set up language switcher
-        document.getElementById("langSwitchBtn").innerHTML = `
-            <i class="fas fa-language"></i>
-            English
-        `;
+        // Set up language switcher state
+        const toggle = document.getElementById("langToggle");
+        if (toggle) toggle.checked = false;
 
         // Ensure default year 2025 is selected
         const yearSelect = document.getElementById("mapYear");
@@ -1171,6 +1172,12 @@
         // Initialize with proper language display
         updateLanguageContent();
         updateMap();
+
+        const savedSimple = localStorage.getItem("simpleBackground") === "true";
+        if (savedSimple) {
+          document.body.classList.add("simple-bg");
+        }
+        updateBackgroundBtnIcon(savedSimple);
       });
     </script>
   </body>
