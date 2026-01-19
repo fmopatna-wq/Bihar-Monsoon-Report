@@ -71,7 +71,7 @@
       }
 
       body {
-        padding-top: 150px !important;
+        padding-top: 180px !important;
       }
       @media (max-width: 1023px) {
         body {
@@ -110,6 +110,9 @@
         color: #4b5563;
         text-decoration: none;
         display: inline-block;
+        min-width: 110px;
+        text-align: center;
+        justify-content: center;
       }
       .dark .nav-box {
         color: #d1d5db;
@@ -146,18 +149,81 @@
       }
 
       /* Language Switcher */
-      .lang-switcher button {
-        background: linear-gradient(to right, #2563eb, #0d9488);
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
+      .lang-switch-wrapper {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.6);
+        padding: 4px 8px;
+        border-radius: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(4px);
+      }
+      .dark .lang-switch-wrapper {
+        background: rgba(30, 41, 59, 0.6);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      .lang-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+        user-select: none;
+      }
+      .dark .lang-label {
+        color: #94a3b8;
+      }
+      .lang-label.active {
+        opacity: 1;
+        color: #2563eb;
+      }
+      .dark .lang-label.active {
+        color: #60a5fa;
+      }
+      .toggle-switch {
+        position: relative;
+        width: 36px;
+        height: 20px;
+        display: inline-block;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e1;
+        transition: 0.4s;
+        border-radius: 20px;
+      }
+      .dark .toggle-slider {
+        background-color: #475569;
+      }
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .toggle-switch input:checked + .toggle-slider {
+        background-color: #2563eb;
+      }
+      .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(16px);
       }
 
       .lang-en {
@@ -313,126 +379,147 @@
     class="bg-blue-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col"
   >
     <nav id="navbar" class="navbar">
-      <div
-        class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between"
-      >
-        <div class="flex items-center gap-3 nav-logo shrink-0">
-          <img
-            src="assets/logo.png"
-            alt="IMD Logo"
-            class="h-8 w-8 object-contain dark:invert hidden sm:block"
-          />
-          <div class="text-3xl text-blue-600 dark:text-blue-400">
-            <i class="fa-solid fa-cloud-bolt"></i>
-          </div>
-          <div>
-            <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">
-              बिहार मानसून डैशबोर्ड
-            </h1>
-            <h1 class="text-xl font-bold leading-tight gradient-text lang-en">
-              Bihar Monsoon Dashboard
-            </h1>
-            <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">
-              IMD MC Patna — तीव्रता विश्लेषण
+      <div class="max-w-7xl mx-auto px-4 py-2 flex flex-col gap-2">
+        <div class="flex flex-wrap items-center justify-between w-full gap-4">
+          <div class="flex items-center gap-3 nav-logo shrink-0">
+            <img
+              src="assets/logo.png"
+              alt="IMD Logo"
+              class="h-8 w-8 object-contain dark:invert hidden sm:block"
+            />
+            <div class="text-3xl text-blue-600 dark:text-blue-400">
+              <i class="fa-solid fa-cloud-bolt"></i>
             </div>
-            <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">
-              IMD MC Patna — Intensity Analysis
+            <div>
+              <h1 class="text-xl font-bold leading-tight gradient-text lang-hi">
+                बिहार मानसून डैशबोर्ड
+              </h1>
+              <h1 class="text-xl font-bold leading-tight gradient-text lang-en">
+                Bihar Monsoon Dashboard
+              </h1>
+              <div class="text-xs text-gray-500 dark:text-gray-400 lang-hi">
+                IMD MC Patna — तीव्रता विश्लेषण
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-400 lang-en">
+                IMD MC Patna — Intensity Analysis
+              </div>
             </div>
           </div>
-        </div>
 
-        <div
-          class="flex nav-links-container text-sm font-semibold mx-4 lg:mx-0 py-2 lg:py-0"
-        >
-          <a href="index.html" class="nav-box lang-hi" onclick="setActive(this)"
-            >होम</a
-          >
-          <a href="index.html" class="nav-box lang-en" onclick="setActive(this)"
-            >Home</a
-          >
-          <a
-            href="index.html#analysis"
-            class="nav-box lang-hi"
-            onclick="setActive(this)"
-            >डैशबोर्ड</a
-          >
-          <a
-            href="index.html#analysis"
-            class="nav-box lang-en"
-            onclick="setActive(this)"
-            >Dashboard</a
-          >
-          <a
-            href="district.html"
-            class="nav-box lang-hi"
-            onclick="setActive(this)"
-            >जिलावार</a
-          >
-          <a
-            href="district.html"
-            class="nav-box lang-en"
-            onclick="setActive(this)"
-            >District-wise</a
-          >
-          <a
-            href="intensity.html"
-            class="nav-box active-nav lang-hi"
-            onclick="setActive(this)"
-            >तीव्रता</a
-          >
-          <a
-            href="intensity.html"
-            class="nav-box active-nav lang-en"
-            onclick="setActive(this)"
-            >Intensity</a
-          >
-          <a href="maps.html" class="nav-box lang-hi" onclick="setActive(this)"
-            >मानचित्र</a
-          >
-          <a href="maps.html" class="nav-box lang-en" onclick="setActive(this)"
-            >Maps</a
-          >
-          <a
-            href="history.html"
-            class="nav-box lang-hi"
-            onclick="setActive(this)"
-            >ऐतिहासिक</a
-          >
-          <a
-            href="history.html"
-            class="nav-box lang-en"
-            onclick="setActive(this)"
-            >Historical</a
-          >
-          <a
-            href="comparison.html"
-            class="nav-box lang-hi"
-            onclick="setActive(this)"
-            >तुलना</a
-          >
-          <a
-            href="comparison.html"
-            class="nav-box lang-en"
-            onclick="setActive(this)"
-            >Comparison</a
-          >
-        </div>
-
-        <div class="flex items-center gap-4 shrink-0">
-          <div class="lang-switcher">
-            <button id="langSwitchBtn" onclick="toggleLanguage()">
-              <i class="fas fa-language"></i>
-              <span class="lang-hi">English</span>
-              <span class="lang-en">हिन्दी</span>
+          <div class="flex items-center gap-4 shrink-0">
+            <div class="lang-switch-wrapper">
+              <span
+                class="lang-label active"
+                id="lblHi"
+                onclick="
+                  document.getElementById('langToggle').checked = false;
+                  toggleLanguage();
+                "
+                >HI</span
+              >
+              <label class="toggle-switch">
+                <input
+                  type="checkbox"
+                  id="langToggle"
+                  onchange="toggleLanguage()"
+                />
+                <span class="toggle-slider"></span>
+              </label>
+              <span
+                class="lang-label"
+                id="lblEn"
+                onclick="
+                  document.getElementById('langToggle').checked = true;
+                  toggleLanguage();
+                "
+                >EN</span
+              >
+            </div>
+            <button
+              onclick="toggleDarkMode()"
+              class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            >
+              <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
+              <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
             </button>
           </div>
-          <button
-            onclick="toggleDarkMode()"
-            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-          >
-            <i class="fa-solid fa-moon dark:hidden text-gray-600"></i>
-            <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
-          </button>
+        </div>
+
+        <div class="flex justify-center w-full overflow-x-auto pb-1">
+          <div class="flex nav-links-container text-sm font-semibold gap-4">
+            <a
+              href="index.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >होम</a
+            >
+            <a
+              href="index.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >Home</a
+            >
+            <a
+              href="district.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >जिलावार</a
+            >
+            <a
+              href="district.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >District-wise</a
+            >
+            <a
+              href="intensity.html"
+              class="nav-box active-nav lang-hi"
+              onclick="setActive(this)"
+              >तीव्रता</a
+            >
+            <a
+              href="intensity.html"
+              class="nav-box active-nav lang-en"
+              onclick="setActive(this)"
+              >Intensity</a
+            >
+            <a
+              href="maps.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >मानचित्र</a
+            >
+            <a
+              href="maps.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >Maps</a
+            >
+            <a
+              href="history.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >ऐतिहासिक</a
+            >
+            <a
+              href="history.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >Historical</a
+            >
+            <a
+              href="comparison.html"
+              class="nav-box lang-hi"
+              onclick="setActive(this)"
+              >तुलना</a
+            >
+            <a
+              href="comparison.html"
+              class="nav-box lang-en"
+              onclick="setActive(this)"
+              >Comparison</a
+            >
+          </div>
         </div>
       </div>
     </nav>
@@ -480,7 +567,7 @@
                 class="bg-white dark:bg-gray-800 border-none rounded-md px-2 py-1 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer"
               >
                 <option value="block">Block Wise (Raw)</option>
-                <option value="district_top_block">District (Top Block)</option>
+                <option value="district_top_block">District</option>
                 <option value="district" selected>District Wise (Avg)</option>
               </select>
             </div>
@@ -991,16 +1078,25 @@
         document.body.classList.add("hindi");
         generateCheckboxes();
         generateMonthCheckboxes();
+        const toggle = document.getElementById("langToggle");
+        if (toggle) toggle.checked = false;
         loadData();
       });
 
       function toggleLanguage() {
-        document.body.classList.toggle("english");
-        currentLanguage = document.body.classList.contains("english")
-          ? "en"
-          : "hi";
-        document.getElementById("langSwitchBtn").innerHTML =
-          `<i class="fas fa-language"></i> ${currentLanguage === "en" ? "हिन्दी" : "English"}`;
+        const toggle = document.getElementById("langToggle");
+        const isEnglish = toggle.checked;
+        currentLanguage = isEnglish ? "en" : "hi";
+
+        if (isEnglish) {
+          document.body.classList.add("english");
+          document.getElementById("lblEn").classList.add("active");
+          document.getElementById("lblHi").classList.remove("active");
+        } else {
+          document.body.classList.remove("english");
+          document.getElementById("lblHi").classList.add("active");
+          document.getElementById("lblEn").classList.remove("active");
+        }
 
         const searchInput = document.getElementById("tableSearchInput");
         if (searchInput)
