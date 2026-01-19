@@ -2,5 +2,6 @@
   // ... आपकी अन्य सेटिंग्स ...
 
   "css.lint.unknownAtRules": "ignore",
-  "liveServer.settings.port": 5502
+  "liveServer.settings.port": 5502,
+  "livePreview.defaultPreviewPath": "/intensity.html"
 }

@@ -71,11 +71,11 @@
       }
 
       body {
-        padding-top: 180px !important;
+        padding-top: 160px !important;
       }
       @media (max-width: 1023px) {
         body {
-          padding-top: 220px !important;
+          padding-top: 200px !important;
         }
       }
 
@@ -1039,6 +1039,24 @@
               >Week-wise Intensity Heatmap</span
             >
           </h3>
+
+          <!-- Expanded View Checkbox -->
+          <div class="flex items-center gap-2 mr-4">
+            <input
+              type="checkbox"
+              id="expandHeatmapCheckbox"
+              onchange="toggleHeatmapLayout(this.checked)"
+              class="intensity-checkbox w-5 h-5 cursor-pointer"
+            />
+            <label
+              for="expandHeatmapCheckbox"
+              class="text-sm font-bold text-gray-700 dark:text-gray-300 cursor-pointer select-none"
+            >
+              <span class="lang-hi">विस्तारित दृश्य (Expanded View)</span>
+              <span class="lang-en">Expanded View</span>
+            </label>
+          </div>
+
           <!-- Toolbar -->
           <div class="plotly-toolbar">
             <button
@@ -1057,8 +1075,16 @@
             </button>
           </div>
         </div>
-        <div class="chart-container">
-          <div id="heatmapChart" class="w-full h-[800px]"></div>
+        <div
+          class="chart-container"
+          id="heatmapContainer"
+          style="
+            max-height: 800px;
+            overflow-y: auto;
+            transition: max-height 0.3s ease;
+          "
+        >
+          <div id="heatmapChart" class="w-full"></div>
         </div>
         <div id="loadingMessage" class="hidden text-center py-10 text-gray-500">
           <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
@@ -1151,7 +1177,7 @@
             />
           </div>
         </div>
-        <div class="overflow-x-auto max-h-[500px]">
+        <div class="overflow-x-auto max-h-[800px]">
           <table
             class="w-full text-sm text-left text-gray-600 dark:text-gray-300"
           >
@@ -1403,6 +1429,7 @@
         generateMonthCheckboxes();
         const toggle = document.getElementById("langToggle");
         if (toggle) toggle.checked = false;
+        updateLevelDropdown();
         loadData();
 
         const savedSimple = localStorage.getItem("simpleBackground") === "true";
@@ -1435,7 +1462,18 @@
         generateCheckboxes();
         generateMonthCheckboxes();
         updateDropdownButtonText();
+        updateLevelDropdown();
         updateMonthDropdownText();
+        processAndRender();
+      }
+
+      function toggleHeatmapLayout(isExpanded) {
+        const container = document.getElementById("heatmapContainer");
+        if (isExpanded) {
+          container.style.maxHeight = "none";
+        } else {
+          container.style.maxHeight = "800px";
+        }
         processAndRender();
       }
 
@@ -1461,6 +1499,28 @@
       function toggleDarkMode() {
         document.documentElement.classList.toggle("dark");
         processAndRender();
+      }
+
+      function updateLevelDropdown() {
+        const select = document.getElementById("viewLevelSelect");
+        if (!select) return;
+        const options = select.options;
+
+        const translations = {
+          block: { en: "Block Wise (Raw)", hi: "ब्लॉक वार (Raw)" },
+          district_top_block: { en: "District", hi: "जिला" },
+          district: { en: "District Wise (Avg)", hi: "जिला वार (औसत)" },
+        };
+
+        for (let i = 0; i < options.length; i++) {
+          const val = options[i].value;
+          if (translations[val]) {
+            options[i].text =
+              currentLanguage === "en"
+                ? translations[val].en
+                : translations[val].hi;
+          }
+        }
       }
 
       function setActive(el) {
@@ -2185,10 +2245,19 @@
           );
         }
 
+        // Calculate dynamic height based on number of rows (yLabels)
+        const rowHeight = 25;
+        const minHeight = 600;
+        const dynamicHeight = Math.max(
+          minHeight,
+          yLabels.length * rowHeight + 150,
+        );
+
         const zData = yLabels.map((y) =>
           weeksLabels.map((w) => mapData[y][w] || 0),
         );
         const isDark = document.documentElement.classList.contains("dark");
+        const fontColor = isDark ? "#cbd5e1" : "#334155";
 
         const trace = {
           z: zData,
@@ -2196,13 +2265,16 @@
           y: yLabels,
           type: "heatmap",
           colorscale: [
-            [0.0, RAINFALL_COLORS_HEX["NO RAIN"]], // White (Low)
-            [0.2, RAINFALL_COLORS_HEX["LARGE DEFICIENT"]], // Yellow
-            [0.4, RAINFALL_COLORS_HEX["DEFICIENT"]], // Red
-            [0.6, RAINFALL_COLORS_HEX["NORMAL"]], // Green
-            [0.8, RAINFALL_COLORS_HEX["EXCESS"]], // Light Blue
-            [1.0, RAINFALL_COLORS_HEX["LARGE EXCESS"]], // Dark Blue (High)
+            [0.0, RAINFALL_COLORS_HEX["NO RAIN"]],
+            [0.2, RAINFALL_COLORS_HEX["LARGE DEFICIENT"]],
+            [0.4, RAINFALL_COLORS_HEX["DEFICIENT"]],
+            [0.6, RAINFALL_COLORS_HEX["NORMAL"]],
+            [0.8, RAINFALL_COLORS_HEX["EXCESS"]],
+            [1.0, RAINFALL_COLORS_HEX["LARGE EXCESS"]],
           ],
+          zmin: 0,
+          zmax: 7,
+          showscale: true,
           colorbar: {
             title: currentLanguage === "en" ? "Count" : "संख्या",
             titleside: "right",
@@ -2213,19 +2285,23 @@
               : "<b>%{y}</b><br>%{x}<br>संख्या: %{z}<extra></extra>",
         };
 
-        Plotly.newPlot(
-          "heatmapChart",
-          [trace],
-          {
-            paper_bgcolor: "rgba(0,0,0,0)",
-            plot_bgcolor: "rgba(0,0,0,0)",
-            font: { family: "Poppins", color: isDark ? "#cbd5e1" : "#334155" },
-            margin: { t: 30, b: 80, l: 120, r: 20 },
-            xaxis: { side: "top" },
-            yaxis: { automargin: true },
+        const layout = {
+          height: dynamicHeight,
+          paper_bgcolor: "rgba(0,0,0,0)",
+          plot_bgcolor: "rgba(0,0,0,0)",
+          font: { family: "Poppins", color: fontColor },
+          margin: { t: 80, b: 80, l: 120, r: 20 },
+          xaxis: {
+            side: "top",
+            tickangle: -45,
           },
-          { responsive: true, displayModeBar: false },
-        );
+          yaxis: { automargin: true },
+        };
+
+        Plotly.newPlot("heatmapChart", [trace], layout, {
+          responsive: true,
+          displayModeBar: false,
+        });
       }
 
       function renderBarChart(data, viewLevel) {
@@ -2264,20 +2340,49 @@
       }
 
       function renderTable(data, viewLevel) {
-        const counts = {};
+        const groupedStats = {};
+
         data.forEach((d) => {
           const key =
             viewLevel === "district" ? d.district : `${d.district}|${d.block}`;
-          counts[key] = (counts[key] || 0) + 1;
+
+          if (!groupedStats[key]) {
+            groupedStats[key] = {
+              count: 0,
+              heavy: 0,
+              veryHeavy: 0,
+              extHeavy: 0,
+              maxRain: 0,
+            };
+          }
+
+          const stats = groupedStats[key];
+          stats.count++;
+
+          // Categories thresholds
+          // Heavy: 64.5 - 124.4
+          // Very Heavy: 124.5 - 244.4
+          // Ext Heavy: >= 244.5
+
+          if (d.value >= 64.5 && d.value <= 124.4) stats.heavy++;
+          if (d.value >= 124.5 && d.value <= 244.4) stats.veryHeavy++;
+          if (d.value >= 244.5) stats.extHeavy++;
+
+          if (d.value > stats.maxRain) stats.maxRain = d.value;
         });
 
-        tableData = Object.keys(counts).map((k) => {
+        tableData = Object.keys(groupedStats).map((k) => {
           const [d, b] = k.split("|");
+          const stats = groupedStats[k];
           return {
             district: d,
             block:
               b || (currentLanguage === "en" ? "District Avg" : "जिला औसत"),
-            count: counts[k],
+            count: stats.count,
+            heavy: stats.heavy,
+            veryHeavy: stats.veryHeavy,
+            extHeavy: stats.extHeavy,
+            maxRain: stats.maxRain,
           };
         });
         renderTableUI();
@@ -2285,7 +2390,74 @@
 
       function renderTableUI() {
         const tbody = document.getElementById("dataTableBody");
+        const thead =
+          document.querySelector("#dataTableBody").previousElementSibling;
         tbody.innerHTML = "";
+
+        const viewLevel = document.getElementById("viewLevelSelect").value;
+        const isDistrictLevel = viewLevel === "district";
+
+        // Update Header
+        let headerHTML = `
+              <tr>
+                <th class="px-6 py-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('district')">
+                  <div class="flex items-center">
+                    <span class="lang-hi">जिला</span>
+                    <span class="lang-en">District</span>
+                    <i id="sort-icon-district" class="fa-solid fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th class="px-6 py-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('block')">
+                  <div class="flex items-center">
+                    <span class="lang-hi">ब्लॉक / स्तर</span>
+                    <span class="lang-en">Block / Level</span>
+                    <i id="sort-icon-block" class="fa-solid fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('count')">
+                  <div class="flex items-center justify-end">
+                    <span class="lang-hi">कुल वर्षा दिवस</span>
+                    <span class="lang-en">Total Rainy Days</span>
+                    <i id="sort-icon-count" class="fa-solid fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+        `;
+
+        if (isDistrictLevel) {
+          headerHTML += `
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('heavy')">
+                  <div class="flex items-center justify-end">
+                    <span class="lang-hi">भारी वर्षा</span>
+                    <span class="lang-en">Heavy Rain</span>
+                    <i id="sort-icon-heavy" class="fa-solid fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('veryHeavy')">
+                  <div class="flex items-center justify-end">
+                    <span class="lang-hi">बहुत भारी</span>
+                    <span class="lang-en">Very Heavy</span>
+                    <i id="sort-icon-veryHeavy" class="fa-solid fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('extHeavy')">
+                  <div class="flex items-center justify-end">
+                    <span class="lang-hi">अत्यधिक भारी</span>
+                    <span class="lang-en">Ext. Heavy</span>
+                    <i id="sort-icon-extHeavy" class="fa-solid fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+                <th class="px-6 py-3 text-right cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="sortTable('maxRain')">
+                  <div class="flex items-center justify-end">
+                    <span class="lang-hi">अधिकतम वर्षा (मिमी)</span>
+                    <span class="lang-en">Max RF (mm)</span>
+                    <i id="sort-icon-maxRain" class="fa-solid fa-sort ml-1 text-gray-400"></i>
+                  </div>
+                </th>
+            `;
+        }
+        headerHTML += `</tr>`;
+        thead.innerHTML = headerHTML;
+
         const search = document
           .getElementById("tableSearchInput")
           .value.toLowerCase();
@@ -2306,7 +2478,8 @@
         });
 
         if (display.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-4 text-center">No Data</td></tr>`;
+          const colSpan = isDistrictLevel ? 7 : 3;
+          tbody.innerHTML = `<tr><td colspan="${colSpan}" class="px-6 py-4 text-center">No Data</td></tr>`;
           return;
         }
 
@@ -2314,11 +2487,23 @@
           const tr = document.createElement("tr");
           tr.className =
             "bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700";
-          tr.innerHTML = `
+
+          let rowHTML = `
                 <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${d.district}</td>
                 <td class="px-6 py-4 text-gray-600 dark:text-gray-300">${d.block}</td>
                 <td class="px-6 py-4 text-right font-bold text-blue-600 dark:text-blue-400">${d.count}</td>
             `;
+
+          if (isDistrictLevel) {
+            rowHTML += `
+                <td class="px-6 py-4 text-right font-bold text-orange-500">${d.heavy}</td>
+                <td class="px-6 py-4 text-right font-bold text-red-500">${d.veryHeavy}</td>
+                <td class="px-6 py-4 text-right font-bold text-red-700">${d.extHeavy}</td>
+                <td class="px-6 py-4 text-right font-bold text-gray-800 dark:text-gray-200">${d.maxRain.toFixed(1)}</td>
+              `;
+          }
+
+          tr.innerHTML = rowHTML;
           tbody.appendChild(tr);
         });
         updateSortIcons();
@@ -2336,7 +2521,15 @@
       }
 
       function updateSortIcons() {
-        ["district", "block", "count"].forEach((col) => {
+        [
+          "district",
+          "block",
+          "count",
+          "heavy",
+          "veryHeavy",
+          "extHeavy",
+          "maxRain",
+        ].forEach((col) => {
           const icon = document.getElementById(`sort-icon-${col}`);
           if (icon) {
             icon.className = "fa-solid fa-sort ml-1 text-gray-400";
